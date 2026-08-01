@@ -27,8 +27,8 @@ A business organization the Agency serves under contract. Owns one or more Locat
 _Avoid_: Customer (ambiguous with Agency as buyer), account, company (too vague)
 
 **Client User**:
-A human who signs into the **Client Portal** with access limited to one Client (and its Locations). Not Agency staff.
-_Avoid_: Customer login, guest (Clerk guest ≠ portal role)
+A human who signs into the **Client Portal** with access limited to granted Client(s)/Locations via **Convex ACL**, not via membership in the Agency’s Clerk Organization (ADR-0026). Not Agency staff.
+_Avoid_: Customer login, guest (Clerk guest ≠ portal role), org member (Agency staff)
 
 **Client Portal**:
 The authenticated Mission Control Surface for Client Users—progress graphs, shared audit outcomes, and related read-mostly views. Part of MVP (ADR-0025).
