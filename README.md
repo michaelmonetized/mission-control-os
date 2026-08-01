@@ -31,5 +31,6 @@ Implementation starts only after shared understanding is confirmed in the grill-
 | Agent | User-level OS service (not Electron sidecar) |
 | Repos | Separate repos per surface/component + public relations repo (ADR-0017) |
 | Contracts | Dedicated protocol repo, semver packages (ADR-0018) |
+| Client portal | Authenticated Client Users; metrics graphs (ADR-0025) |
 
 See `docs/adr/` for full records.
