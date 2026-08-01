@@ -11,8 +11,8 @@ _Avoid_: Agency OS (repo codename only), BreezyApp (different product)
 ### Tenancy
 
 **Agency**:
-The paying customer of this SaaS—a marketing/SEO firm that serves multiple businesses. The top multi-tenant boundary.
-_Avoid_: Tenant (implementation), account (ambiguous), shop
+The paying customer of this SaaS—a marketing/SEO firm that serves multiple businesses. The top multi-tenant boundary. Implemented as a **Clerk Organization** (ADR-0015).
+_Avoid_: Tenant (implementation), account (ambiguous), shop, Clerk user (that's User)
 
 **Client**:
 A business organization the Agency serves under contract. Owns one or more Locations. Not the SaaS buyer.
