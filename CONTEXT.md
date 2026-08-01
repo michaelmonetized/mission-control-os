@@ -51,8 +51,8 @@ _Avoid_: WAVE (vendor), a11y audit (unless meaning a packaged report)
 ### Execution
 
 **Agent**:
-A long-running **OS service/daemon** installed by an Agency that executes Crawls on Sites. It registers with launchd/systemd/Windows Service (or equivalent), connects to the SaaS Control Plane, pulls job instructions, fetches pages from its own network, and streams results. Surfaces talk to it via local IPC and/or the Control Plane—not as a child of Desktop. Not a human User.
-_Avoid_: Worker (implementation), bot (ambiguous with search bots), crawler app (vague), sidecar (rejected model)
+A long-running **user-level OS service/daemon** installed by an Agency operator that executes Crawls on Sites (LaunchAgent / systemd user unit / per-user Windows service). Connects to the SaaS Control Plane, pulls job instructions, fetches pages from its own network, and streams results. Surfaces talk to it via local IPC and/or the Control Plane—not as a child of Desktop. Not a human User.
+_Avoid_: Worker (implementation), bot (ambiguous with search bots), crawler app (vague), sidecar (rejected model), system/root service (not default)
 
 **Control Plane**:
 The multi-tenant cloud SaaS that owns tenancy, auth, Crawl Run orchestration, stored results, and real-time sync. It does not fetch target Site HTML in v1. Always remote—not a self-hosted local server product. Web/API on **TanStack Start + Clerk + Convex** (ADR-0010); Surfaces attach as native/TUI/web clients.
