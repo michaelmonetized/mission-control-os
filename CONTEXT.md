@@ -49,8 +49,8 @@ One execution of a Crawl against a Site at a point in time, with config snapshot
 _Avoid_: Job (implementation), session
 
 **Audit Finding**:
-A discrete issue or observation produced by a Crawl Run or related checker (e.g. broken link, missing alt, duplicate cluster). Severity and type are attributes of the finding.
-_Avoid_: Issue (overloaded with bug trackers), error, alert
+A discrete issue or observation produced by a Crawl Run or related checker (e.g. broken link, missing alt, duplicate cluster). Severity, type, and **status** are attributes of the finding. Streamed to Convex live; status is a simple field (Open → Triaged → In progress → Done / Won’t fix / False positive)—not a separate workflow system.
+_Avoid_: Issue (overloaded with bug trackers), error, alert, ticket (unless integrated later)
 
 **Duplicate Cluster**:
 A set of pages on a Site judged to share substantially similar content for SEO purposes.
