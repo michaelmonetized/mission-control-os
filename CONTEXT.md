@@ -12,6 +12,10 @@ _Avoid_: Agency OS (repo codename only), BreezyApp (different product)
 The separate repository for marketing, launch, press, and public-facing content about Mission Control—not application runtime code.
 _Avoid_: Docs-only product repo (ADRs live with design/meta), Control Plane
 
+**Protocol repo**:
+The repository that publishes versioned shared contracts (API schemas, Agent wire format, DTOs) for all Mission Control Surfaces and the Agent. Not a Surface.
+_Avoid_: SDK (may be generated from protocol), Control Plane repo
+
 ### Tenancy
 
 **Agency**:
