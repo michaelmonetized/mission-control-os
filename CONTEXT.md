@@ -113,3 +113,11 @@ _Avoid_: Result (Convex-facing outcomes), asset (UI static files), archive (not 
 **Ignore Robots**:
 An explicit, audited Crawl Run/Site setting that allows the Agent to disregard robots.txt/meta robots restrictions. Default is off (robots respected).
 _Avoid_: Stealth mode, unblock (vague)
+
+**Rendered Crawl**:
+A Crawl Run mode that executes page JavaScript (headless browser) before extracting signals. **Default** mode for Mission Control crawls.
+_Avoid_: Browser crawl (vague), SPA mode
+
+**HTTP-only Crawl**:
+A Crawl Run mode that fetches response bodies without executing JavaScript. Opt-in for speed or special cases; not the default.
+_Avoid_: Quick scan (marketing-only name unless productized)
