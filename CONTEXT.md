@@ -1,8 +1,12 @@
-# Agency OS
+# Mission Control
 
-Multi-tenant operating system for digital marketing and local SEO agencies: delivery tooling, acquisition tracking, CRM, and client-facing reporting in one product.
+Multi-tenant operating system for digital marketing and local SEO agencies (**Mission Control**): delivery tooling, acquisition tracking, CRM, and client-facing reporting in one product. Repo codename may remain `agency-os`.
 
 ## Language
+
+**Mission Control**:
+The product—the multi-surface Control Plane, Local Agent, and Audit tooling for agencies. User-facing name.
+_Avoid_: Agency OS (repo codename only), BreezyApp (different product)
 
 ### Tenancy
 

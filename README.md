@@ -1,41 +1,33 @@
-# Agency OS
+# Mission Control
 
 Local SEO / digital marketing **agency operating system**.
 
-Working name — final product name TBD during design grilling.
+**Product name:** Mission Control  
+**Repo codename:** `agency-os`
 
 ## Intent
 
-A single workspace that covers agency delivery + client-facing reporting, combining capabilities inspired by:
-
-| Inspiration | Capability area |
-|-------------|-----------------|
-| Screaming Frog | Site crawl / technical SEO audit |
-| Siteliner | Duplicate / thin content detection |
-| WebAIM | Accessibility checks |
-| Buffer | Social scheduling |
-| HubSpot | CRM + marketing ops |
-| GoHighLevel | Agency multi-client ops / portals |
-| *(net-new)* | Citation acquisition tracker |
-| *(net-new)* | Link-building acquisition tracker |
-| *(net-new)* | Client portal with cached PostHog / GA report data |
+A single multi-surface workspace (Web, Desktop, TUI, Mobile) plus a user-level Local Agent daemon for technical audits that aim to surpass Screaming Frog / Sitebulb for agency workflows—with a roadmap toward citations, links, CRM, and client portals.
 
 ## Status
 
-**Design / alignment phase.** See grilling notes and domain docs as they land:
+**Design / alignment phase.** Domain language and ADRs:
 
 - `CONTEXT.md` — ubiquitous language (glossary only)
 - `docs/adr/` — architecture decision records
+- `docs/research/` — research notes
 
-Implementation starts only after shared understanding is confirmed.
+Implementation starts only after shared understanding is confirmed in the grill-with-docs session.
 
-## Repo layout (emerging)
+## Locked decisions (summary)
 
-```
-/
-├── CONTEXT.md          # domain glossary (lazy)
-├── docs/
-│   ├── adr/            # ADRs (lazy)
-│   └── agents/         # agent skill config (lazy)
-└── README.md
-```
+| Topic | Decision |
+|-------|----------|
+| Tenancy | Multi-tenant SaaS; Agency → Client → Location |
+| MVP wedge | Technical audit suite (full SF + Sitebulb-class + agency ops bar) |
+| Crawl execution | Local Agent only (no cloud fetch fleet) |
+| Surfaces | Web, Desktop, TUI, Mobile — equal; full Audit Loop on each |
+| Stack | TanStack Start + Clerk + Convex + Resend; Electron+Effect Desktop; Swift iOS; Kotlin Android; Rust TUI+Agent |
+| Agent | User-level OS service (not Electron sidecar) |
+
+See `docs/adr/` for full records.
