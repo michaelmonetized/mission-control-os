@@ -55,5 +55,17 @@ A long-running process installed by an Agency that executes Crawls on Sites. It 
 _Avoid_: Worker (implementation), bot (ambiguous with search bots), crawler app (vague)
 
 **Control Plane**:
-The multi-tenant SaaS (web/API/mobile) that owns tenancy, auth, Crawl Run orchestration, stored results, and client-facing surfaces. It does not fetch target Site HTML in v1.
-_Avoid_: Backend (vague), server
+The multi-tenant cloud SaaS that owns tenancy, auth, Crawl Run orchestration, stored results, and real-time sync. It does not fetch target Site HTML in v1. Always remote—not a self-hosted local server product.
+_Avoid_: Backend (vague), server, on-prem OS
+
+**Surface**:
+A first-class human interface to the Control Plane: Web, Desktop, TUI, or Mobile. Surfaces share live state over the sync fabric; none is a second-class “viewer only” forever, though only Desktop hosts the full Agent install path in v1.
+_Avoid_: Client (means Client org), app (vague), frontend
+
+**Sync Fabric**:
+The real-time connection layer (WebSocket or equivalent) that keeps Surfaces and Agents aligned: jobs, progress, findings, presence, and commands. Bidirectional up and down the toolchain.
+_Avoid_: Websocket (transport-only name), realtime API (vague)
+
+**Desktop**:
+The Surface that installs and manages the Local Agent and background crawl tooling on a machine, and provides a full operator UI. The bridge between human workflow and Agent execution.
+_Avoid_: Electron app (implementation), local server
