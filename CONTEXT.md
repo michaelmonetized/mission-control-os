@@ -77,3 +77,7 @@ _Avoid_: CLI-only scripts (one-shot), SSH admin console
 **Mobile**:
 The phone/tablet Surface for on-the-go monitor, triage, and light actions over the Sync Fabric. Does not host the Local Agent.
 _Avoid_: Responsive web only (Mobile is a first-class Surface, even if implementation shares code)
+
+**Audit Loop**:
+The core operator journey: choose Location/Site → start Crawl Run → watch progress → review Audit Findings → open page detail. MVP requires this loop on every Surface.
+_Avoid_: Scan workflow, crawl session (use Crawl Run)
