@@ -67,8 +67,8 @@ The real-time connection layer (WebSocket or equivalent) that keeps Surfaces and
 _Avoid_: Websocket (transport-only name), realtime API (vague)
 
 **Desktop**:
-The Surface that installs and manages the Local Agent and background crawl tooling on a machine, and provides a full operator UI. The bridge between human workflow and Agent execution.
-_Avoid_: Electron app (implementation), local server
+The Surface that installs and manages the Local Agent and background crawl tooling on a machine, and provides a full operator UI. The bridge between human workflow and Agent execution. Implemented as a cross-platform **Electron** app with **Effect** for orchestration (ADR-0011); bundles/supervises the Rust Agent.
+_Avoid_: Local server, Swift desktop (superseded)
 
 **TUI**:
 The terminal Surface for operators who live in the shell—same Control Plane and Sync Fabric as Web/Desktop/Mobile, not a separate offline tool.

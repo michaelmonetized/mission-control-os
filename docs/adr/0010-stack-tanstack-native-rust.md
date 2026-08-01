@@ -10,7 +10,8 @@ Supersedes ADR-0009 (Lakebed as Control Plane runtime).
 | **Auth** | **Clerk** (Users, multi-tenant Agency org model via Clerk Organizations or app-level orgs) |
 | **App data + realtime** | **Convex** (reactive queries/mutations; primary store for tenancy, Crawl Run metadata, findings workflow) |
 | **Transactional email** | **Resend** |
-| **iOS + macOS Desktop Surface** | **Swift** (native; macOS hosts/installs Local Agent tooling) |
+| **Desktop Surface** | **Electron + Effect** (cross-platform; see [ADR-0011](./0011-desktop-electron-effect.md)) — *originally Swift macOS; superseded* |
+| **iOS Surface** | **Swift** |
 | **Android Surface** | **Kotlin** |
 | **TUI + Local Agent / background crawl tools** | **Rust** |
 
@@ -27,12 +28,12 @@ Sync Fabric is implemented across these clients (WebSocket or Convex subscriptio
 ## Considered
 
 - **Lakebed capsule** as entire Control Plane (ADR-0009) — rejected for platform limits vs product bar (ADR-0008).
-- **Electron/Tauri Desktop** — rejected in favor of native Swift macOS (and implied Windows strategy TBD).
-- **TypeScript Agent** — rejected in favor of Rust for background tools/TUI.
+- **Native Swift Desktop** — superseded by Electron + Effect ([ADR-0011](./0011-desktop-electron-effect.md)) for cross-platform Desktop.
+- **TypeScript Agent** — rejected in favor of Rust for background tools/TUI (Electron shell may orchestrate; crawl stays Rust).
 
 ## Consequences
 
 - Polyglot monorepo (or multi-repo) and shared protocol/schema contracts are load-bearing (OpenAPI/JSON schema/protobuf — choose later).
 - Convex holds operational app state; raw crawl payloads may still need object storage (R2/S3) + Rust-side local cache.
-- Windows Desktop Surface not specified—must decide if Swift-only macOS first or add a Windows Agent path.
+- Desktop = Electron multi-arch builds; Agent = Rust multi-arch sidecars ([ADR-0011](./0011-desktop-electron-effect.md)).
 - Resend covers email only; SMS/other channels deferred.
