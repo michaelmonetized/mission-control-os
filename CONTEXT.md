@@ -107,5 +107,5 @@ The set of URLs discovered and/or fetched in a Crawl Run, with technical attribu
 _Avoid_: Sitemap (XML artifact), URL list
 
 **Artifact**:
-Raw crawl material retained on the Agent machine (e.g. HTML bodies, intermediate extracts). Not uploaded to Convex by default; may be pruned by local retention policy.
-_Avoid_: Result (Convex-facing outcomes), asset (UI static files)
+Raw crawl material held **ephemerally** on the Agent machine during a Crawl Run (e.g. HTML bodies, intermediate extracts). Not uploaded to Convex; **cleaned after the run** once results are streamed (ADR-0020).
+_Avoid_: Result (Convex-facing outcomes), asset (UI static files), archive (not retained)
