@@ -51,8 +51,8 @@ _Avoid_: WAVE (vendor), a11y audit (unless meaning a packaged report)
 ### Execution
 
 **Agent**:
-A long-running process installed by an Agency that executes Crawls on Sites. It connects to the SaaS control plane, pulls job instructions, fetches pages from its own network, and streams results. Not a human User.
-_Avoid_: Worker (implementation), bot (ambiguous with search bots), crawler app (vague)
+A long-running **OS service/daemon** installed by an Agency that executes Crawls on Sites. It registers with launchd/systemd/Windows Service (or equivalent), connects to the SaaS Control Plane, pulls job instructions, fetches pages from its own network, and streams results. Surfaces talk to it via local IPC and/or the Control Plane—not as a child of Desktop. Not a human User.
+_Avoid_: Worker (implementation), bot (ambiguous with search bots), crawler app (vague), sidecar (rejected model)
 
 **Control Plane**:
 The multi-tenant cloud SaaS that owns tenancy, auth, Crawl Run orchestration, stored results, and real-time sync. It does not fetch target Site HTML in v1. Always remote—not a self-hosted local server product. Web/API on **TanStack Start + Clerk + Convex** (ADR-0010); Surfaces attach as native/TUI/web clients.
@@ -67,8 +67,8 @@ The real-time connection layer (WebSocket or equivalent) that keeps Surfaces and
 _Avoid_: Websocket (transport-only name), realtime API (vague)
 
 **Desktop**:
-The Surface that installs and manages the Local Agent and background crawl tooling on a machine, and provides a full operator UI. The bridge between human workflow and Agent execution. Implemented as a cross-platform **Electron** app with **Effect** for orchestration (ADR-0011); bundles/supervises the Rust Agent.
-_Avoid_: Local server, Swift desktop (superseded)
+Cross-platform **Electron + Effect** operator Surface (ADR-0011). Provides full Audit Loop UI and can run installers/repair for the Agent **daemon** (ADR-0012); does not keep the Agent alive as a child process. Talks to a local daemon via IPC when present.
+_Avoid_: Local server, Swift desktop (superseded), Agent host process
 
 **TUI**:
 The terminal Surface for operators who live in the shell—same Control Plane and Sync Fabric as Web/Desktop/Mobile, not a separate offline tool.

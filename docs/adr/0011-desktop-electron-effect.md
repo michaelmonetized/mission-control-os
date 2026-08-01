@@ -12,7 +12,7 @@ Amends [ADR-0010](./0010-stack-tanstack-native-rust.md): **macOS Desktop is not 
 | **TUI + Local Agent / background tools** | **Rust** (unchanged) |
 | **Web / Control Plane** | TanStack Start + Clerk + Convex + Resend (unchanged) |
 
-Desktop is **one codebase**, multi-arch via CI build matrix (not separate Swift/Windows stacks). The Desktop app installs, updates, and supervises the **Rust Local Agent** (sidecar binary per platform/arch) and participates fully in the Audit Loop and Sync Fabric.
+Desktop is **one codebase**, multi-arch via CI build matrix (not separate Swift/Windows stacks). The Desktop app participates fully in the Audit Loop and Sync Fabric. The **Rust Local Agent** is an OS **daemon** (ADR-0012), not an Electron sidecar; Desktop may ship or invoke installers and use local IPC to a running daemon.
 
 ## Why
 
