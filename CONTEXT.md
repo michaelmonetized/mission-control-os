@@ -109,3 +109,7 @@ _Avoid_: Sitemap (XML artifact), URL list
 **Artifact**:
 Raw crawl material held **ephemerally** on the Agent machine during a Crawl Run (e.g. HTML bodies, intermediate extracts). Not uploaded to Convex; **cleaned after the run** once results are streamed (ADR-0020).
 _Avoid_: Result (Convex-facing outcomes), asset (UI static files), archive (not retained)
+
+**Ignore Robots**:
+An explicit, audited Crawl Run/Site setting that allows the Agent to disregard robots.txt/meta robots restrictions. Default is off (robots respected).
+_Avoid_: Stealth mode, unblock (vague)
