@@ -1,5 +1,7 @@
 # Control Plane runtime: Lakebed
 
+**Status: superseded by [ADR-0010](./0010-stack-tanstack-native-rust.md).**
+
 The Control Plane is built on **[Lakebed](https://docs.lakebed.dev/)** — an agent-native TypeScript capsule runtime (server schema/queries/mutations/endpoints + reactive client subscriptions + built-in auth + hosted deploy), not TanStack+Convex or a hand-rolled Postgres stack as the primary app platform.
 
 **Why:** Aligns with agent-driven build velocity, integrated DB + live queries + deploy, and a single capsule contract for the multi-tenant OS core.
