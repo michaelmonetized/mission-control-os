@@ -103,5 +103,9 @@ A grouped set of related Audit Findings (by type, template, or root cause) used 
 _Avoid_: Category (UI only), bucket
 
 **Page Inventory**:
-The set of URLs discovered and/or fetched in a Crawl Run, with technical attributes (status, indexability, links, content signals). The spider’s tabular truth.
+The set of URLs discovered and/or fetched in a Crawl Run, with technical attributes (status, indexability, links, content signals). The spider’s tabular truth. Stored as **results** in Convex (streamed from the Agent); not the raw HTML.
 _Avoid_: Sitemap (XML artifact), URL list
+
+**Artifact**:
+Raw crawl material retained on the Agent machine (e.g. HTML bodies, intermediate extracts). Not uploaded to Convex by default; may be pruned by local retention policy.
+_Avoid_: Result (Convex-facing outcomes), asset (UI static files)
