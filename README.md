@@ -29,5 +29,6 @@ Implementation starts only after shared understanding is confirmed in the grill-
 | Surfaces | Web, Desktop, TUI, Mobile — equal; full Audit Loop on each |
 | Stack | TanStack Start + Clerk + Convex + Resend; Electron+Effect Desktop; Swift iOS; Kotlin Android; Rust TUI+Agent |
 | Agent | User-level OS service (not Electron sidecar) |
+| Repos | Separate repos per surface/component + public relations repo (ADR-0017) |
 
 See `docs/adr/` for full records.

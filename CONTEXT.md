@@ -8,6 +8,10 @@ Multi-tenant operating system for digital marketing and local SEO agencies (**Mi
 The product—the multi-surface Control Plane, Local Agent, and Audit tooling for agencies. User-facing name.
 _Avoid_: Agency OS (repo codename only), BreezyApp (different product)
 
+**Public Relations repo**:
+The separate repository for marketing, launch, press, and public-facing content about Mission Control—not application runtime code.
+_Avoid_: Docs-only product repo (ADRs live with design/meta), Control Plane
+
 ### Tenancy
 
 **Agency**:
