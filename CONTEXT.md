@@ -81,3 +81,11 @@ _Avoid_: Responsive web only (Mobile is a first-class Surface, even if implement
 **Audit Loop**:
 The core operator journey: choose Location/Site → start Crawl Run → watch progress → review Audit Findings → open page detail. MVP requires this loop on every Surface.
 _Avoid_: Scan workflow, crawl session (use Crawl Run)
+
+**Issue Cluster**:
+A grouped set of related Audit Findings (by type, template, or root cause) used for prioritised “fix next” workflows—not a single page row.
+_Avoid_: Category (UI only), bucket
+
+**Page Inventory**:
+The set of URLs discovered and/or fetched in a Crawl Run, with technical attributes (status, indexability, links, content signals). The spider’s tabular truth.
+_Avoid_: Sitemap (XML artifact), URL list
