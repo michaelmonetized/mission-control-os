@@ -55,8 +55,12 @@ A long-running process installed by an Agency that executes Crawls on Sites. It 
 _Avoid_: Worker (implementation), bot (ambiguous with search bots), crawler app (vague)
 
 **Control Plane**:
-The multi-tenant cloud SaaS that owns tenancy, auth, Crawl Run orchestration, stored results, and real-time sync. It does not fetch target Site HTML in v1. Always remote—not a self-hosted local server product.
+The multi-tenant cloud SaaS that owns tenancy, auth, Crawl Run orchestration, stored results, and real-time sync. It does not fetch target Site HTML in v1. Always remote—not a self-hosted local server product. Implemented as a **Lakebed capsule** (or capsule-fronted system) per ADR-0009.
 _Avoid_: Backend (vague), server, on-prem OS
+
+**Capsule**:
+A Lakebed application unit: server contract, database schema, reactive queries/mutations, optional HTTP endpoints, and (for Web) a Preact client. The Control Plane’s home runtime shape.
+_Avoid_: Microservice, app package (vague)
 
 **Surface**:
 A first-class human interface to the Control Plane: Web, Desktop, TUI, or Mobile. Surfaces share live state over the sync fabric; none is a second-class “viewer only” forever, though only Desktop hosts the full Agent install path in v1.
