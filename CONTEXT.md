@@ -69,3 +69,11 @@ _Avoid_: Websocket (transport-only name), realtime API (vague)
 **Desktop**:
 The Surface that installs and manages the Local Agent and background crawl tooling on a machine, and provides a full operator UI. The bridge between human workflow and Agent execution.
 _Avoid_: Electron app (implementation), local server
+
+**TUI**:
+The terminal Surface for operators who live in the shell—same Control Plane and Sync Fabric as Web/Desktop/Mobile, not a separate offline tool.
+_Avoid_: CLI-only scripts (one-shot), SSH admin console
+
+**Mobile**:
+The phone/tablet Surface for on-the-go monitor, triage, and light actions over the Sync Fabric. Does not host the Local Agent.
+_Avoid_: Responsive web only (Mobile is a first-class Surface, even if implementation shares code)
