@@ -26,6 +26,14 @@ _Avoid_: Tenant (implementation), account (ambiguous), shop, Clerk user (that's 
 A business organization the Agency serves under contract. Owns one or more Locations. Not the SaaS buyer.
 _Avoid_: Customer (ambiguous with Agency as buyer), account, company (too vague)
 
+**Client User**:
+A human who signs into the **Client Portal** with access limited to one Client (and its Locations). Not Agency staff.
+_Avoid_: Customer login, guest (Clerk guest ≠ portal role)
+
+**Client Portal**:
+The authenticated Mission Control Surface for Client Users—progress graphs, shared audit outcomes, and related read-mostly views. Part of MVP (ADR-0025).
+_Avoid_: Marketing site, Public Relations repo
+
 **Location**:
 A physical place or market unit under a Client (storefront, service area hub, franchise unit). The primary unit for local SEO work, citations, and many site/analytics bindings.
 _Avoid_: Site (a Location may have multiple Sites), branch (retail-specific), listing
