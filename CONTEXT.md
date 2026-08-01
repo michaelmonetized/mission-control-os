@@ -47,3 +47,13 @@ _Avoid_: Duplicate group, copy set
 **Accessibility Check**:
 An evaluation of page accessibility signals (e.g. WCAG-oriented rules) for URLs in a Crawl Run or sample—not a legal compliance certification.
 _Avoid_: WAVE (vendor), a11y audit (unless meaning a packaged report)
+
+### Execution
+
+**Agent**:
+A long-running process installed by an Agency that executes Crawls on Sites. It connects to the SaaS control plane, pulls job instructions, fetches pages from its own network, and streams results. Not a human User.
+_Avoid_: Worker (implementation), bot (ambiguous with search bots), crawler app (vague)
+
+**Control Plane**:
+The multi-tenant SaaS (web/API/mobile) that owns tenancy, auth, Crawl Run orchestration, stored results, and client-facing surfaces. It does not fetch target Site HTML in v1.
+_Avoid_: Backend (vague), server
