@@ -25,3 +25,25 @@ _Avoid_: Member, seat, agent (ambiguous with SEO/automation agents)
 **Site**:
 A web property (domain or origin) associated with a Location (or occasionally Client-wide). The unit of crawl, accessibility, and technical SEO audit.
 _Avoid_: Page, property (GA jargon only), URL
+
+### Technical audit
+
+**Crawl**:
+A job that discovers and fetches URLs on a Site and extracts technical signals (status, links, canonicals, indexability, etc.).
+_Avoid_: Scan (ambiguous with security), spider (informal)
+
+**Crawl Run**:
+One execution of a Crawl against a Site at a point in time, with config snapshot and results.
+_Avoid_: Job (implementation), session
+
+**Audit Finding**:
+A discrete issue or observation produced by a Crawl Run or related checker (e.g. broken link, missing alt, duplicate cluster). Severity and type are attributes of the finding.
+_Avoid_: Issue (overloaded with bug trackers), error, alert
+
+**Duplicate Cluster**:
+A set of pages on a Site judged to share substantially similar content for SEO purposes.
+_Avoid_: Duplicate group, copy set
+
+**Accessibility Check**:
+An evaluation of page accessibility signals (e.g. WCAG-oriented rules) for URLs in a Crawl Run or sample—not a legal compliance certification.
+_Avoid_: WAVE (vendor), a11y audit (unless meaning a packaged report)
