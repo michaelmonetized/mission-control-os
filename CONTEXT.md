@@ -113,8 +113,12 @@ A coordinated marketing or SEO work effort over time, often tied to a Client/Loc
 _Avoid_: Crawl Run, Ad set (paid-only)
 
 **Connected Account**:
-An external integration identity (Google, Meta, email mailbox, analytics, etc.) linked to an Agency or Client for Connectivity.
+An external integration identity (Google, Meta, email mailbox, analytics, etc.) linked for Connectivity. May be **Agency-owned or Client-owned** (ADR-0039).
 _Avoid_: Integration (the product capability), OAuth app (platform)
+
+**Publish Failure**:
+A failed attempt to publish a Social Post (channel/API/auth error). Triggers Agency + Client notification and narrative-preserving auto-reschedule (ADR-0038).
+_Avoid_: Soft fail (silent)
 
 **Social Post**:
 A piece of content on the social calendar (copy, media, link, channel, schedule). **Approved by default**; Client Users may disapprove (with notes) or edit. Publishes unless disapproved (ADR-0037).
