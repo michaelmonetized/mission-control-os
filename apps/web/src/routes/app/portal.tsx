@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
@@ -16,6 +16,7 @@ function PortalSetupPage() {
   const clients = useQuery(api.clients.list, {});
   const isAdmin = useIsAgencyAdmin();
   const invite = useMutation(api.portal.invite);
+  const sendInviteEmail = useAction(api.notify.sendPortalInviteEmail);
   const [clientId, setClientId] = useState<string>("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"admin" | "member">("member");
@@ -36,7 +37,17 @@ function PortalSetupPage() {
         email: email.trim(),
         role,
       });
-      setStatus(`Invited ${res.email} as ${res.role}`);
+      const clientName = clients?.find((c) => c.id === selected)?.name;
+      const mail = await sendInviteEmail({
+        to: res.email,
+        clientName,
+        portalUrl: `${window.location.origin}/portal`,
+      }).catch((e) => ({ mock: true, note: String(e) }));
+      setStatus(
+        `Invited ${res.email} as ${res.role}${
+          "mock" in mail && mail.mock ? " · email mock/skipped" : " · email sent"
+        }`,
+      );
       setEmail("");
     } catch (e) {
       setStatus(e instanceof Error ? e.message : "Invite failed");

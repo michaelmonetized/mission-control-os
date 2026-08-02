@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { CockpitShell } from "@/components/layout/cockpit-shell";
+import { SetupChecklist } from "@/components/layout/setup-checklist";
 import { AgencyGate } from "@/lib/auth-guards";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -15,6 +16,7 @@ function AgencyAppLayout() {
     <AgencyGate>
       <AgencyBootstrap>
         <CockpitShell>
+          <SetupChecklist />
           <Outlet />
         </CockpitShell>
       </AgencyBootstrap>

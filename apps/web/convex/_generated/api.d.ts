@@ -22,6 +22,7 @@ import type * as hierarchy from "../hierarchy.js";
 import type * as http from "../http.js";
 import type * as jobs from "../jobs.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as notify from "../notify.js";
 import type * as opportunities from "../opportunities.js";
 import type * as portal from "../portal.js";
 import type * as social from "../social.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   jobs: typeof jobs;
   "lib/auth": typeof lib_auth;
+  notify: typeof notify;
   opportunities: typeof opportunities;
   portal: typeof portal;
   social: typeof social;

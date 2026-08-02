@@ -78,7 +78,32 @@ http.route({
       severity?: string;
       url?: string;
       message?: string;
+      findings?: {
+        type: string;
+        severity?: string;
+        url: string;
+        message?: string;
+      }[];
     };
+    // Bulk stream from agent crawl result
+    if (body.crawlRunId && Array.isArray(body.findings)) {
+      const ids: unknown[] = [];
+      for (const f of body.findings) {
+        try {
+          const res = await ctx.runMutation(internal.jobs.streamFindingInternal, {
+            crawlRunId: body.crawlRunId as any,
+            type: f.type,
+            severity: f.severity ?? "medium",
+            url: f.url,
+            message: f.message,
+          });
+          ids.push(res.findingId);
+        } catch {
+          /* continue other findings */
+        }
+      }
+      return Response.json({ ok: true, data: { count: ids.length, ids } });
+    }
     if (!body.crawlRunId || !body.type || !body.url) {
       return Response.json({ ok: false, error: "crawlRunId, type, url required" }, { status: 400 });
     }

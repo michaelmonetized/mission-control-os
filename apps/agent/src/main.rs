@@ -180,20 +180,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let result =
                 tokio::task::spawn_blocking(move || crawl::run_crawl(&d, &opts)).await??;
 
-            for f in &result.findings {
-                let _ = client
-                    .post(format!("{site}/agent/findings"))
-                    .headers(auth_header(&agent_secret))
-                    .json(&serde_json::json!({
-                        "crawlRunId": crawl_run_id,
+            // Bulk stream findings (faster than one HTTP call per finding)
+            let findings_json: Vec<serde_json::Value> = result
+                .findings
+                .iter()
+                .map(|f| {
+                    serde_json::json!({
                         "type": f.r#type,
                         "severity": f.severity,
                         "url": f.url,
                         "message": f.message,
-                    }))
-                    .send()
-                    .await?;
-            }
+                    })
+                })
+                .collect();
+            let _ = client
+                .post(format!("{site}/agent/findings"))
+                .headers(auth_header(&agent_secret))
+                .json(&serde_json::json!({
+                    "crawlRunId": crawl_run_id,
+                    "findings": findings_json,
+                }))
+                .send()
+                .await?;
 
             let pages = result.pages_retrieved;
             let broken = result.broken_links;

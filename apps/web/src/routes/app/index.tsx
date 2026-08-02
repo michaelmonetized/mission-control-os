@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
+import { KEYMAP } from "@/lib/keymap";
 
 export const Route = createFileRoute("/app/")({
   component: CockpitHome,
@@ -28,7 +29,7 @@ function CockpitHome() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {modules.map((m) => (
           <Link key={m.to} to={m.to} className="block group">
-            <Card className="h-full transition-shadow group-hover:shadow-[0_0_28px_color-mix(in_oklab,var(--color-brand-sky)_30%,transparent)]">
+            <Card className="h-full mc-transition group-hover:mc-elev-2">
               <CardHeader>
                 <CardTitle className="text-lg group-hover:text-[var(--color-brand-sky)]">
                   {m.title}
@@ -39,6 +40,22 @@ function CockpitHome() {
           </Link>
         ))}
       </div>
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="text-base">Keymap</CardTitle>
+          <CardDescription>⌘K palette · vim motions (DSD-0011)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="grid sm:grid-cols-2 gap-1 text-xs font-mono text-[var(--color-mocha-subtext0)]">
+            {KEYMAP.map((k) => (
+              <li key={k.keys} className="flex gap-2">
+                <span className="text-[var(--color-brand-sky)] min-w-[7rem]">{k.keys}</span>
+                <span>{k.action}</span>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
     </div>
   );
 }
