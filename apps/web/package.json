@@ -7,9 +7,13 @@
     "dev": "vite dev --host 127.0.0.1 --port 5173",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "convex:dev": "convex dev",
+    "convex:deploy": "convex deploy"
   },
   "dependencies": {
+    "@clerk/backend": "^3.15.0",
+    "@clerk/react": "^6.12.10",
     "@mc/protocol": "workspace:*",
     "@mc/tokens": "workspace:*",
     "@radix-ui/react-dialog": "^1.1.14",

@@ -1,4 +1,8 @@
-/** In-memory store until Convex is configured — mirrors domain model for local dev */
+/**
+ * In-memory fallback for Vite `/api/*` middleware only.
+ * Primary data path is Convex (clients list/add live on `api.clients.*`).
+ * Kept so Agent/token stubs and local API smoke tests still work offline.
+ */
 import type { ClientId } from "@mc/protocol";
 
 export type ClientRecord = {

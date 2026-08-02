@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { OrganizationSwitcher, UserButton, useAuth } from "@clerk/react";
 import { LogoLockup } from "@/components/mc/logo";
 import { cn } from "cnfast";
+import { useIsAgencyAdmin } from "@/lib/auth-guards";
 
 const nav = [
   { to: "/app", label: "Cockpit" },
@@ -10,7 +12,7 @@ const nav = [
   { to: "/app/audit", label: "Audit" },
   { to: "/app/social", label: "Social" },
   { to: "/app/email", label: "Email" },
-  { to: "/app/portal", label: "Portal" },
+  { to: "/app/portal", label: "Portal setup" },
 ] as const;
 
 export function CockpitShell({
@@ -20,6 +22,9 @@ export function CockpitShell({
   children: React.ReactNode;
   title?: string;
 }) {
+  const { isSignedIn, orgRole } = useAuth();
+  const isAdmin = useIsAgencyAdmin();
+
   return (
     <div className="min-h-dvh flex flex-col">
       <header
@@ -46,11 +51,34 @@ export function CockpitShell({
             </Link>
           ))}
         </nav>
-        <div className="text-xs text-[var(--color-mocha-subtext0)] hidden md:block">
-          <kbd className="mc-neu px-2 py-1 rounded-[var(--radius-xs)] text-[var(--color-brand-sky)]">
-            ⌘K
-          </kbd>{" "}
-          palette · vim j/k
+        <div className="flex items-center gap-3 shrink-0">
+          {isSignedIn ? (
+            <>
+              <span className="text-[10px] uppercase tracking-wide text-[var(--color-mocha-subtext0)] hidden lg:inline">
+                {isAdmin ? "Admin" : orgRole === "org:member" ? "Member" : "Staff"}
+              </span>
+              <OrganizationSwitcher
+                hidePersonal
+                afterCreateOrganizationUrl="/onboarding"
+                afterSelectOrganizationUrl="/app"
+                appearance={{
+                  elements: {
+                    rootBox: "flex items-center",
+                    organizationSwitcherTrigger:
+                      "text-[var(--color-mocha-text)] border border-[var(--color-mocha-surface1)] rounded-md px-2 py-1",
+                  },
+                }}
+              />
+              <UserButton />
+            </>
+          ) : (
+            <div className="text-xs text-[var(--color-mocha-subtext0)] hidden md:block">
+              <kbd className="mc-neu px-2 py-1 rounded-[var(--radius-xs)] text-[var(--color-brand-sky)]">
+                ⌘K
+              </kbd>{" "}
+              palette · vim j/k
+            </div>
+          )}
         </div>
       </header>
       <main className="flex-1 px-4 py-8 max-w-6xl w-full mx-auto">

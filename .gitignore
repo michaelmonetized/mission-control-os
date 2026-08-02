@@ -10,3 +10,4 @@ target
 .turbo
 .convex
 apps/web/src/routeTree.gen.ts.bak
+.vercel
