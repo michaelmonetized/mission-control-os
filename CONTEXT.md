@@ -38,6 +38,10 @@ _Avoid_: Flat same radius on every nest level, subtractive concentric unless DSD
 Primary logo mark—circular badge with geometric keyhole/launch-path glyph (DSD-0006). Paired with Max **900** (`max95`) wordmark “Mission Control”.
 _Avoid_: Generic rocket emoji, Apple-like command symbol
 
+**MC mirror (UI)**:
+Product-owned wrappers around untouched **shadcn/ui** components; brand classes applied via **cn-fast**. App code imports mirrors only (DSD-0007).
+_Avoid_: Editing shadcn sources in place, importing `@/components/ui` from features
+
 **Skeuomorph control**:
 Selective tactile/realistic control styling (Icon Factory energy) on buttons and hardware-like affordances (DSD-0002).
 _Avoid_: Full retro skeuomorphic chrome, pure flat-only

@@ -27,6 +27,7 @@ Hammered via grill-with-docs. Architecture ADRs live in `docs/adr/`; domain lang
 | [0004](./0004-typography-neue-haas.md) | Neue Haas / max* |
 | [0005](./0005-radius-scale-and-nesting.md) | Radius + nested calc |
 | [0006](./0006-logo-launch-keyhole.md) | Launch keyhole + max95 wordmark |
+| [0007](./0007-shadcn-mirror-abstraction.md) | Untouched shadcn + MC mirror + cn-fast |
 
 ## Naming
 
