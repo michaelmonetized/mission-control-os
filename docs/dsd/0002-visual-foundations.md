@@ -6,9 +6,9 @@
 
 - Base / mantle / crust for deep layers  
 - Text: text, subtext0/1  
-- Accents: use Mocha blue/lavender/mauve/green/peach/red as semantic tokens, elevated with glow when interactive  
+- Accents: **brand pair Flamingo + Sky** (DSD-0003 / Hustle Launch); other Mocha hues for semantics (green/red/yellow/sapphire/…)  
 
-Exact hex token table ships in the frontend tokens package; this DSD locks the **system**.
+Exact hex token table ships in the frontend tokens package; this DSD locks the **system**. See DSD-0003 for brand accent rules.
 
 ## Material: Apple glass over Mocha
 

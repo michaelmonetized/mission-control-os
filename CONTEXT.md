@@ -19,8 +19,12 @@ Translucent, blurred panel material over Catppuccin Mocha bases (DSD-0002).
 _Avoid_: Flat opaque cards as default
 
 **Neon border**:
-Accent-colored glow edge for focus, selection, and live/important states (DSD-0002).
+Accent-colored glow edge for focus, selection, and live/important states (DSD-0002). Brand glow uses **Flamingo** (`#f2cdcd`) and **Sky** (`#89dceb`)—DSD-0003.
 _Avoid_: Constant full-UI rainbow glow
+
+**Flamingo / Sky**:
+Mission Control brand accent pair (Catppuccin Mocha flamingo + sky; Hustle Launch continuity). Sky for ops/focus; Flamingo for brand/warm CTA; dual for hero (DSD-0003).
+_Avoid_: Random pink/cyan without tokens
 
 **Skeuomorph control**:
 Selective tactile/realistic control styling (Icon Factory energy) on buttons and hardware-like affordances (DSD-0002).
