@@ -3,8 +3,8 @@
 ## Mark source
 
 - **Canonical mark:** Launch keyhole (DSD-0006).
-- **Vector:** Authoritative vector already held by the product owner (user-supplied). Raster brief: `media/launch-keyhole-source.jpg`.
-- Production kit **exports from the vector**, not from the JPEG.
+- **Vector:** Authoritative file lives in the owner’s **iCloud Documents** (not necessarily in this git repo). Raster brief in-repo: `media/launch-keyhole-source.jpg`.
+- Production kit **exports from the iCloud vector**, not from the JPEG. Optional: copy SVG into `docs/dsd/media/` or `@mc/brand` when publishing the kit.
 
 ## Kit deliverables (export from vector)
 

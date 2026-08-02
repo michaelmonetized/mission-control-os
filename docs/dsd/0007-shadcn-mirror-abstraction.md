@@ -29,21 +29,18 @@ Exact folder names can be `components/ui` + `components/mc` (or `primitives` / `
 
 1. Import the untouched shadcn component from `components/ui/…`.
 2. Re-export a Mission Control component with the **same (or extended) props API** so call sites stay stable.
-3. Apply brand styling via **`cn-fast`** (house class-merge helper—wire to the actual package/util in implementation) to compose:
-   - glass / neon border / neumorph / Max type tokens  
-   - nested radius helpers  
-   - Flamingo/Sky accents  
+3. Apply brand styling via **[cnfast](https://github.com/aidenybai/cnfast)** (`npm i cnfast`) — fast drop-in `cn` (clsx + tailwind-merge compatible, ~3.8× faster on average). Use in mirrors as `import { cn } from "cnfast"` (or re-export as house `cn` / `cnFast` alias).
 4. Prefer `className` merge + token classes over forking shadcn source.
 
 ```tsx
 // conceptual — components/mc/button.tsx
 import { Button as ShadcnButton } from "@/components/ui/button";
-import { cnFast } from "@/lib/cn-fast";
+import { cn } from "cnfast";
 
 export function Button({ className, ...props }: React.ComponentProps<typeof ShadcnButton>) {
   return (
     <ShadcnButton
-      className={cnFast(
+      className={cn(
         "/* MC glass + skeuomorph + neon focus tokens */",
         className,
       )}
@@ -52,6 +49,8 @@ export function Button({ className, ...props }: React.ComponentProps<typeof Shad
   );
 }
 ```
+
+shadcn projects can also: `npx shadcn@latest add aidenybai/cnfast/cn`
 
 ## Update path when shadcn changes
 
@@ -69,6 +68,7 @@ export function Button({ className, ...props }: React.ComponentProps<typeof Shad
 
 User direction: abstraction over **untouched** shadcn so upgrades don’t force a full refactor; brand Tailwind reapplied in mirrors via **cn-fast**.
 
-## Open implementation detail
+## Dependency
 
-Confirm exact `cn-fast` package vs house `cn`/`cx` util when scaffolding the frontend package—name is reserved in docs until wired.
+- **Package:** [`cnfast`](https://github.com/aidenybai/cnfast) / npm `cnfast` (Aiden Bai)
+- **Role:** class merge for all MC mirrors and product UI

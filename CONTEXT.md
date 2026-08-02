@@ -39,8 +39,12 @@ Primary logo mark—circular badge with geometric keyhole/launch-path glyph (DSD
 _Avoid_: Generic rocket emoji, Apple-like command symbol
 
 **MC mirror (UI)**:
-Product-owned wrappers around untouched **shadcn/ui** components; brand classes applied via **cn-fast**. App code imports mirrors only (DSD-0007). **All** available shadcn components get a mirror (DSD-0010).
+Product-owned wrappers around untouched **shadcn/ui** components; brand classes applied via **[cnfast](https://github.com/aidenybai/cnfast)** (`cn`). App code imports mirrors only (DSD-0007). **All** available shadcn components get a mirror (DSD-0010).
 _Avoid_: Editing shadcn sources in place, importing `@/components/ui` from features
+
+**cnfast**:
+Fast drop-in `cn` for Tailwind class merging ([aidenybai/cnfast](https://github.com/aidenybai/cnfast)). Used in all MC mirrors.
+_Avoid_: ad-hoc string concat, slow per-render tailwind-merge-only without reason
 
 **φ scale**:
 Spacing and fluid type system from house **test-create-next-app** / `cna` theme (golden-ratio clamps)—DSD-0009.
