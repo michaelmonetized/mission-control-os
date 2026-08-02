@@ -132,6 +132,10 @@ _Avoid_: Agent (crawl daemon), Zap (vendor), system rule (fixed product behavior
 Reusable email or SMS content (and metadata) in a CRM Workspace, used by Automations and manual sends.
 _Avoid_: Social Post (calendar), Layout (UI)
 
+**Automation Run**:
+One execution of an Automation for a trigger event. Attempts **inline** first; on first failure, continues via **Trigger.dev** retries (ADR-0046).
+_Avoid_: Job (vague), Zap run
+
 **Pipeline**:
 A named board of stages for Opportunities (or other card types) inside a CRM Workspace.
 _Avoid_: Funnel (analytics only), board (UI only)
