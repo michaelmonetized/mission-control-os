@@ -1,0 +1,134 @@
+/* Mission Control design tokens — DSD-0002/0003/0005/0009 */
+@theme inline {
+  --phi: calc((1 + sqrt(5)) / 2);
+  --gwx: calc(var(--phi) - 1);
+  --gnx: calc(1 - var(--gwx));
+  --snx: calc(1 + var(--gnx));
+  --swx: var(--phi);
+
+  /* Catppuccin Mocha */
+  --color-mocha-base: #1e1e2e;
+  --color-mocha-mantle: #181825;
+  --color-mocha-crust: #11111b;
+  --color-mocha-surface0: #313244;
+  --color-mocha-surface1: #45475a;
+  --color-mocha-surface2: #585b70;
+  --color-mocha-overlay0: #6c7086;
+  --color-mocha-text: #cdd6f4;
+  --color-mocha-subtext0: #a6adc8;
+  --color-mocha-subtext1: #bac2de;
+  --color-mocha-green: #a6e3a1;
+  --color-mocha-red: #f38ba8;
+  --color-mocha-yellow: #f9e2af;
+  --color-mocha-peach: #fab387;
+  --color-mocha-sapphire: #74c7ec;
+  --color-mocha-blue: #89b4fa;
+  --color-mocha-lavender: #b4befe;
+
+  /* Brand — DSD-0003 */
+  --color-brand-flamingo: #f2cdcd;
+  --color-brand-sky: #89dceb;
+
+  --color-background: var(--color-mocha-base);
+  --color-foreground: var(--color-mocha-text);
+  --color-card: color-mix(in oklab, var(--color-mocha-surface0) 55%, transparent);
+  --color-card-foreground: var(--color-mocha-text);
+  --color-primary: var(--color-brand-sky);
+  --color-primary-foreground: var(--color-mocha-crust);
+  --color-secondary: var(--color-mocha-surface1);
+  --color-secondary-foreground: var(--color-mocha-text);
+  --color-muted: var(--color-mocha-surface0);
+  --color-muted-foreground: var(--color-mocha-subtext0);
+  --color-accent: var(--color-brand-flamingo);
+  --color-accent-foreground: var(--color-mocha-crust);
+  --color-destructive: var(--color-mocha-red);
+  --color-border: color-mix(in oklab, var(--color-brand-sky) 25%, var(--color-mocha-surface1));
+  --color-ring: var(--color-brand-sky);
+  --color-input: var(--color-mocha-surface0);
+
+  /* Radius — DSD-0005 */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius: var(--radius-md);
+
+  /* φ type — DSD-0009 */
+  --text-md: clamp(21px, calc(1dvw * var(--phi)), 28px);
+  --text-core: var(--text-md);
+  --text-xs: calc(var(--text-md) * 0.98);
+  --text-sm: calc(var(--text-md) * 0.99);
+  --text-lg: clamp(28px, calc(var(--text-md) * pow(var(--snx), 2)), 35px);
+  --text-xl: clamp(35px, calc(var(--text-md) * pow(var(--snx), 3)), 42px);
+  --text-2x: clamp(42px, calc(var(--text-md) * pow(var(--snx), 4)), 49px);
+
+  --line-height: clamp(1, var(--gnx), var(--gwx));
+
+  --spacing-base: clamp(4px, calc(1rem * var(--gnx) / var(--swx)), 6px);
+  --spacing-sm: clamp(2px, calc(var(--spacing-base) / var(--swx)), 4px);
+  --spacing-xs: clamp(1px, calc(var(--spacing-sm) / var(--swx)), 3px);
+  --spacing-md: clamp(var(--spacing-base), calc(var(--spacing-base) * var(--swx)), 28px);
+  --spacing-lg: clamp(var(--spacing-md), calc(var(--spacing-md) * var(--swx)), 35px);
+  --spacing-xl: clamp(var(--spacing-lg), calc(var(--spacing-lg) * var(--swx)), 42px);
+
+  --font-sans: max, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", SFMono-Regular, monospace;
+}
+
+:root {
+  color-scheme: dark;
+  background: var(--color-mocha-base);
+  color: var(--color-mocha-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: var(--line-height);
+}
+
+/* Glass — DSD-0002 */
+.mc-glass {
+  background: color-mix(in oklab, var(--color-mocha-surface0) 45%, transparent);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid color-mix(in oklab, var(--color-brand-sky) 22%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, #000 35%, transparent),
+    0 12px 40px color-mix(in oklab, #000 35%, transparent),
+    inset 0 1px 0 color-mix(in oklab, #fff 8%, transparent);
+}
+
+.mc-neon-focus:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-mocha-base),
+    0 0 0 4px var(--color-brand-sky),
+    0 0 24px color-mix(in oklab, var(--color-brand-sky) 55%, transparent);
+}
+
+.mc-neon-border {
+  border-color: color-mix(in oklab, var(--color-brand-sky) 55%, transparent);
+  box-shadow: 0 0 16px color-mix(in oklab, var(--color-brand-sky) 35%, transparent);
+}
+
+.mc-neon-flamingo {
+  border-color: color-mix(in oklab, var(--color-brand-flamingo) 60%, transparent);
+  box-shadow: 0 0 16px color-mix(in oklab, var(--color-brand-flamingo) 40%, transparent);
+}
+
+/* Neumorph well — DSD-0002 */
+.mc-neu {
+  background: var(--color-mocha-mantle);
+  box-shadow:
+    6px 6px 14px color-mix(in oklab, #000 45%, transparent),
+    -4px -4px 12px color-mix(in oklab, var(--color-mocha-surface1) 35%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--color-brand-sky) 12%, transparent);
+}
+
+/* Nested radius helper parent sets --radius and --padding */
+.mc-nested-round {
+  border-radius: calc(var(--radius, 8px) + var(--padding, 0px));
+}
+
+.mc-sparse {
+  letter-spacing: 0.01em;
+}

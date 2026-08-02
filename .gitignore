@@ -1,0 +1,12 @@
+node_modules
+dist
+.DS_Store
+.env
+.env.*
+!.env.example
+target
+*.log
+.vite
+.turbo
+.convex
+apps/web/src/routeTree.gen.ts.bak

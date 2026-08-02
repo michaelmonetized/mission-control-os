@@ -1,0 +1,13 @@
+{
+  "name": "@mc/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.mjs",
+  "scripts": {
+    "dev": "electron .",
+    "typecheck": "node -e \"process.exit(0)\""
+  },
+  "devDependencies": {
+    "electron": "^35.0.0"
+  }
+}

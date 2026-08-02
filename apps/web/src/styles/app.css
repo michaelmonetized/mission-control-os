@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import "@mc/tokens/theme.css";
+@import "@mc/tokens/max.css";
+
+@source "../**/*.{ts,tsx}";
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, color-mix(in oklab, var(--color-brand-sky) 12%, transparent), transparent),
+    radial-gradient(900px 500px at 90% 0%, color-mix(in oklab, var(--color-brand-flamingo) 10%, transparent), transparent),
+    var(--color-mocha-base);
+  font-family: max, ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: var(--color-brand-sky);
+  text-decoration: none;
+}

@@ -3,36 +3,58 @@
 Local SEO / digital marketing **agency operating system**.
 
 **Product name:** Mission Control  
-**Repo codename:** `mission-control-os`
+**Repo:** `mission-control-os`  
+**GitHub:** https://github.com/michaelmonetized/mission-control-os
 
-## Intent
+## Quick start
 
-A single multi-surface workspace (Web, Desktop, TUI, Mobile) plus a user-level Local Agent daemon for technical audits that aim to surpass Screaming Frog / Sitebulb for agency workflows—with a roadmap toward citations, links, CRM, and client portals.
+```bash
+bun install
+bun run dev:web    # http://127.0.0.1:5173
+```
+
+Agent:
+
+```bash
+cargo run --manifest-path apps/agent/Cargo.toml -- paths
+cargo run --manifest-path apps/agent/Cargo.toml -- heartbeat
+cargo run --manifest-path apps/agent/Cargo.toml -- daemon
+```
+
+Desktop (loads web URL):
+
+```bash
+# terminal 1: bun run dev:web
+# terminal 2:
+cd apps/desktop && bun install && bun run dev
+```
+
+## Monorepo
+
+| Path | Role |
+|------|------|
+| `apps/web` | Sparse cockpit UI (TanStack Router, Vite, design system, `/api/*`) |
+| `apps/desktop` | Electron shell |
+| `apps/agent` | Rust Local Agent daemon |
+| `apps/tui` | Rust TUI stub |
+| `packages/tokens` | Mocha, Flamingo/Sky, φ scale, Max CSS, glass |
+| `packages/protocol` | Shared types + API paths |
+| `apps/web/convex/schema.ts` | Full domain Convex schema |
+| `docs/adr` | Architecture decisions |
+| `docs/dsd` | Design system docs |
+| `IMPLEMENTATION.md` | ADR → code map |
+
+## Design system (locked)
+
+- Sparse cockpit · glass over Catppuccin Mocha · neon · neumorph · skeuomorph controls  
+- Flamingo `#f2cdcd` + Sky `#89dceb`  
+- Neue Haas Grotesque Pro (`max*.ttf`)  
+- Launch keyhole logo + max95 wordmark  
+- shadcn untouched + MC mirrors + **cnfast**  
+- Radius nesting `calc(radius + padding)` · φ spacing from cna  
 
 ## Status
 
-**Design grilling wrapped** (shared understanding on locked ADRs). Open items: `docs/OPEN-QUESTIONS.md`.
+Architecture + DSD grill complete. Implementation scaffold satisfies structure and happy-path UI/API; production crawl engine, live Clerk/Convex/Resend, and mobile apps are next.
 
-- `CONTEXT.md` — ubiquitous language (glossary only)
-- `docs/adr/` — architecture decision records (0001–0046)
-- `docs/research/` — research notes
-- `docs/OPEN-QUESTIONS.md` — unresolved questions
-
-Implement when you choose to start scaffolding multi-repo Mission Control.
-
-## Locked decisions (summary)
-
-| Topic | Decision |
-|-------|----------|
-| Tenancy | Multi-tenant SaaS; Agency → Client → Location |
-| First ship | Full agency OS: audit + CRM + tasks + email + social + connectivity (ADR-0031) |
-| Crawl execution | Local Agent only (no cloud fetch fleet) |
-| Surfaces | Web, Desktop, TUI, Mobile — equal; full Audit Loop on each |
-| Stack | TanStack Start + Clerk + Convex + Resend; Electron+Effect Desktop; Swift iOS; Kotlin Android; Rust TUI+Agent |
-| Agent | User-level OS service (not Electron sidecar) |
-| Repos | Separate repos per surface/component + public relations repo (ADR-0017) |
-| Contracts | Dedicated protocol repo, semver packages (ADR-0018) |
-| Client portal | Auth Client Users; graphs + shared findings (ADR-0025–28) |
-| Hosting | Convex + Vercel (ADR-0029) |
-
-See `docs/adr/` for full records (0001–0029).
+Copy `.env.example` → `.env` for real credentials.

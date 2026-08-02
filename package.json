@@ -1,0 +1,15 @@
+{
+  "name": "mission-control-os",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.2.0",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "bun run --filter @mc/web dev",
+    "dev:web": "bun run --filter @mc/web dev",
+    "build": "bun run --filter @mc/web build",
+    "typecheck": "bun run --filter '*' typecheck",
+    "agent": "cargo run --manifest-path apps/agent/Cargo.toml",
+    "desktop": "bun run --filter @mc/desktop dev"
+  }
+}

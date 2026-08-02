@@ -1,0 +1,12 @@
+[Unit]
+Description=Mission Control Local Agent (user)
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/mc-agent daemon --control-plane http://127.0.0.1:5173
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

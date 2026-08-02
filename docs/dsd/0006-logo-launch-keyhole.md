@@ -64,12 +64,12 @@ Gap between mark and wordmark ≈ mark radius / 2 (Ive air).
 
 ## Media kit deliverables (from this DSD)
 
-- [ ] SVG keyhole (multi colorway)  
+- [x] SVG keyhole (light + sky) — `media/launch-keyhole.svg`, `launch-keyhole-sky.svg` (refined when iCloud vector imported)  
 - [ ] PNG @1x/2x/3x  
 - [ ] Horizontal + stacked lockups (SVG/PNG)  
-- [ ] Favicon set  
+- [x] Favicon set (SVG favicon wired in web `index.html`)  
 - [ ] Social avatar (mark on Mocha crust / sky glass)  
-- [ ] Wordmark-only SVG  
+- [ ] Wordmark-only SVG (runtime: Max 900 text component)  
 
 ## Relationship to prior DSD questions
 

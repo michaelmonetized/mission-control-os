@@ -1,0 +1,66 @@
+import { Link } from "@tanstack/react-router";
+import { LogoLockup } from "@/components/mc/logo";
+import { cn } from "cnfast";
+
+const nav = [
+  { to: "/app", label: "Cockpit" },
+  { to: "/app/clients", label: "Clients" },
+  { to: "/app/crm", label: "CRM" },
+  { to: "/app/tasks", label: "Tasks" },
+  { to: "/app/audit", label: "Audit" },
+  { to: "/app/social", label: "Social" },
+  { to: "/app/email", label: "Email" },
+  { to: "/app/portal", label: "Portal" },
+] as const;
+
+export function CockpitShell({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title?: string;
+}) {
+  return (
+    <div className="min-h-dvh flex flex-col">
+      <header
+        className="mc-glass sticky top-0 z-40 mx-4 mt-4 px-5 py-3 flex items-center justify-between gap-6"
+        style={{ borderRadius: "var(--radius-lg)" }}
+      >
+        <Link to="/" className="shrink-0">
+          <LogoLockup sky />
+        </Link>
+        <nav className="flex flex-wrap gap-1 text-sm">
+          {nav.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={cn(
+                "px-3 py-1.5 rounded-[var(--radius-xs)] text-[var(--color-mocha-subtext0)] hover:text-[var(--color-brand-sky)] transition-colors",
+              )}
+              activeProps={{
+                className:
+                  "px-3 py-1.5 rounded-[var(--radius-xs)] text-[var(--color-brand-sky)] mc-neon-border bg-[color-mix(in_oklab,var(--color-brand-sky)_10%,transparent)]",
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="text-xs text-[var(--color-mocha-subtext0)] hidden md:block">
+          <kbd className="mc-neu px-2 py-1 rounded-[var(--radius-xs)] text-[var(--color-brand-sky)]">
+            ⌘K
+          </kbd>{" "}
+          palette · vim j/k
+        </div>
+      </header>
+      <main className="flex-1 px-4 py-8 max-w-6xl w-full mx-auto">
+        {title ? (
+          <h1 className="text-2xl font-semibold mb-6 text-[var(--color-mocha-text)] mc-sparse">
+            {title}
+          </h1>
+        ) : null}
+        {children}
+      </main>
+    </div>
+  );
+}

@@ -1,0 +1,113 @@
+/* Neue Haas Grotesque Pro — DSD-0004 (files in apps/web/public/max) */
+@font-face {
+  font-family: max;
+  font-weight: 100;
+  font-style: normal;
+  src: url("/max/max15.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 100;
+  font-style: italic;
+  src: url("/max/max16.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 200;
+  font-style: normal;
+  src: url("/max/max25.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 200;
+  font-style: italic;
+  src: url("/max/max26.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 300;
+  font-style: normal;
+  src: url("/max/max35.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 300;
+  font-style: italic;
+  src: url("/max/max36.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 400;
+  font-style: normal;
+  src: url("/max/max45.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 400;
+  font-style: italic;
+  src: url("/max/max46.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 500;
+  font-style: normal;
+  src: url("/max/max55.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 500;
+  font-style: italic;
+  src: url("/max/max56.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 600;
+  font-style: normal;
+  src: url("/max/max65.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 600;
+  font-style: italic;
+  src: url("/max/max66.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 700;
+  font-style: normal;
+  src: url("/max/max75.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 700;
+  font-style: italic;
+  src: url("/max/max76.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 900;
+  font-style: normal;
+  src: url("/max/max95.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: max;
+  font-weight: 900;
+  font-style: italic;
+  src: url("/max/max96.ttf") format("truetype");
+  font-display: swap;
+}

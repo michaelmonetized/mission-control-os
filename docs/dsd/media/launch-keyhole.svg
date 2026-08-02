@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Mission Control launch keyhole">
+  <circle cx="100" cy="100" r="92" fill="#E8EEF8" stroke="#1e3a5f" stroke-width="10"/>
+  <!-- Launch keyhole: vertical path with mid diagonal step -->
+  <path fill="#1e3a5f" fill-rule="evenodd" d="
+    M88 34h24v52l-28 36h28v44H88v-52l28-36H88V34z
+  "/>
+</svg>
