@@ -17,6 +17,8 @@ function SocialPage() {
   const [weeks, setWeeks] = useState(4);
   const [body, setBody] = useState("");
   const [channel, setChannel] = useState("instagram");
+  const [category, setCategory] = useState("promo");
+  const recycle = useMutation(api.social.recyclePost);
   const [when, setWhen] = useState(() => {
     const d = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
     d.setMinutes(0, 0, 0);
@@ -63,6 +65,7 @@ function SocialPage() {
         body: body.trim(),
         channel,
         scheduledAt: new Date(when).getTime(),
+        category,
       });
       setBody("");
     } catch (e) {
@@ -129,6 +132,16 @@ function SocialPage() {
               <option value="facebook">facebook</option>
               <option value="google_business">google_business</option>
               <option value="linkedin">linkedin</option>
+            </select>
+            <select
+              className="rounded-[var(--radius-sm)] border border-[var(--color-mocha-surface1)] bg-[var(--color-mocha-surface0)] px-3 py-2 text-sm"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="promo">promo</option>
+              <option value="edu">edu</option>
+              <option value="ugc">ugc</option>
+              <option value="seasonal">seasonal</option>
             </select>
             <Input
               type="datetime-local"
@@ -218,6 +231,18 @@ function SocialPage() {
                             Re-approve
                           </Button>
                         )}
+                        <Button
+                          variant="ghost"
+                          onClick={() =>
+                            void recycle({
+                              postId: p.id as Id<"socialPosts">,
+                              scheduledAt: Date.now() + 14 * 864e5,
+                              category: category,
+                            })
+                          }
+                        >
+                          Recycle +14d
+                        </Button>
                         <Button
                           variant="secondary"
                           onClick={() =>

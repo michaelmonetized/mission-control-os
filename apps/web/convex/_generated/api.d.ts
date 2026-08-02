@@ -27,6 +27,8 @@ import type * as lib_auth from "../lib/auth.js";
 import type * as notify from "../notify.js";
 import type * as opportunities from "../opportunities.js";
 import type * as portal from "../portal.js";
+import type * as portalCrm from "../portalCrm.js";
+import type * as reports from "../reports.js";
 import type * as scheduler from "../scheduler.js";
 import type * as social from "../social.js";
 import type * as socialPublish from "../socialPublish.js";
@@ -58,6 +60,8 @@ declare const fullApi: ApiFromModules<{
   notify: typeof notify;
   opportunities: typeof opportunities;
   portal: typeof portal;
+  portalCrm: typeof portalCrm;
+  reports: typeof reports;
   scheduler: typeof scheduler;
   social: typeof social;
   socialPublish: typeof socialPublish;

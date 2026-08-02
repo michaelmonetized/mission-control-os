@@ -36,6 +36,10 @@ function ClientPortalHome() {
     api.findings.sharedForClient,
     clientId ? { clientId: clientId as Id<"clients"> } : "skip",
   );
+  const portalContacts = useQuery(
+    api.portalCrm.listContacts,
+    clientId ? { clientId: clientId as Id<"clients"> } : "skip",
+  );
   const sites = useQuery(
     api.hierarchy.listSitesForPortalClient,
     clientId ? { clientId: clientId as Id<"clients"> } : "skip",
@@ -127,6 +131,27 @@ function ClientPortalHome() {
                       </div>
                     ))}
                   </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Client CRM contacts</CardTitle>
+                <CardDescription>Workspace scoped to your grant</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-1 text-sm">
+                {(portalContacts ?? []).length === 0 ? (
+                  <p className="text-[var(--color-mocha-subtext0)]">No contacts yet.</p>
+                ) : (
+                  (portalContacts ?? []).map((c) => (
+                    <div key={c.id} className="mc-glass px-3 py-2 rounded-md">
+                      {c.name}
+                      {c.email ? (
+                        <span className="text-xs text-[var(--color-mocha-subtext0)]"> · {c.email}</span>
+                      ) : null}
+                    </div>
+                  ))
                 )}
               </CardContent>
             </Card>

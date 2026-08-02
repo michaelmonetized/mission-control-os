@@ -156,6 +156,8 @@ export default defineSchema({
     scheduledAt: v.number(),
     status: v.string(),
     editNotes: v.optional(v.string()),
+    category: v.optional(v.string()),
+    recycleFromId: v.optional(v.id("socialPosts")),
   }).index("by_client", ["clientId"]),
 
   emailDomains: defineTable({
@@ -216,4 +218,17 @@ export default defineSchema({
     refreshHash: v.string(),
     deviceLabel: v.optional(v.string()),
   }).index("by_user", ["clerkUserId"]),
+
+  /** Saved audit report snapshots for history/export */
+  auditReports: defineTable({
+    agencyId: v.id("agencies"),
+    clientId: v.id("clients"),
+    siteId: v.id("sites"),
+    crawlRunId: v.id("crawlRuns"),
+    title: v.string(),
+    summary: v.any(),
+    createdAt: v.number(),
+  })
+    .index("by_agency", ["agencyId"])
+    .index("by_client", ["clientId"]),
 });

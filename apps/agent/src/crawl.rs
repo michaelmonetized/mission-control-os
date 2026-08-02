@@ -219,6 +219,31 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
             push_finding(&mut findings, "missing_alt", "medium", &url, m);
         }
 
+        // thin content heuristic
+        let text_len = strip_tags_len(&html);
+        if text_len < 200 {
+            push_finding(
+                &mut findings,
+                "thin_content",
+                "low",
+                &url,
+                format!("approx text length {text_len} < 200"),
+            );
+        }
+
+        // missing viewport
+        if !html.to_ascii_lowercase().contains("name=\"viewport\"")
+            && !html.to_ascii_lowercase().contains("name='viewport'")
+        {
+            push_finding(
+                &mut findings,
+                "missing_viewport",
+                "medium",
+                &url,
+                "no viewport meta",
+            );
+        }
+
         // enqueue same-origin links
         for link in extract_hrefs(&html) {
             if link.starts_with("mailto:") || link.starts_with("tel:") || link.starts_with("javascript:") {
@@ -499,6 +524,20 @@ fn html_has_noindex(html: &str) -> bool {
         && (lower.contains("name=\"robots\"")
             || lower.contains("name='robots'")
             || lower.contains("name=robots"))
+}
+
+fn strip_tags_len(html: &str) -> usize {
+    let mut out = String::new();
+    let mut in_tag = false;
+    for c in html.chars() {
+        match c {
+            '<' => in_tag = true,
+            '>' => in_tag = false,
+            _ if !in_tag => out.push(c),
+            _ => {}
+        }
+    }
+    out.split_whitespace().map(|w| w.len() + 1).sum::<usize>().saturating_sub(1)
 }
 
 fn resolve_url(base: &str, href: &str) -> String {

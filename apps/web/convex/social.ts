@@ -70,6 +70,7 @@ export const schedulePost = mutation({
     scheduledAt: v.number(),
     mediaUrls: v.optional(v.array(v.string())),
     link: v.optional(v.string()),
+    category: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { clerkOrgId } = await requireAgencyOrg(ctx);
@@ -90,6 +91,38 @@ export const schedulePost = mutation({
       scheduledAt: args.scheduledAt,
       // Default approved look-ahead (ADR-0037)
       status: "approved",
+      category: args.category,
+    });
+    return { id, status: "approved" as const };
+  },
+});
+
+/** Recycle an existing post into a new scheduled slot (ADR-0037 categories/recycle). */
+export const recyclePost = mutation({
+  args: {
+    postId: v.id("socialPosts"),
+    scheduledAt: v.number(),
+    category: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) throw new Error("Agency not found");
+    const post = await ctx.db.get(args.postId);
+    if (!post) throw new Error("not found");
+    if (!(await assertClient(ctx, post.clientId, agency._id))) {
+      throw new Error("not found");
+    }
+    const id = await ctx.db.insert("socialPosts", {
+      clientId: post.clientId,
+      body: post.body,
+      mediaUrls: post.mediaUrls,
+      link: post.link,
+      channel: post.channel,
+      scheduledAt: args.scheduledAt,
+      status: "approved",
+      category: args.category ?? post.category,
+      recycleFromId: post._id,
     });
     return { id, status: "approved" as const };
   },

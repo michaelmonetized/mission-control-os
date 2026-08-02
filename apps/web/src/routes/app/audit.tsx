@@ -54,6 +54,11 @@ function AuditPage() {
   const setStatus = useMutation(api.findings.setStatus);
   const setShared = useMutation(api.findings.setShared);
   const toTask = useMutation(api.findings.createTaskFromFinding);
+  const saveReport = useMutation(api.reports.saveSnapshot);
+  const reports = useQuery(
+    api.reports.list,
+    effectiveClient ? { clientId: effectiveClient as Id<"clients"> } : "skip",
+  );
   const openIssues = useQuery(
     api.findings.listOpenIssues,
     effectiveSite ? { siteId: effectiveSite as Id<"sites"> } : "skip",
@@ -61,6 +66,7 @@ function AuditPage() {
 
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [ignoreRobots, setIgnoreRobots] = useState(false);
 
   const history = useMemo(() => {
     return (metrics ?? [])
@@ -84,7 +90,7 @@ function AuditPage() {
       const run = await queueRun({
         siteId: effectiveSite as Id<"sites">,
         mode: "rendered",
-        ignoreRobots: false,
+        ignoreRobots,
       });
       setRunId(run.crawlRunId);
       // Demo stream: agent would call these; simulate core finding types
@@ -170,8 +176,27 @@ function AuditPage() {
             )}
           </select>
         </label>
+        <label className="text-xs flex items-center gap-2 text-[var(--color-mocha-subtext0)]">
+          <input
+            type="checkbox"
+            checked={ignoreRobots}
+            onChange={(e) => setIgnoreRobots(e.target.checked)}
+          />
+          Ignore robots.txt (logged override)
+        </label>
         <Button onClick={() => void startCrawl()} disabled={busy || !effectiveSite}>
           Queue crawl run
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={!latestRun}
+          onClick={() =>
+            void saveReport({ crawlRunId: latestRun as Id<"crawlRuns"> }).then((r) =>
+              setNote(`Report saved · ${r.findingCount} findings`),
+            )
+          }
+        >
+          Save report snapshot
         </Button>
       </div>
 
@@ -242,6 +267,26 @@ function AuditPage() {
           </ul>
         </CardContent>
       </Card>
+
+      {(reports ?? []).length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Report history</CardTitle>
+            <CardDescription>Saved snapshots for export / portal</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {(reports ?? []).slice(0, 5).map((r) => (
+              <div key={r.id} className="mc-glass px-3 py-2 rounded-md flex justify-between gap-2">
+                <span>{r.title}</span>
+                <span className="text-xs text-[var(--color-mocha-subtext0)]">
+                  {(r.summary as { findingCount?: number })?.findingCount ?? "?"} findings ·{" "}
+                  {new Date(r.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Card>
         <CardHeader>
