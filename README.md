@@ -11,13 +11,14 @@ A single multi-surface workspace (Web, Desktop, TUI, Mobile) plus a user-level L
 
 ## Status
 
-**Design / alignment phase.** Domain language and ADRs:
+**Design grilling wrapped** (shared understanding on locked ADRs). Open items: `docs/OPEN-QUESTIONS.md`.
 
 - `CONTEXT.md` — ubiquitous language (glossary only)
-- `docs/adr/` — architecture decision records
+- `docs/adr/` — architecture decision records (0001–0046)
 - `docs/research/` — research notes
+- `docs/OPEN-QUESTIONS.md` — unresolved questions
 
-Implementation starts only after shared understanding is confirmed in the grill-with-docs session.
+Implement when you choose to start scaffolding multi-repo Mission Control.
 
 ## Locked decisions (summary)
 
