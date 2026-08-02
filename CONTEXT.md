@@ -85,8 +85,12 @@ A scoped instance of the **CRM primitive**: either **Agency CRM** (agency sales,
 _Avoid_: Sub-account (GHL jargon), portal (UI shell only)
 
 **CRM API**:
-The public, versioned HTTP API for the CRM primitive—migration and bidirectional sync with external CRMs, plus headless automation (ADR-0034).
+The public, versioned HTTP API for the CRM primitive—migration and bidirectional sync with external CRMs, plus headless automation (ADR-0034). Path style matches Mission Control **API routes** (ADR-0042).
 _Avoid_: Internal Convex mutations only, Zapier-only access
+
+**API route**:
+An HTTP endpoint under `/api/v1/<module>/<action>/…` (Vercel-style modules and actions—ADR-0042), e.g. `/api/v1/crm/add/client`, `/api/v1/tasks/list`, `/api/v1/notify/email`.
+_Avoid_: GraphQL operation, RPC service name only
 
 **Contact**:
 A person in a CRM Workspace (lead, customer, vendor, etc.). May link to a Mission Control User if they have login.
