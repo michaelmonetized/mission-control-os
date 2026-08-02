@@ -19,6 +19,7 @@ import type * as email from "../email.js";
 import type * as findings from "../findings.js";
 import type * as handoffs from "../handoffs.js";
 import type * as hierarchy from "../hierarchy.js";
+import type * as jobs from "../jobs.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as opportunities from "../opportunities.js";
 import type * as portal from "../portal.js";
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   findings: typeof findings;
   handoffs: typeof handoffs;
   hierarchy: typeof hierarchy;
+  jobs: typeof jobs;
   "lib/auth": typeof lib_auth;
   opportunities: typeof opportunities;
   portal: typeof portal;

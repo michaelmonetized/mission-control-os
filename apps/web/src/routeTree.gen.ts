@@ -26,6 +26,7 @@ import { Route as AppEmailRouteImport } from './routes/app/email'
 import { Route as AppPortalRouteImport } from './routes/app/portal'
 import { Route as AppSocialRouteImport } from './routes/app/social'
 import { Route as AppTasksRouteImport } from './routes/app/tasks'
+import { Route as PortalOnboardingRouteImport } from './routes/portal/onboarding'
 import { Route as SignInSplatRouteImport } from './routes/sign-in.$'
 import { Route as SignUpSplatRouteImport } from './routes/sign-up.$'
 
@@ -114,6 +115,11 @@ const AppTasksRoute = AppTasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => AppRoute,
 } as any)
+const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => PortalRoute,
+} as any)
 const SignInSplatRoute = SignInSplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -129,7 +135,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/onboarding': typeof OnboardingRoute
-  '/portal': typeof PortalRoute
+  '/portal': typeof PortalRouteWithChildren
   '/select-agency': typeof SelectAgencyRoute
   '/sign-in': typeof SignInRouteWithChildren
   '/sign-up': typeof SignUpRouteWithChildren
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/app/portal': typeof AppPortalRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
+  '/portal/onboarding': typeof PortalOnboardingRoute
   '/sign-in/$': typeof SignInSplatRoute
   '/sign-up/$': typeof SignUpSplatRoute
   '/app/': typeof AppIndexRoute
@@ -149,7 +156,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
-  '/portal': typeof PortalRoute
+  '/portal': typeof PortalRouteWithChildren
   '/select-agency': typeof SelectAgencyRoute
   '/sign-in': typeof SignInRouteWithChildren
   '/sign-up': typeof SignUpRouteWithChildren
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/app/portal': typeof AppPortalRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
+  '/portal/onboarding': typeof PortalOnboardingRoute
   '/sign-in/$': typeof SignInSplatRoute
   '/sign-up/$': typeof SignUpSplatRoute
   '/app': typeof AppIndexRoute
@@ -171,7 +179,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/onboarding': typeof OnboardingRoute
-  '/portal': typeof PortalRoute
+  '/portal': typeof PortalRouteWithChildren
   '/select-agency': typeof SelectAgencyRoute
   '/sign-in': typeof SignInRouteWithChildren
   '/sign-up': typeof SignUpRouteWithChildren
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/app/portal': typeof AppPortalRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
+  '/portal/onboarding': typeof PortalOnboardingRoute
   '/sign-in/$': typeof SignInSplatRoute
   '/sign-up/$': typeof SignUpSplatRoute
   '/app/': typeof AppIndexRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/app/portal'
     | '/app/social'
     | '/app/tasks'
+    | '/portal/onboarding'
     | '/sign-in/$'
     | '/sign-up/$'
     | '/app/'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/app/portal'
     | '/app/social'
     | '/app/tasks'
+    | '/portal/onboarding'
     | '/sign-in/$'
     | '/sign-up/$'
     | '/app'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/app/portal'
     | '/app/social'
     | '/app/tasks'
+    | '/portal/onboarding'
     | '/sign-in/$'
     | '/sign-up/$'
     | '/app/'
@@ -257,7 +269,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
-  PortalRoute: typeof PortalRoute
+  PortalRoute: typeof PortalRouteWithChildren
   SelectAgencyRoute: typeof SelectAgencyRoute
   SignInRoute: typeof SignInRouteWithChildren
   SignUpRoute: typeof SignUpRouteWithChildren
@@ -384,6 +396,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTasksRouteImport
       parentRoute: typeof AppRoute
     }
+    '/portal/onboarding': {
+      id: '/portal/onboarding'
+      path: '/onboarding'
+      fullPath: '/portal/onboarding'
+      preLoaderRoute: typeof PortalOnboardingRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/sign-in/$': {
       id: '/sign-in/$'
       path: '/$'
@@ -429,6 +448,17 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface PortalRouteChildren {
+  PortalOnboardingRoute: typeof PortalOnboardingRoute
+}
+
+const PortalRouteChildren: PortalRouteChildren = {
+  PortalOnboardingRoute: PortalOnboardingRoute,
+}
+
+const PortalRouteWithChildren =
+  PortalRoute._addFileChildren(PortalRouteChildren)
+
 interface SignInRouteChildren {
   SignInSplatRoute: typeof SignInSplatRoute
 }
@@ -455,7 +485,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
-  PortalRoute: PortalRoute,
+  PortalRoute: PortalRouteWithChildren,
   SelectAgencyRoute: SelectAgencyRoute,
   SignInRoute: SignInRouteWithChildren,
   SignUpRoute: SignUpRouteWithChildren,
