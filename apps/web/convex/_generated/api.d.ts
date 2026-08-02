@@ -13,6 +13,7 @@ import type * as clients from "../clients.js";
 import type * as crawl from "../crawl.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as portal from "../portal.js";
+import type * as tasks from "../tasks.js";
 
 import type {
   ApiFromModules,
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   crawl: typeof crawl;
   "lib/auth": typeof lib_auth;
   portal: typeof portal;
+  tasks: typeof tasks;
 }>;
 
 /**

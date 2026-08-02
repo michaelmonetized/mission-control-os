@@ -75,6 +75,9 @@ export const API = {
     list: "/api/tasks/list",
     add: "/api/tasks/add",
     update: "/api/tasks/update",
+    promote: "/api/tasks/promote",
+    projectsList: "/api/tasks/projects/list",
+    projectsAdd: "/api/tasks/projects/add",
   },
   crm: {
     contactsList: "/api/crm/contacts/list",

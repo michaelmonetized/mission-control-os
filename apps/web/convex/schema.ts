@@ -87,7 +87,10 @@ export default defineSchema({
     contactId: v.optional(v.id("contacts")),
     workspaceId: v.optional(v.id("crmWorkspaces")),
     assigneeUserId: v.optional(v.string()),
-  }).index("by_client", ["clientId"]),
+  })
+    .index("by_client", ["clientId"])
+    .index("by_project", ["projectId"])
+    .index("by_workspace", ["workspaceId"]),
 
   crawlRuns: defineTable({
     siteId: v.id("sites"),
