@@ -54,6 +54,10 @@ function AuditPage() {
   const setStatus = useMutation(api.findings.setStatus);
   const setShared = useMutation(api.findings.setShared);
   const toTask = useMutation(api.findings.createTaskFromFinding);
+  const openIssues = useQuery(
+    api.findings.listOpenIssues,
+    effectiveSite ? { siteId: effectiveSite as Id<"sites"> } : "skip",
+  );
 
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -233,6 +237,25 @@ function AuditPage() {
                   {r.mode}
                   {r.ignoreRobots ? " · robots override" : ""}
                 </button>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Open issues (fingerprinted)</CardTitle>
+          <CardDescription>Across runs · type|url|message identity</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="text-sm space-y-1">
+            {(openIssues ?? []).map((o) => (
+              <li key={o.id} className="mc-glass px-3 py-2 rounded-md flex justify-between gap-2">
+                <span>
+                  {o.type} · {o.status}
+                  <span className="block font-mono text-xs break-all">{o.url}</span>
+                </span>
               </li>
             ))}
           </ul>

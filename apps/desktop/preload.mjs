@@ -7,4 +7,7 @@ contextBridge.exposeInMainWorld("mcDesktop", {
   pairAgent: (opts) => ipcRenderer.invoke("mc:pairAgent", opts ?? {}),
   /** @param {{ binPath?: string }} opts */
   installAgentService: (opts) => ipcRenderer.invoke("mc:installAgentService", opts ?? {}),
+  /** Effect-style bootstrap: pair → install → health (ADR-0011) */
+  orchestrateAgentBootstrap: (opts) =>
+    ipcRenderer.invoke("mc:orchestrateAgentBootstrap", opts ?? {}),
 });

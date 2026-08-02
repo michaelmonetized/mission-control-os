@@ -32,6 +32,33 @@ async function assertRunInAgency(
   return { run, site, location, client };
 }
 
+export const listOpenIssues = query({
+  args: { siteId: v.id("sites") },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) return [];
+    const site = await ctx.db.get(args.siteId);
+    if (!site) return [];
+    const location = await ctx.db.get(site.locationId);
+    if (!location) return [];
+    const client = await ctx.db.get(location.clientId);
+    if (!client || client.agencyId !== agency._id) return [];
+    const rows = await ctx.db
+      .query("openIssues")
+      .withIndex("by_site", (q) => q.eq("siteId", args.siteId))
+      .collect();
+    return rows.map((r) => ({
+      id: r._id,
+      fingerprint: r.fingerprint,
+      type: r.type,
+      url: r.url,
+      status: r.status,
+      shared: r.shared,
+    }));
+  },
+});
+
 export const setStatus = mutation({
   args: {
     findingId: v.id("auditFindings"),

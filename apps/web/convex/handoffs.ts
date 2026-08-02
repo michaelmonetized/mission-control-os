@@ -1,0 +1,90 @@
+import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
+import { getAgencyByClerkOrg, requireAgencyOrg } from "./lib/auth";
+
+/** Persist Trigger.dev handoff jobs (ADR-0046). */
+
+export const enqueue = mutation({
+  args: {
+    automationId: v.id("automations"),
+    fromStep: v.number(),
+    reason: v.string(),
+    idempotencyKey: v.string(),
+    payload: v.optional(v.any()),
+  },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) throw new Error("Agency not found");
+
+    const existing = await ctx.db
+      .query("automationHandoffs")
+      .withIndex("by_idempotency", (q) => q.eq("idempotencyKey", args.idempotencyKey))
+      .unique();
+    if (existing) {
+      return { id: existing._id, existing: true, status: existing.status };
+    }
+
+    const auto = await ctx.db.get(args.automationId);
+    if (!auto) throw new Error("automation not found");
+    const ws = await ctx.db.get(auto.workspaceId);
+    if (!ws || ws.agencyId !== agency._id) throw new Error("automation not in agency");
+
+    const id = await ctx.db.insert("automationHandoffs", {
+      automationId: args.automationId,
+      agencyId: agency._id,
+      fromStep: args.fromStep,
+      reason: args.reason,
+      idempotencyKey: args.idempotencyKey,
+      payload: args.payload ?? {},
+      status: "queued",
+      createdAt: Date.now(),
+    });
+    return { id, existing: false, status: "queued" as const };
+  },
+});
+
+export const listQueued = query({
+  args: {},
+  handler: async (ctx) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) return [];
+    const rows = await ctx.db
+      .query("automationHandoffs")
+      .withIndex("by_agency", (q) => q.eq("agencyId", agency._id))
+      .collect();
+    return rows
+      .filter((r) => r.status === "queued" || r.status === "processing")
+      .map((r) => ({
+        id: r._id,
+        automationId: r.automationId,
+        fromStep: r.fromStep,
+        reason: r.reason,
+        status: r.status,
+        idempotencyKey: r.idempotencyKey,
+        createdAt: r.createdAt,
+      }));
+  },
+});
+
+export const mark = mutation({
+  args: {
+    handoffId: v.id("automationHandoffs"),
+    status: v.union(
+      v.literal("processing"),
+      v.literal("done"),
+      v.literal("failed"),
+      v.literal("queued"),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) throw new Error("Agency not found");
+    const row = await ctx.db.get(args.handoffId);
+    if (!row || row.agencyId !== agency._id) throw new Error("not found");
+    await ctx.db.patch(args.handoffId, { status: args.status });
+    return { ok: true };
+  },
+});

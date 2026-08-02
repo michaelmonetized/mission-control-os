@@ -45,9 +45,22 @@ function CrmPage() {
       : "skip",
   );
 
+  const opportunities = useQuery(
+    api.opportunities.list,
+    scopeArgs === "skip" ? "skip" : scopeArgs,
+  );
+  const companies = useQuery(
+    api.opportunities.listCompanies,
+    scopeArgs === "skip" ? "skip" : scopeArgs,
+  );
   const addContact = useMutation(api.crm.addContact);
   const openConversation = useMutation(api.crm.openConversation);
   const ingest = useMutation(api.crm.ingestMessage);
+  const addOpp = useMutation(api.opportunities.add);
+  const setStage = useMutation(api.opportunities.setStage);
+  const addCompany = useMutation(api.opportunities.addCompany);
+  const [oppName, setOppName] = useState("");
+  const [companyName, setCompanyName] = useState("");
 
   async function createContact() {
     if (!contactName.trim() || scopeArgs === "skip") return;
@@ -286,6 +299,100 @@ function CrmPage() {
                 </div>
               </>
             )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Companies</CardTitle>
+            <CardDescription>Accounts / orgs in workspace</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Company name"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+              />
+              <Button
+                disabled={!companyName.trim() || scopeArgs === "skip"}
+                onClick={() =>
+                  void addCompany({
+                    ...(scopeArgs === "skip" ? {} : scopeArgs),
+                    name: companyName.trim(),
+                  }).then(() => setCompanyName(""))
+                }
+              >
+                Add
+              </Button>
+            </div>
+            <ul className="text-sm space-y-1">
+              {(companies ?? []).map((c) => (
+                <li key={c.id} className="mc-glass px-3 py-2 rounded-md">
+                  {c.name}
+                  {c.domain ? (
+                    <span className="text-xs text-[var(--color-mocha-subtext0)]"> · {c.domain}</span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Opportunities</CardTitle>
+            <CardDescription>Pipeline · won creates delivery Client</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Deal name"
+                value={oppName}
+                onChange={(e) => setOppName(e.target.value)}
+              />
+              <Button
+                disabled={!oppName.trim() || scopeArgs === "skip"}
+                onClick={() =>
+                  void addOpp({
+                    ...(scopeArgs === "skip" ? {} : scopeArgs),
+                    name: oppName.trim(),
+                  }).then(() => setOppName(""))
+                }
+              >
+                Add
+              </Button>
+            </div>
+            <ul className="text-sm space-y-2">
+              {(opportunities ?? []).map((o) => (
+                <li
+                  key={o.id}
+                  className="mc-glass px-3 py-2 rounded-md flex flex-wrap justify-between gap-2"
+                >
+                  <span>
+                    {o.name}{" "}
+                    <span className="text-xs text-[var(--color-mocha-subtext0)]">{o.stage}</span>
+                  </span>
+                  <select
+                    className="text-xs rounded border border-[var(--color-mocha-surface1)] bg-[var(--color-mocha-surface0)] px-2 py-1"
+                    value={o.stage}
+                    onChange={(e) =>
+                      void setStage({
+                        opportunityId: o.id as Id<"opportunities">,
+                        stage: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="qualified">qualified</option>
+                    <option value="proposal">proposal</option>
+                    <option value="negotiation">negotiation</option>
+                    <option value="won">won</option>
+                    <option value="lost">lost</option>
+                  </select>
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
       </div>

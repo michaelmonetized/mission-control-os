@@ -8,6 +8,7 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { registerEffectOrchestration } from "./effect-runtime.mjs";
 
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -76,13 +77,31 @@ ipcMain.handle("mc:getAgentSecret", () => {
   };
 });
 
-/**
- * Pair Agent: Control Plane issues refresh token; Desktop writes OS-safe store (ADR-0016).
- * `bearer` is the Clerk session JWT from the web renderer (getToken).
- */
-ipcMain.handle("mc:pairAgent", async (_evt, { bearer, deviceLabel } = {}) => {
+// pairAgent registered below after shared impl
+
+async function installAgentService({ binPath } = {}) {
+  const installSh = path.join(__dirname, "../agent/install/install.sh");
+  if (!fs.existsSync(installSh)) {
+    return { ok: false, error: `install script missing: ${installSh}` };
+  }
   try {
-    // Prefer Convex HTTP later; for now use Vite API stub or web session via fetch
+    const args = [];
+    if (binPath) args.push("--bin", binPath);
+    args.push("--control-plane", CONTROL_PLANE);
+    const { stdout, stderr } = await execFileAsync("bash", [installSh, ...args], {
+      env: { ...process.env, MC_CONTROL_PLANE: CONTROL_PLANE },
+    });
+    return { ok: true, stdout, stderr };
+  } catch (e) {
+    return { ok: false, error: String(e), stdout: e.stdout, stderr: e.stderr };
+  }
+}
+
+ipcMain.handle("mc:installAgentService", async (_evt, opts) => installAgentService(opts ?? {}));
+
+// Extract pair logic for Effect orchestration
+async function pairAgentImpl({ bearer, deviceLabel } = {}) {
+  try {
     const res = await fetch(`${CONTROL_PLANE.replace(/\/$/, "")}/api/agent/token`, {
       method: "POST",
       headers: {
@@ -103,7 +122,6 @@ ipcMain.handle("mc:pairAgent", async (_evt, { bearer, deviceLabel } = {}) => {
       issuedAt: Date.now(),
       expiresIn: data.expiresIn,
     });
-    // Also write agent data dir config for daemon (plaintext path used if keychain unavailable)
     const agentDir =
       process.platform === "darwin"
         ? path.join(app.getPath("home"), "Library/Application Support/MissionControl/Agent")
@@ -126,29 +144,21 @@ ipcMain.handle("mc:pairAgent", async (_evt, { bearer, deviceLabel } = {}) => {
   } catch (e) {
     return { ok: false, error: String(e) };
   }
+}
+
+ipcMain.handle("mc:pairAgent", async (_evt, opts) => pairAgentImpl(opts ?? {}));
+
+registerEffectOrchestration({
+  pairAgent: pairAgentImpl,
+  installAgent: installAgentService,
+  readSecret: readAgentSecret,
+  writeSecret: writeAgentSecret,
+  controlPlane: CONTROL_PLANE,
 });
 
-ipcMain.handle("mc:installAgentService", async (_evt, { binPath } = {}) => {
-  const installSh = path.join(__dirname, "../agent/install/install.sh");
-  if (!fs.existsSync(installSh)) {
-    return { ok: false, error: `install script missing: ${installSh}` };
-  }
-  try {
-    const args = [];
-    if (binPath) args.push("--bin", binPath);
-    args.push("--control-plane", CONTROL_PLANE);
-    const { stdout, stderr } = await execFileAsync("bash", [installSh, ...args], {
-      env: { ...process.env, MC_CONTROL_PLANE: CONTROL_PLANE },
-    });
-    return { ok: true, stdout, stderr };
-  } catch (e) {
-    return { ok: false, error: String(e), stdout: e.stdout, stderr: e.stderr };
-  }
-});
-
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   createWindow();
-  // Refresh/repair secret on open (ADR-0016)
+  // Effect-style bootstrap on open (ADR-0011/0016)
   const existing = readAgentSecret();
   if (existing?.refreshToken) {
     console.log("[mc-desktop] agent secret present", {
@@ -156,7 +166,7 @@ app.whenReady().then(() => {
       issuedAt: existing.issuedAt,
     });
   } else {
-    console.log("[mc-desktop] no agent secret — pair from UI");
+    console.log("[mc-desktop] no agent secret — pair from UI or run orchestrateAgentBootstrap");
   }
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

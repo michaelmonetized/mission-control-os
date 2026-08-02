@@ -99,11 +99,11 @@ cargo run -p mc-tui
 | Item | Gap |
 |------|-----|
 | ADR-0006 mobile | Swift/Kotlin apps not started (issue #16) |
-| ADR-0011 Effect | Desktop Effect runtime orchestration incomplete |
-| ADR-0008 full Sitebulb depth | Crawl is HTTP+alt/links core; expand checks over time |
-| ADR-0034 HTTP CRM proxy | Catalog complete; Convex is source of truth (no dual-write HTTP yet) |
-| ADR-0046 Trigger.dev cloud | Handoff payload + mock; needs TRIGGER_SECRET_KEY project |
-| ADR-0022 Playwright | Used when `npx playwright` works; else HTTP |
+| ADR-0011 Effect | Desktop bootstrap orchestration present (`effect` + pipeline); full Effect graph TBD |
+| ADR-0008 full Sitebulb depth | Expanded checks (title/h1/meta/canonical/noindex/dupes); more extractors TBD |
+| ADR-0034 HTTP CRM proxy | Catalog + Convex SoT; thin HTTP dual-write optional |
+| ADR-0046 Trigger.dev cloud | `automationHandoffs` queue + worker contract; needs Trigger project key |
+| ADR-0022 Playwright | Default when `require('playwright')` works; else HTTP |
 | DSD-0008 iCloud vector | Reconstructed SVG until iCloud import |
 | DSD-0010 full shadcn dump | Core mirrors; expand via `shadcn add` |
 | Clerk production instance | Dev keys on Vercel previews |

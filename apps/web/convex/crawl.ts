@@ -102,7 +102,33 @@ export const streamFinding = mutation({
       shared: args.shared ?? false,
       message: args.message,
     });
-    return { findingId };
+
+    // Open Issue fingerprint across runs (ADR-0023 consequences)
+    const fingerprint =
+      `${args.type}|${args.url}|${args.message ?? ""}`.slice(0, 400);
+    const existing = await ctx.db
+      .query("openIssues")
+      .withIndex("by_site_fingerprint", (q) =>
+        q.eq("siteId", scoped.run.siteId).eq("fingerprint", fingerprint),
+      )
+      .unique();
+    if (existing) {
+      if (existing.status === "done" || existing.status === "wont_fix") {
+        // re-open if seen again
+        await ctx.db.patch(existing._id, { status: "open" });
+      }
+    } else {
+      await ctx.db.insert("openIssues", {
+        siteId: scoped.run.siteId,
+        fingerprint,
+        type: args.type,
+        url: args.url,
+        status: "open",
+        shared: args.shared ?? false,
+      });
+    }
+
+    return { findingId, fingerprint };
   },
 });
 

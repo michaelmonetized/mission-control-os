@@ -198,6 +198,17 @@ export const runInline = mutation({
             error: "wait steps require scheduler/Trigger handoff",
             handoff: true,
           });
+          const idempotencyKey = `auto:${args.automationId}:wait:${i}:${Date.now()}`;
+          await ctx.db.insert("automationHandoffs", {
+            automationId: args.automationId,
+            agencyId: agency._id,
+            fromStep: i,
+            reason: "wait_step",
+            idempotencyKey,
+            payload: { context: args.context, results, delayMs: step.config?.ms ?? 60_000 },
+            status: "queued",
+            createdAt: Date.now(),
+          });
           return {
             automationId: args.automationId,
             status: "handoff_trigger",
@@ -207,6 +218,7 @@ export const runInline = mutation({
               fromStep: i,
               context: args.context,
               reason: "wait_step",
+              idempotencyKey,
             },
           };
         } else {
@@ -215,6 +227,18 @@ export const runInline = mutation({
       } catch (e) {
         const error = e instanceof Error ? e.message : String(e);
         results.push({ step: i, type: step.type, ok: false, error, handoff: true });
+        const idempotencyKey = `auto:${args.automationId}:step:${i}:${Date.now()}`;
+        // Persist handoff for Trigger worker (ADR-0046)
+        await ctx.db.insert("automationHandoffs", {
+          automationId: args.automationId,
+          agencyId: agency._id,
+          fromStep: i,
+          reason: error,
+          idempotencyKey,
+          payload: { context: args.context, results },
+          status: "queued",
+          createdAt: Date.now(),
+        });
         return {
           automationId: args.automationId,
           status: "handoff_trigger",
@@ -224,7 +248,7 @@ export const runInline = mutation({
             fromStep: i,
             context: args.context,
             reason: error,
-            idempotencyKey: `auto:${args.automationId}:step:${i}:${Date.now()}`,
+            idempotencyKey,
           },
         };
       }

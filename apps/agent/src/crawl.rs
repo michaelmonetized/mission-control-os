@@ -1,8 +1,9 @@
 //! Local crawl executor (ADR-0004) — artifacts local, findings streamed (ADR-0019/0020).
-//! Default mode is rendered when Playwright CLI is available (ADR-0022); otherwise HTTP.
+//! Default mode is rendered when Playwright is available (ADR-0022); otherwise HTTP.
+//! Depth: broken links, missing alt, title/h1/meta, duplicates, canonical, noindex (ADR-0008).
 
 use serde::{Deserialize, Serialize};
-use std::collections::{HashSet, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -22,6 +23,8 @@ pub struct Finding {
     pub severity: String,
     pub url: String,
     pub message: Option<String>,
+    #[serde(default)]
+    pub fingerprint: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -30,8 +33,31 @@ pub struct CrawlResult {
     pub pages_retrieved: usize,
     pub broken_links: usize,
     pub missing_alt: usize,
+    pub duplicate_titles: usize,
+    pub missing_meta: usize,
     pub mode_used: String,
     pub artifacts_dir: PathBuf,
+}
+
+fn fingerprint(kind: &str, url: &str, detail: &str) -> String {
+    format!("{kind}|{url}|{detail}")
+}
+
+fn push_finding(
+    findings: &mut Vec<Finding>,
+    kind: &str,
+    severity: &str,
+    url: &str,
+    message: impl Into<String>,
+) {
+    let msg = message.into();
+    findings.push(Finding {
+        r#type: kind.into(),
+        severity: severity.into(),
+        url: url.into(),
+        fingerprint: fingerprint(kind, url, &msg),
+        message: Some(msg),
+    });
 }
 
 pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, String> {
@@ -50,7 +76,7 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
         fetch_robots_disallow(&origin).unwrap_or_default()
     };
 
-    let use_rendered = opts.mode == "rendered" && playwright_available();
+    let use_rendered = opts.mode != "http_only" && playwright_available();
     let mode_used = if use_rendered {
         "rendered".to_string()
     } else {
@@ -69,9 +95,12 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
     let mut pages = 0usize;
     let mut broken = 0usize;
     let mut missing_alt = 0usize;
+    let mut missing_meta = 0usize;
+    let mut titles: HashMap<String, Vec<String>> = HashMap::new();
 
     let client = reqwest::blocking::Client::builder()
         .timeout(std::time::Duration::from_secs(20))
+        .redirect(reqwest::redirect::Policy::limited(5))
         .user_agent("MissionControlAgent/0.1 (+local-audit)")
         .build()
         .map_err(|e| e.to_string())?;
@@ -84,59 +113,19 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
             continue;
         }
 
-        let html = if use_rendered {
-            match render_with_playwright(&url, &artifacts) {
-                Ok(h) => h,
-                Err(e) => {
-                    tracing::warn!(%url, error = %e, "rendered fetch failed; trying HTTP");
-                    match client.get(&url).send() {
-                        Ok(r) if r.status().is_success() => r.text().unwrap_or_default(),
-                        Ok(r) => {
-                            broken += 1;
-                            findings.push(Finding {
-                                r#type: "broken_link".into(),
-                                severity: "high".into(),
-                                url: url.clone(),
-                                message: Some(format!("HTTP {}", r.status())),
-                            });
-                            continue;
-                        }
-                        Err(e) => {
-                            broken += 1;
-                            findings.push(Finding {
-                                r#type: "broken_link".into(),
-                                severity: "high".into(),
-                                url: url.clone(),
-                                message: Some(e.to_string()),
-                            });
-                            continue;
-                        }
-                    }
-                }
-            }
-        } else {
-            match client.get(&url).send() {
-                Ok(r) if r.status().is_success() => r.text().unwrap_or_default(),
-                Ok(r) => {
-                    broken += 1;
-                    findings.push(Finding {
-                        r#type: "broken_link".into(),
-                        severity: "high".into(),
-                        url: url.clone(),
-                        message: Some(format!("HTTP {}", r.status())),
-                    });
-                    continue;
-                }
-                Err(e) => {
-                    broken += 1;
-                    findings.push(Finding {
-                        r#type: "broken_link".into(),
-                        severity: "high".into(),
-                        url: url.clone(),
-                        message: Some(e.to_string()),
-                    });
-                    continue;
-                }
+        let fetch = fetch_page(&client, &url, use_rendered, &artifacts);
+        let html = match fetch {
+            Ok(h) => h,
+            Err(status_msg) => {
+                broken += 1;
+                push_finding(
+                    &mut findings,
+                    "broken_link",
+                    "high",
+                    &url,
+                    status_msg,
+                );
+                continue;
             }
         };
 
@@ -144,19 +133,97 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
         let page_path = artifacts.join(format!("page_{pages}.html"));
         let _ = fs::write(&page_path, &html);
 
+        // title
+        let title = extract_title(&html);
+        if title.is_empty() {
+            push_finding(
+                &mut findings,
+                "missing_title",
+                "high",
+                &url,
+                "document missing <title>",
+            );
+        } else {
+            titles.entry(title.clone()).or_default().push(url.clone());
+            if title.len() > 60 {
+                push_finding(
+                    &mut findings,
+                    "title_too_long",
+                    "low",
+                    &url,
+                    format!("title length {} > 60", title.len()),
+                );
+            }
+        }
+
+        // h1
+        let h1s = count_tag(&html, "h1");
+        if h1s == 0 {
+            push_finding(
+                &mut findings,
+                "missing_h1",
+                "medium",
+                &url,
+                "no H1 on page",
+            );
+        } else if h1s > 1 {
+            push_finding(
+                &mut findings,
+                "multiple_h1",
+                "low",
+                &url,
+                format!("{h1s} H1 elements"),
+            );
+        }
+
+        // meta description
+        if extract_meta_description(&html).is_none() {
+            missing_meta += 1;
+            push_finding(
+                &mut findings,
+                "missing_meta_description",
+                "medium",
+                &url,
+                "no meta description",
+            );
+        }
+
+        // canonical
+        if let Some(canon) = extract_rel(&html, "canonical") {
+            let abs = resolve_url(&url, &canon);
+            if !abs.starts_with(&origin) {
+                push_finding(
+                    &mut findings,
+                    "canonical_off_origin",
+                    "medium",
+                    &url,
+                    format!("canonical points off-origin: {abs}"),
+                );
+            }
+        }
+
+        // noindex
+        if html_has_noindex(&html) {
+            push_finding(
+                &mut findings,
+                "noindex",
+                "low",
+                &url,
+                "page has noindex robots directive",
+            );
+        }
+
         // missing alt
         for m in extract_imgs_missing_alt(&html) {
             missing_alt += 1;
-            findings.push(Finding {
-                r#type: "missing_alt".into(),
-                severity: "medium".into(),
-                url: url.clone(),
-                message: Some(m),
-            });
+            push_finding(&mut findings, "missing_alt", "medium", &url, m);
         }
 
         // enqueue same-origin links
         for link in extract_hrefs(&html) {
+            if link.starts_with("mailto:") || link.starts_with("tel:") || link.starts_with("javascript:") {
+                continue;
+            }
             let abs = resolve_url(&url, &link);
             if abs.starts_with(&origin) && seen.insert(abs.clone()) {
                 queue.push_back(abs);
@@ -164,18 +231,66 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
         }
     }
 
-    let result = CrawlResult {
+    // duplicate titles
+    let mut duplicate_titles = 0usize;
+    for (title, urls) in &titles {
+        if urls.len() > 1 {
+            duplicate_titles += urls.len();
+            for u in urls {
+                push_finding(
+                    &mut findings,
+                    "duplicate_title",
+                    "medium",
+                    u,
+                    format!("title shared by {} pages: {title}", urls.len()),
+                );
+            }
+        }
+    }
+
+    // ADR-0020: clean artifacts after run (keep a small summary json optional)
+    let _ = fs::write(
+        data_dir.join("artifacts").join(format!("summary_{run_id}.json")),
+        serde_json::to_string_pretty(&serde_json::json!({
+            "pages": pages,
+            "broken": broken,
+            "missing_alt": missing_alt,
+            "duplicate_titles": duplicate_titles,
+            "mode": mode_used,
+        }))
+        .unwrap_or_default(),
+    );
+    cleanup_artifacts(&artifacts);
+
+    Ok(CrawlResult {
         findings,
         pages_retrieved: pages,
         broken_links: broken,
         missing_alt,
+        duplicate_titles,
+        missing_meta,
         mode_used,
-        artifacts_dir: artifacts.clone(),
-    };
+        artifacts_dir: artifacts,
+    })
+}
 
-    // ADR-0020: clean artifacts after run
-    cleanup_artifacts(&artifacts);
-    Ok(result)
+fn fetch_page(
+    client: &reqwest::blocking::Client,
+    url: &str,
+    use_rendered: bool,
+    artifacts: &Path,
+) -> Result<String, String> {
+    if use_rendered {
+        match render_with_playwright(url, artifacts) {
+            Ok(h) => return Ok(h),
+            Err(e) => tracing::warn!(%url, error = %e, "rendered fetch failed; trying HTTP"),
+        }
+    }
+    match client.get(url).send() {
+        Ok(r) if r.status().is_success() => r.text().map_err(|e| e.to_string()),
+        Ok(r) => Err(format!("HTTP {}", r.status())),
+        Err(e) => Err(e.to_string()),
+    }
 }
 
 fn cleanup_artifacts(dir: &Path) {
@@ -187,22 +302,27 @@ fn cleanup_artifacts(dir: &Path) {
 }
 
 fn playwright_available() -> bool {
-    Command::new("npx")
-        .args(["--yes", "playwright", "--version"])
+    // Prefer local playwright package; fall back to npx
+    Command::new("node")
+        .args(["-e", "require('playwright'); console.log('ok')"])
         .output()
         .map(|o| o.status.success())
         .unwrap_or(false)
+        || Command::new("npx")
+            .args(["--yes", "playwright", "--version"])
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false)
 }
 
 fn render_with_playwright(url: &str, artifacts: &Path) -> Result<String, String> {
     let out = artifacts.join("playwright_out.html");
-    // Minimal script via node -e if playwright installed
     let script = format!(
         r#"const {{ chromium }} = require('playwright');
 (async () => {{
   const browser = await chromium.launch({{ headless: true }});
   const page = await browser.newPage();
-  await page.goto({url}, {{ waitUntil: 'networkidle', timeout: 30000 }});
+  await page.goto({url}, {{ waitUntil: 'networkidle', timeout: 45000 }});
   const html = await page.content();
   require('fs').writeFileSync({out}, html);
   await browser.close();
@@ -289,6 +409,98 @@ fn extract_imgs_missing_alt(html: &str) -> Vec<String> {
     out
 }
 
+fn extract_title(html: &str) -> String {
+    let lower = html.to_ascii_lowercase();
+    if let Some(s) = lower.find("<title") {
+        let after = &html[s..];
+        if let Some(gt) = after.find('>') {
+            let rest = &after[gt + 1..];
+            if let Some(end) = rest.to_ascii_lowercase().find("</title>") {
+                return rest[..end].trim().to_string();
+            }
+        }
+    }
+    String::new()
+}
+
+fn count_tag(html: &str, tag: &str) -> usize {
+    let needle = format!("<{tag}");
+    html.to_ascii_lowercase().matches(&needle).count()
+}
+
+fn extract_meta_description(html: &str) -> Option<String> {
+    let lower = html.to_ascii_lowercase();
+    let mut idx = 0;
+    while let Some(rel) = lower[idx..].find("<meta") {
+        let start = idx + rel;
+        let end = lower[start..].find('>').map(|e| start + e).unwrap_or(html.len());
+        let tag = lower[start..end.min(lower.len())].to_string();
+        if tag.contains("name=\"description\"") || tag.contains("name='description'") {
+            // find content=
+            if let Some(c) = tag.find("content=") {
+                let rest = &tag[c + 8..];
+                let q = rest.chars().next()?;
+                if q == '"' || q == '\'' {
+                    let inner = &rest[1..];
+                    if let Some(e) = inner.find(q) {
+                        return Some(inner[..e].to_string());
+                    }
+                }
+            }
+        }
+        idx = end + 1;
+        if idx >= lower.len() {
+            break;
+        }
+    }
+    None
+}
+
+fn extract_rel(html: &str, rel: &str) -> Option<String> {
+    let lower = html.to_ascii_lowercase();
+    let needle = format!("rel=\"{rel}\"");
+    let needle2 = format!("rel='{rel}'");
+    let mut idx = 0;
+    while let Some(rel_pos) = lower[idx..]
+        .find(&needle)
+        .or_else(|| lower[idx..].find(&needle2))
+    {
+        let start = idx + rel_pos;
+        // search backward for <link
+        let window_start = start.saturating_sub(200);
+        let slice = &html[window_start..start.min(html.len())];
+        if let Some(link_rel) = slice.rfind("<link") {
+            let tag_start = window_start + link_rel;
+            let tag_end = html[tag_start..]
+                .find('>')
+                .map(|e| tag_start + e)
+                .unwrap_or(html.len());
+            let tag = &html[tag_start..tag_end];
+            let tlow = tag.to_ascii_lowercase();
+            if let Some(c) = tlow.find("href=") {
+                let rest = &tag[c + 5..];
+                let q = rest.chars().next()?;
+                if q == '"' || q == '\'' {
+                    let inner = &rest[1..];
+                    if let Some(e) = inner.find(q) {
+                        return Some(inner[..e].to_string());
+                    }
+                }
+            }
+        }
+        idx = start + 1;
+    }
+    None
+}
+
+fn html_has_noindex(html: &str) -> bool {
+    let lower = html.to_ascii_lowercase();
+    lower.contains("noindex")
+        && (lower.contains("name=\"robots\"")
+            || lower.contains("name='robots'")
+            || lower.contains("name=robots"))
+}
+
 fn resolve_url(base: &str, href: &str) -> String {
     if href.starts_with("http://") || href.starts_with("https://") {
         return href.to_string();
@@ -301,5 +513,9 @@ fn resolve_url(base: &str, href: &str) -> String {
             return format!("{}://{}{}", u.scheme(), u.host_str().unwrap_or(""), href);
         }
     }
-    format!("{}/{}", base.trim_end_matches('/'), href.trim_start_matches('/'))
+    format!(
+        "{}/{}",
+        base.trim_end_matches('/'),
+        href.trim_start_matches('/')
+    )
 }

@@ -40,6 +40,8 @@ function AutomationsPage() {
   const saveTemplate = useMutation(api.automations.saveTemplate);
   const setEnabled = useMutation(api.automations.setEnabled);
   const runInline = useMutation(api.automations.runInline);
+  const handoffs = useQuery(api.handoffs.listQueued, {});
+  const markHandoff = useMutation(api.handoffs.mark);
 
   const [name, setName] = useState("Welcome sequence");
   const [trigger, setTrigger] = useState<string>("ingest.contact");
@@ -188,6 +190,40 @@ function AutomationsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Trigger.dev handoff queue</CardTitle>
+          <CardDescription>Durable recovery jobs (ADR-0046)</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          {(handoffs ?? []).length === 0 ? (
+            <p className="text-[var(--color-mocha-subtext0)]">No queued handoffs.</p>
+          ) : (
+            (handoffs ?? []).map((h) => (
+              <div
+                key={h.id}
+                className="mc-glass px-3 py-2 rounded-md flex flex-wrap justify-between gap-2"
+              >
+                <span>
+                  step {h.fromStep} · {h.reason} · {h.status}
+                </span>
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    void markHandoff({
+                      handoffId: h.id as Id<"automationHandoffs">,
+                      status: "done",
+                    })
+                  }
+                >
+                  Mark done
+                </Button>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

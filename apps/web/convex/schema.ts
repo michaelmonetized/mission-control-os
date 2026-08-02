@@ -118,7 +118,24 @@ export default defineSchema({
     url: v.string(),
     status: v.string(),
     shared: v.boolean(),
-  }).index("by_site", ["siteId"]),
+  })
+    .index("by_site", ["siteId"])
+    .index("by_site_fingerprint", ["siteId", "fingerprint"]),
+
+  /** Queued automation handoffs for Trigger.dev (ADR-0046) */
+  automationHandoffs: defineTable({
+    automationId: v.id("automations"),
+    agencyId: v.id("agencies"),
+    fromStep: v.number(),
+    reason: v.string(),
+    idempotencyKey: v.string(),
+    payload: v.any(),
+    status: v.string(), // queued | processing | done | failed
+    createdAt: v.number(),
+  })
+    .index("by_agency", ["agencyId"])
+    .index("by_status", ["status"])
+    .index("by_idempotency", ["idempotencyKey"]),
 
   metricsSnapshots: defineTable({
     crawlRunId: v.id("crawlRuns"),
