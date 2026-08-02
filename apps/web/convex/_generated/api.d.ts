@@ -14,6 +14,7 @@ import type * as crawl from "../crawl.js";
 import type * as crm from "../crm.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as portal from "../portal.js";
+import type * as social from "../social.js";
 import type * as tasks from "../tasks.js";
 
 import type {
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   crm: typeof crm;
   "lib/auth": typeof lib_auth;
   portal: typeof portal;
+  social: typeof social;
   tasks: typeof tasks;
 }>;
 
