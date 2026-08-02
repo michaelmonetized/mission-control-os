@@ -17,7 +17,7 @@ Hammered via grill-with-docs. Architecture ADRs live in `docs/adr/`; domain lang
 
 ## Status
 
-**Grilling in progress.** Locked DSDs:
+**DSD grill wrapped.** Open items: [OPEN-QUESTIONS.md](./OPEN-QUESTIONS.md).
 
 | ID | Topic |
 |----|--------|
@@ -28,6 +28,10 @@ Hammered via grill-with-docs. Architecture ADRs live in `docs/adr/`; domain lang
 | [0005](./0005-radius-scale-and-nesting.md) | Radius + nested calc |
 | [0006](./0006-logo-launch-keyhole.md) | Launch keyhole + max95 wordmark |
 | [0007](./0007-shadcn-mirror-abstraction.md) | Untouched shadcn + MC mirror + cn-fast |
+| [0008](./0008-media-kit-vector-source.md) | Media kit; vector is source of truth |
+| [0009](./0009-spacing-type-scale-cna.md) | φ spacing/type = test-create-next-app |
+| [0010](./0010-shadcn-mirror-all.md) | Mirror all shadcn components |
+| [0011](./0011-command-palette-deferred.md) | Command palette → later ADR |
 
 ## Naming
 

@@ -39,8 +39,12 @@ Primary logo mark—circular badge with geometric keyhole/launch-path glyph (DSD
 _Avoid_: Generic rocket emoji, Apple-like command symbol
 
 **MC mirror (UI)**:
-Product-owned wrappers around untouched **shadcn/ui** components; brand classes applied via **cn-fast**. App code imports mirrors only (DSD-0007).
+Product-owned wrappers around untouched **shadcn/ui** components; brand classes applied via **cn-fast**. App code imports mirrors only (DSD-0007). **All** available shadcn components get a mirror (DSD-0010).
 _Avoid_: Editing shadcn sources in place, importing `@/components/ui` from features
+
+**φ scale**:
+Spacing and fluid type system from house **test-create-next-app** / `cna` theme (golden-ratio clamps)—DSD-0009.
+_Avoid_: Ad-hoc rem spacing ladder
 
 **Skeuomorph control**:
 Selective tactile/realistic control styling (Icon Factory energy) on buttons and hardware-like affordances (DSD-0002).
