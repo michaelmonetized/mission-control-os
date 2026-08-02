@@ -120,6 +120,14 @@ _Avoid_: Integration (the product capability), OAuth app (platform)
 A piece of content scheduled or published to social channels via the social calendar.
 _Avoid_: Buffer (vendor), update (vague)
 
+**Email Domain**:
+A sending domain verified for an Agency or Client ESP workspace via DNS records issued through Resend-backed provisioning. Required to enable full email features for that workspace.
+_Avoid_: Connected Account alone (OAuth mailbox ≠ authenticated sending domain)
+
+**ESP Workspace**:
+Email sending context for Agency or Client (domains, campaigns, transactional templates) backed by Resend—not the Mission Control product’s own system mail only.
+_Avoid_: Mailbox (receive/sync), Resend account (vendor implementation)
+
 ### Technical audit
 
 **Crawl**:
