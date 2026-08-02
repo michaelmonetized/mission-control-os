@@ -20,6 +20,7 @@ import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
 import { Route as AppAutomationsRouteImport } from './routes/app/automations'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
+import { Route as AppConnectionsRouteImport } from './routes/app/connections'
 import { Route as AppCrmRouteImport } from './routes/app/crm'
 import { Route as AppEmailRouteImport } from './routes/app/email'
 import { Route as AppPortalRouteImport } from './routes/app/portal'
@@ -83,6 +84,11 @@ const AppClientsRoute = AppClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => AppRoute,
 } as any)
+const AppConnectionsRoute = AppConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCrmRoute = AppCrmRouteImport.update({
   id: '/crm',
   path: '/crm',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
+  '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
   '/app/portal': typeof AppPortalRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
+  '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
   '/app/portal': typeof AppPortalRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
+  '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
   '/app/portal': typeof AppPortalRoute
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/app/audit'
     | '/app/automations'
     | '/app/clients'
+    | '/app/connections'
     | '/app/crm'
     | '/app/email'
     | '/app/portal'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/app/audit'
     | '/app/automations'
     | '/app/clients'
+    | '/app/connections'
     | '/app/crm'
     | '/app/email'
     | '/app/portal'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/app/audit'
     | '/app/automations'
     | '/app/clients'
+    | '/app/connections'
     | '/app/crm'
     | '/app/email'
     | '/app/portal'
@@ -330,6 +342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClientsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/connections': {
+      id: '/app/connections'
+      path: '/connections'
+      fullPath: '/app/connections'
+      preLoaderRoute: typeof AppConnectionsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/crm': {
       id: '/app/crm'
       path: '/crm'
@@ -386,6 +405,7 @@ interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
   AppAutomationsRoute: typeof AppAutomationsRoute
   AppClientsRoute: typeof AppClientsRoute
+  AppConnectionsRoute: typeof AppConnectionsRoute
   AppCrmRoute: typeof AppCrmRoute
   AppEmailRoute: typeof AppEmailRoute
   AppPortalRoute: typeof AppPortalRoute
@@ -398,6 +418,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
   AppAutomationsRoute: AppAutomationsRoute,
   AppClientsRoute: AppClientsRoute,
+  AppConnectionsRoute: AppConnectionsRoute,
   AppCrmRoute: AppCrmRoute,
   AppEmailRoute: AppEmailRoute,
   AppPortalRoute: AppPortalRoute,

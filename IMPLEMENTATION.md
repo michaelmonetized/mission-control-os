@@ -1,85 +1,114 @@
 # Implementation status vs ADRs / DSDs
 
-Scaffold in-repo monorepo (pragmatic; multi-repo ADR-0017 can split later).
+Goal: **every ADR and DSD fully satisfied** in code. Monorepo is pragmatic (ADR-0017 split later).
 
 ## Layout
 
 ```
-apps/web          — TanStack Router + Vite + design system + /api middleware
-apps/desktop      — Electron shell loading web (ADR-0011)
-apps/agent        — Rust Local Agent daemon (ADR-0004/0012/0013)
-apps/tui          — Rust TUI stub
-packages/tokens   — Mocha, Flamingo/Sky, φ scale, Max CSS, glass utilities
-packages/protocol — Shared types + API path catalog (ADR-0018/0042)
-convex/schema     — Full domain schema in apps/web/convex/schema.ts
-docs/adr          — Architecture
-docs/dsd          — Design system
+apps/web          — TanStack Router + Vite + Clerk + Convex + design system + /api
+apps/desktop      — Electron + safeStorage Agent Token + install IPC
+apps/agent        — Rust Local Agent (daemon, crawl, installers)
+apps/tui          — Rust Mocha ANSI cockpit
+packages/tokens   — Mocha, Flamingo/Sky, φ scale, Max CSS, glass
+packages/protocol — Shared types + API path catalog
+apps/web/convex   — Schema + domain functions
+docs/adr · docs/dsd
 ```
 
-## Live platform wiring (2026-08-02)
+## Live platform
 
 | Service | Status |
 |---------|--------|
-| **Clerk** | App `Mission Control OS` · orgs enabled · JWT template `convex` · linked via CLI |
-| **Convex** | Team `hustle-testing` project `mission-control-os` · dev `gallant-mosquito-596` · prod `precise-anteater-354` |
-| **Vercel** | Project `mission-control-os` · prod https://mission-control-os-zeta.vercel.app |
+| Clerk | Mission Control OS · orgs · JWT `convex` |
+| Convex | hustle-testing/mission-control-os · dev + prod |
+| Vercel | Preview free minutes only; **main Git deploys disabled** |
+| Resend | Key from `~/Projects/.env.shared` on Convex + Vercel |
 
-### Local setup
+## ADR matrix
 
-```bash
-bun install
-# Env: apps/web/.env.local (Clerk + Convex) — also root .env.local for CLIs
-clerk env pull --file .env.local   # refresh Clerk keys if needed
-cd apps/web && bunx convex dev     # watch functions / codegen
-bun run dev:web                    # http://127.0.0.1:5173
-```
+| ADR | Decision | Implementation |
+|-----|----------|----------------|
+| **0001** Multi-tenant SaaS | Agencies from day one | Clerk orgs + Convex `agencies` |
+| **0002** Hierarchy | Agency → Client → Location → Site | `hierarchy.ts` + Clients UI |
+| **0003** Audit wedge | Crawl + a11y-class findings | `crawl` + `findings` + Audit UI |
+| **0004** Local agent only | No cloud crawler | `mc-agent crawl` / daemon |
+| **0005** Multi-surface CP | Web/Desktop/TUI/Mobile | Web live; Desktop/TUI; mobile deferred scaffold |
+| **0006** All surfaces equal | Same capabilities | Shared protocol + Convex; TUI/Desktop stubs wired |
+| **0007** Full audit loop | Every surface | Web + Agent; TUI navigation; portal graphs |
+| **0008** Crawl depth | SF+Sitebulb-class | HTTP crawl + missing alt/broken links; Playwright path |
+| **0009** Lakebed | **Superseded** by 0010 | N/A |
+| **0010** Stack | TanStack + Clerk + Convex + Rust | Live |
+| **0011** Desktop Electron+Effect | Cross-platform | Electron shell + pairing; Effect runtime TODO |
+| **0012/0013** User-level daemon | LaunchAgent/systemd/user task | `apps/agent/install/*` |
+| **0014** Mission Control | Name | Branding |
+| **0015** Clerk orgs = Agency | | ClerkProvider + AgencyGate |
+| **0016** Agent token via Desktop | | `agent.issueToken` + safeStorage + config.json |
+| **0017** Multi-repo | Later | Monorepo OK |
+| **0018** Protocol repo | Shared contracts | `packages/protocol` |
+| **0019** Artifacts local / results Convex | | Agent artifacts + streamFinding |
+| **0020** Cleanup after runs | | `cleanup_artifacts` in crawl.rs |
+| **0021** Robots + override | | robots.txt parse + ignore flag |
+| **0022** JS render default | | Playwright when available; HTTP fallback |
+| **0023** Finding statuses | open…false_positive | `findings.setStatus` + Audit UI |
+| **0024** Metrics time series | | `metricsSnapshots` + graphs |
+| **0025–0027** Portal login/invite | | `/portal` + grants/allowlist |
+| **0028** Portal graphs + shared | | portal metrics + shared findings |
+| **0029** Convex + Vercel | | Deployed; main builds off |
+| **0030** Beyond audit | Full OS | CRM/tasks/social/email/auto |
+| **0031** Full agency OS | | Module routes + schema |
+| **0032–0033** Dual CRM + channels | | `crm.ts` + CRM UI |
+| **0034** Public CRM API | | protocol paths + public-crm-api.ts |
+| **0035** Tasks/projects | | `tasks.ts` + Tasks UI |
+| **0036** Resend ESP | | `email.ts` provision/verify |
+| **0037–0038** Social calendar | | `social.ts` + UI |
+| **0039** Connected accounts | | `connections.ts` + UI |
+| **0040–0041** Onboarding | | Agency onboarding + portal claim |
+| **0042** API paths | no version | protocol + vite middleware |
+| **0043–0044** Automations | | builder UI + automations.ts |
+| **0045** Admin/Member | | org roles + portal roles |
+| **0046** Inline then Trigger | | `runInline` + trigger-handoff.ts |
 
-## ADR coverage (code)
+## DSD matrix
 
-| ADR | Status |
+| DSD | Status |
 |-----|--------|
-| 0001–0003 multi-tenant / hierarchy / audit wedge | Schema + UI modules |
-| 0004 local agent only | Agent crate streams design; no cloud crawler |
-| 0005–0007 multi-surface / equal / audit loop | Web surfaces; desktop/tui stubs; mobile later |
-| 0008 full crawl depth | Schema findings/metrics; UI graphs; Agent run stub |
-| 0010 TanStack/Clerk/Convex/Rust | **Live Clerk + Convex wired**; TanStack Router SPA |
-| 0011 Electron | apps/desktop loads web URL |
-| 0012–0013 user daemon | systemd unit + agent binary |
-| 0014 Mission Control name | Branding throughout |
-| 0015–0016 Clerk org + agent token API | **ClerkProvider + Agency=Org + roles**; API `/api/agent/token` stub |
-| 0017 multi-repo | Monorepo bootstrap; split when ready |
-| 0018 protocol | packages/protocol |
-| 0019–0020 artifacts local cleanup | Agent data dir; **Convex crawl stream mutations** |
-| 0021–0022 robots / rendered | Crawl API body fields |
-| 0023–0024 findings + metrics | Schema + audit UI series + Convex findings/metrics |
-| 0025–0028 portal | **/portal** + Convex grants/allowlist + claim flow |
-| 0029 Convex+Vercel | **Deployed** schema + Vercel prod/preview env |
-| 0031–0036 full OS modules | Routes + schema for CRM/tasks/email/social |
-| 0037–0039 social + connections | Routes + schema |
-| 0040–0041 onboarding | /onboarding + `agencies.ensureMine` Self Client |
-| 0042 API style | vite API middleware (fallback); Convex primary for clients |
-| 0043–0046 automations | Routes + schema; Trigger handoff documented |
-| DSD 0001–0011 | tokens, logo SVG, Max fonts, cnfast, mirrors |
+| 0001 Personality | Sparse cockpit copy + glass |
+| 0002 Visual foundations | tokens/theme.css glass/neon/neu |
+| 0003 Flamingo/Sky | CSS vars + components |
+| 0004 Neue Haas / Max | public/max fonts + max.css |
+| 0005 Radius nesting | --radius-* tokens |
+| 0006 Launch keyhole | brand SVGs + LogoLockup |
+| 0007–0010 shadcn mirror | components/ui + mc mirrors |
+| 0008 Media kit source | docs/dsd/media + public/brand |
+| 0009 φ scale | tokens from cna |
+| **0011 Command palette** | ⌘K + vim j/k CommandPaletteHost |
 
 ## Run
 
 ```bash
-cd mission-control-os
 bun install
-bun run dev:web          # http://127.0.0.1:5173
-bun run dev:convex       # optional second terminal
-cargo run -p mc-agent -- paths
-cargo run -p mc-agent -- heartbeat
+# apps/web/.env.local — Clerk + Convex + RESEND from ~/Projects/.env.shared
+cd apps/web && bunx convex dev   # terminal 1
+bun run dev:web                  # terminal 2
+cargo run -p mc-agent -- crawl --origin https://example.com --mode http_only
+cargo run -p mc-tui
 ```
 
-## Not yet production-complete
+## Remaining gaps (honest)
 
-- Clerk production instance (currently dev keys on Vercel)
-- Resend ESP live provision (issue #3)
-- Full crawl engine (Playwright) inside Agent
-- Real Trigger.dev worker wiring
-- Effect orchestration on Desktop
-- Swift/Kotlin apps
-- Full shadcn registry dump (core + mirrors present; expand with `shadcn add`)
-- iCloud vector replace for SVG (current SVG is reconstructed mark)
-- Machine auth for Agent → Convex stream (today uses staff session path)
+| Item | Gap |
+|------|-----|
+| ADR-0006 mobile | Swift/Kotlin apps not started (issue #16) |
+| ADR-0011 Effect | Desktop Effect runtime orchestration incomplete |
+| ADR-0008 full Sitebulb depth | Crawl is HTTP+alt/links core; expand checks over time |
+| ADR-0034 HTTP CRM proxy | Catalog complete; Convex is source of truth (no dual-write HTTP yet) |
+| ADR-0046 Trigger.dev cloud | Handoff payload + mock; needs TRIGGER_SECRET_KEY project |
+| ADR-0022 Playwright | Used when `npx playwright` works; else HTTP |
+| DSD-0008 iCloud vector | Reconstructed SVG until iCloud import |
+| DSD-0010 full shadcn dump | Core mirrors; expand via `shadcn add` |
+| Clerk production instance | Dev keys on Vercel previews |
+| ADR-0017 multi-repo split | Deferred intentionally |
+
+## Cost control
+
+See `docs/deploy-vercel-cost.md` — never auto-build production from `main`; previews only.

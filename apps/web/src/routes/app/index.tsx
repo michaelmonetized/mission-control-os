@@ -12,6 +12,7 @@ const modules = [
   { to: "/app/audit", title: "Audit", desc: "Crawl Runs · findings · metrics graphs" },
   { to: "/app/social", title: "Social", desc: "Default-approved look-ahead calendar" },
   { to: "/app/email", title: "Email ESP", desc: "Resend domains · Agency + Client" },
+  { to: "/app/connections", title: "Connected Accounts", desc: "Agency or Client ownership" },
   { to: "/app/portal", title: "Client Portal", desc: "Graphs + shared findings + Client CRM" },
   { to: "/app/automations", title: "Automations", desc: "Trigger → action · templates" },
 ] as const;

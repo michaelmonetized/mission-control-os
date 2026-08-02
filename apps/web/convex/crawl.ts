@@ -166,3 +166,34 @@ export const metricsForSite = query({
       .collect();
   },
 });
+
+/** Portal metrics — grant must cover site's client (ADR-0028). */
+export const metricsForPortalSite = query({
+  args: { siteId: v.id("sites") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+    const site = await ctx.db.get(args.siteId);
+    if (!site) return [];
+    const location = await ctx.db.get(site.locationId);
+    if (!location) return [];
+    const rec = identity as Record<string, unknown>;
+    const email = (rec.email as string | undefined)?.toLowerCase();
+    const byUser = await ctx.db
+      .query("portalGrants")
+      .withIndex("by_clerkUser", (q) => q.eq("clerkUserId", identity.subject))
+      .collect();
+    const byEmail = email
+      ? await ctx.db
+          .query("portalGrants")
+          .withIndex("by_email", (q) => q.eq("email", email))
+          .collect()
+      : [];
+    const ok = [...byUser, ...byEmail].some((g) => g.clientId === location.clientId);
+    if (!ok) return [];
+    return ctx.db
+      .query("metricsSnapshots")
+      .withIndex("by_site", (q) => q.eq("siteId", args.siteId))
+      .collect();
+  },
+});

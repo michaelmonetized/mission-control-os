@@ -1,6 +1,8 @@
 //! Mission Control Local Agent — user-level daemon (ADR-0012/0013/0016/0004/0022)
 //! Fetches Sites, streams results to Control Plane, cleans artifacts after runs.
 
+mod crawl;
+
 use clap::{Parser, Subcommand};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
@@ -28,6 +30,17 @@ enum Commands {
     },
     /// Print agent data dir
     Paths,
+    /// Run a crawl job locally (ADR-0004) — streams findings JSON to stdout
+    Crawl {
+        #[arg(long)]
+        origin: String,
+        #[arg(long, default_value = "rendered")]
+        mode: String,
+        #[arg(long, default_value_t = false)]
+        ignore_robots: bool,
+        #[arg(long, default_value_t = 25)]
+        max_pages: usize,
+    },
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -62,11 +75,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let res = client.post(&url).json(&serde_json::json!({})).send().await?;
             println!("{}", res.text().await?);
         }
+        Commands::Crawl {
+            origin,
+            mode,
+            ignore_robots,
+            max_pages,
+        } => {
+            let d = data_dir();
+            fs::create_dir_all(d.join("artifacts"))?;
+            let opts = crawl::CrawlOptions {
+                origin,
+                mode,
+                ignore_robots,
+                max_pages,
+            };
+            // Run blocking crawl off async runtime
+            let result = tokio::task::spawn_blocking(move || crawl::run_crawl(&d, &opts)).await??;
+            println!("{}", serde_json::to_string_pretty(&result)?);
+        }
         Commands::Daemon { control_plane } => {
             tracing::info!(%control_plane, "mc-agent daemon starting (user-level service)");
             let d = data_dir();
             fs::create_dir_all(d.join("artifacts"))?;
-            // Load token from Desktop-written config (ADR-0016)
             let config_path = d.join("config.json");
             let config: AgentConfig = if config_path.exists() {
                 serde_json::from_str(&fs::read_to_string(&config_path)?)?
@@ -77,10 +107,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             if config.refresh_token.is_none() {
                 tracing::warn!("missing refresh_token in config — crawls will not authenticate");
             } else {
-                tracing::info!(
-                    agency = ?config.agency_id,
-                    "agent credentials loaded"
-                );
+                tracing::info!(agency = ?config.agency_id, "agent credentials loaded");
             }
             let cp = control_plane.clone();
             loop {
@@ -96,7 +123,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     Ok(r) => tracing::debug!(status = r.status().as_u16(), "heartbeat"),
                     Err(e) => tracing::warn!(error = %e, "heartbeat failed"),
                 }
-                // Poll for crawl jobs, run rendered crawl, stream findings, cleanup artifacts
+                // Future: poll Convex/API for queued crawlRuns, run crawl, stream findings
                 tokio::time::sleep(std::time::Duration::from_secs(30)).await;
             }
         }

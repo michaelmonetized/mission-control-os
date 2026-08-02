@@ -67,9 +67,18 @@ export const API = {
     add: "/api/clients/add",
     update: "/api/clients/update",
   },
+  locations: {
+    list: "/api/locations/list",
+    add: "/api/locations/add",
+  },
+  sites: {
+    list: "/api/sites/list",
+    add: "/api/sites/add",
+  },
   crawl: {
     run: "/api/crawl/run",
     results: "/api/crawl/results",
+    findings: "/api/crawl/findings",
   },
   tasks: {
     list: "/api/tasks/list",
@@ -82,7 +91,14 @@ export const API = {
   crm: {
     contactsList: "/api/crm/contacts/list",
     contactsAdd: "/api/crm/contacts/add",
+    contactsUpdate: "/api/crm/contacts/update",
+    companiesList: "/api/crm/companies/list",
+    companiesAdd: "/api/crm/companies/add",
+    opportunitiesList: "/api/crm/opportunities/list",
+    opportunitiesAdd: "/api/crm/opportunities/add",
+    opportunitiesUpdate: "/api/crm/opportunities/update",
     conversationsList: "/api/crm/conversations/list",
+    conversationsIngest: "/api/crm/conversations/ingest",
   },
   notify: {
     email: "/api/notify/email",
@@ -92,12 +108,37 @@ export const API = {
     postsList: "/api/social/posts/list",
     postsAdd: "/api/social/posts/add",
   },
+  connections: {
+    list: "/api/connections/list",
+    add: "/api/connections/add",
+    remove: "/api/connections/remove",
+  },
   automations: {
     list: "/api/automations/list",
     run: "/api/automations/run",
+    templatesList: "/api/automations/templates/list",
+    templatesAdd: "/api/automations/templates/add",
   },
   agent: {
     token: "/api/agent/token",
     heartbeat: "/api/agent/heartbeat",
+    crawlJobs: "/api/agent/crawl/jobs",
+  },
+  email: {
+    domainsList: "/api/email/domains/list",
+    domainsProvision: "/api/email/domains/provision",
+    domainsVerify: "/api/email/domains/verify",
   },
 } as const;
+
+/** Finding status set (ADR-0023) */
+export const FINDING_STATUSES = [
+  "open",
+  "triaged",
+  "in_progress",
+  "done",
+  "wont_fix",
+  "false_positive",
+] as const;
+
+export type FindingStatusApi = (typeof FINDING_STATUSES)[number];

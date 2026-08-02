@@ -2,11 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
 import { UserButton } from "@clerk/react";
 import { api } from "../../convex/_generated/api";
+import type { Id } from "../../convex/_generated/dataModel";
 import { PortalGate } from "@/lib/auth-guards";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
+import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/mc/card";
 import { Button } from "@/components/mc/button";
 import { LogoLockup } from "@/components/mc/logo";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/portal")({
   component: () => (
@@ -19,12 +20,45 @@ export const Route = createFileRoute("/portal")({
 function ClientPortalHome() {
   const grants = useQuery(api.portal.myGrants);
   const claim = useMutation(api.portal.claimInvite);
+  const [clientId, setClientId] = useState<string>("");
 
   useEffect(() => {
-    void claim({}).catch(() => {
-      /* unauthenticated or no email */
-    });
+    void claim({}).catch(() => {});
   }, [claim]);
+
+  useEffect(() => {
+    if (!clientId && grants?.[0]?.clientId) {
+      setClientId(grants[0].clientId);
+    }
+  }, [grants, clientId]);
+
+  const shared = useQuery(
+    api.findings.sharedForClient,
+    clientId ? { clientId: clientId as Id<"clients"> } : "skip",
+  );
+  const sites = useQuery(
+    api.hierarchy.listSitesForPortalClient,
+    clientId ? { clientId: clientId as Id<"clients"> } : "skip",
+  );
+  const firstSite = sites?.[0]?.id;
+  const metrics = useQuery(
+    api.crawl.metricsForPortalSite,
+    firstSite ? { siteId: firstSite as Id<"sites"> } : "skip",
+  );
+
+  const history = useMemo(
+    () =>
+      (metrics ?? [])
+        .slice()
+        .sort((a, b) => a.completedAt - b.completedAt)
+        .map((m) => ({
+          date: new Date(m.completedAt).toISOString().slice(5, 10),
+          broken: m.brokenLinks,
+          alt: m.missingAlt,
+        })),
+    [metrics],
+  );
+  const maxB = Math.max(...history.map((h) => h.broken), 1);
 
   return (
     <div className="min-h-dvh flex flex-col">
@@ -38,8 +72,7 @@ function ClientPortalHome() {
       <main className="flex-1 px-4 py-8 max-w-3xl w-full mx-auto space-y-6">
         <h1 className="text-2xl font-semibold">Your client workspaces</h1>
         <p className="text-sm text-[var(--color-mocha-subtext0)]">
-          Grants live in Convex — you are <strong>not</strong> a member of the Agency Clerk Org
-          (ADR-0026).
+          Outside Agency Clerk Org (ADR-0026). Graphs + Agency-shared findings (ADR-0028).
         </p>
         {grants === undefined ? (
           <p className="text-sm text-[var(--color-mocha-subtext0)]">Loading grants…</p>
@@ -53,16 +86,70 @@ function ClientPortalHome() {
             </CardHeader>
           </Card>
         ) : (
-          <ul className="space-y-3">
-            {grants.map((g) => (
-              <li key={g._id} className="mc-glass px-4 py-3 rounded-[var(--radius-md)] flex justify-between">
-                <span>
-                  Client <span className="font-mono text-xs">{g.clientId}</span>
-                </span>
-                <span className="text-xs text-[var(--color-brand-sky)]">{g.role}</span>
-              </li>
-            ))}
-          </ul>
+          <>
+            <select
+              className="rounded-[var(--radius-sm)] border border-[var(--color-mocha-surface1)] bg-[var(--color-mocha-surface0)] px-3 py-2 text-sm"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+            >
+              {grants.map((g) => (
+                <option key={g._id} value={g.clientId}>
+                  Client {String(g.clientId).slice(-6)} · {g.role}
+                </option>
+              ))}
+            </select>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Audit graphs</CardTitle>
+                <CardDescription>Metrics snapshots for your sites</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {history.length === 0 ? (
+                  <p className="text-sm text-[var(--color-mocha-subtext0)]">No metrics yet.</p>
+                ) : (
+                  <div className="flex items-end gap-2 h-32">
+                    {history.map((h, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                        <div className="w-full flex gap-0.5 items-end h-24">
+                          <div
+                            className="flex-1 rounded-t bg-[var(--color-brand-sky)]"
+                            style={{ height: `${(h.broken / maxB) * 100}%` }}
+                          />
+                          <div
+                            className="flex-1 rounded-t bg-[var(--color-brand-flamingo)]"
+                            style={{
+                              height: `${(h.alt / Math.max(...history.map((x) => x.alt), 1)) * 100}%`,
+                            }}
+                          />
+                        </div>
+                        <span className="text-[10px] text-[var(--color-mocha-subtext0)]">{h.date}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Shared findings</CardTitle>
+                <CardDescription>Agency chose to share these with you</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {(shared ?? []).length === 0 ? (
+                  <p className="text-sm text-[var(--color-mocha-subtext0)]">None shared yet.</p>
+                ) : (
+                  (shared ?? []).map((f) => (
+                    <div key={f.id} className="mc-glass px-3 py-2 rounded-md text-sm">
+                      <strong>{f.type}</strong> · {f.severity} · {f.status}
+                      <div className="font-mono text-xs break-all">{f.url}</div>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </>
         )}
         <Link to="/">
           <Button variant="secondary">Back to landing</Button>
