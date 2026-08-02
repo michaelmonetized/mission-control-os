@@ -63,8 +63,16 @@ A physical place or market unit under a Client (storefront, service area hub, fr
 _Avoid_: Site (a Location may have multiple Sites), branch (retail-specific), listing
 
 **User**:
-A person who signs in. Belongs to an Agency; may be scoped to specific Clients and/or Locations.
-_Avoid_: Member, seat, agent (ambiguous with SEO/automation agents)
+A person who signs in. Agency staff belong to an Agency (Clerk Org) with role **Admin** or **Member** (ADR-0045). Client Users have Admin or Member **within a Client grant**, not Agency org membership.
+_Avoid_: Seat, agent (ambiguous with SEO/automation agents / Local Agent)
+
+**Admin**:
+Role with full control in its scope (Agency or Client CRM Workspace)—settings, Automations, domains, connections, invites.
+_Avoid_: Owner (unless productized later)
+
+**Member**:
+Role for day-to-day work in its scope without high-risk settings (Automations edit, domain DNS, org destruction, etc.).
+_Avoid_: User (broader), guest
 
 **Site**:
 A web property (domain or origin) associated with a Location (or occasionally Client-wide). The unit of crawl, accessibility, and technical SEO audit.
