@@ -34,6 +34,10 @@ _Avoid_: Inter/Geist as primary, Helvetica bare (use licensed Max)
 Inner border-radius computed as `calc(var(--radius) + var(--padding))` so nested rounded elements track parent padding (DSD-0005). Base scale 8/12/16/24/32.
 _Avoid_: Flat same radius on every nest level, subtractive concentric unless DSD changes
 
+**Launch keyhole**:
+Primary logo mark—circular badge with geometric keyhole/launch-path glyph (DSD-0006). Paired with Max **900** (`max95`) wordmark “Mission Control”.
+_Avoid_: Generic rocket emoji, Apple-like command symbol
+
 **Skeuomorph control**:
 Selective tactile/realistic control styling (Icon Factory energy) on buttons and hardware-like affordances (DSD-0002).
 _Avoid_: Full retro skeuomorphic chrome, pure flat-only

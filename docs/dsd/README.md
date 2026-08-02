@@ -17,7 +17,16 @@ Hammered via grill-with-docs. Architecture ADRs live in `docs/adr/`; domain lang
 
 ## Status
 
-**Grilling in progress.** Nothing is final until locked in a DSD.
+**Grilling in progress.** Locked DSDs:
+
+| ID | Topic |
+|----|--------|
+| [0001](./0001-brand-personality.md) | Sparse cockpit personality |
+| [0002](./0002-visual-foundations.md) | Glass, Mocha, neon, skeuomorph |
+| [0003](./0003-brand-accents-flamingo-sky.md) | Flamingo + Sky |
+| [0004](./0004-typography-neue-haas.md) | Neue Haas / max* |
+| [0005](./0005-radius-scale-and-nesting.md) | Radius + nested calc |
+| [0006](./0006-logo-launch-keyhole.md) | Launch keyhole + max95 wordmark |
 
 ## Naming
 
