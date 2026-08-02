@@ -31,8 +31,8 @@ A human who signs into the **Client Portal** with access limited to granted Clie
 _Avoid_: Customer login, guest (Clerk guest ≠ portal role), org member (Agency staff)
 
 **Client Portal**:
-The authenticated Mission Control Surface for Client Users—progress graphs, shared audit outcomes, and related read-mostly views. Part of MVP (ADR-0025).
-_Avoid_: Marketing site, Public Relations repo
+The authenticated Mission Control experience for Client Users: includes **Client CRM** (full conversation-centric CRM for their Client), shared audit graphs/findings, and related modules. Not a marketing site.
+_Avoid_: Read-only portal only (superseded ceiling), Public Relations repo
 
 **Portal Invite**:
 An email-linked invitation for a specific address to become a Client User on a Client. One access path (ADR-0027).
@@ -64,13 +64,37 @@ _Avoid_: Page, property (GA jargon only), URL
 A unit of work tracked in Mission Control’s task queue—assignable, statused, optionally linked to Client, Location, Site, Audit Finding, or Campaign.
 _Avoid_: Ticket (support-only connotation), Issue (audit finding)
 
+**CRM Workspace**:
+A scoped CRM instance: either **Agency CRM** (agency’s own book of business) or **Client CRM** (one Client’s full CRM). Same product capabilities; different data partition and operators.
+_Avoid_: Sub-account (GHL jargon), portal (UI shell only)
+
 **Contact**:
-A person related to a Client or prospect (decision-maker, billing, marketing). CRM entity; may become a Client User if granted portal access.
-_Avoid_: User (authenticated Mission Control account), lead (pipeline stage, not the person)
+A person in a CRM Workspace (lead, customer, vendor, etc.). May link to a Mission Control User if they have login.
+_Avoid_: User (authenticated account), lead (stage/type, not the person record)
+
+**Company**:
+An organization record in a CRM Workspace (prospect or customer business). Distinct from tenancy **Client** when still a prospect in Agency CRM; a won account often **links to** or **becomes** a delivery Client.
+_Avoid_: Client (tenancy/delivery account—use link when same real-world business)
+
+**Opportunity**:
+A pipeline deal/opportunity in a CRM Workspace (value, stage, close date). Conversation- and Contact-linked.
+_Avoid_: Ticket, Task, Campaign
+
+**Conversation**:
+A first-class multi-channel thread (email, SMS, social, form, chat, call notes, etc.) with messages over time—the center of CRM UX. Linked to Contacts, Companies, Opportunities, and workspace.
+_Avoid_: Thread (implementation), inbox (UI), email (one channel)
+
+**Message**:
+One item in a Conversation (inbound/outbound body, channel, timestamps, status).
+_Avoid_: Email (channel-specific), notification
+
+**Automation**:
+A scoped workflow (triggers → conditions → actions) inside a CRM Workspace or Agency-wide ops—e.g. on Message received, stage change, tag added.
+_Avoid_: Agent (crawl daemon), Zap (vendor)
 
 **Pipeline**:
-A named sequence of stages for opportunities or Client relationships (e.g. lead → closed). CRM structure.
-_Avoid_: Funnel (marketing analytics only), board (UI)
+A named board of stages for Opportunities (or other card types) inside a CRM Workspace.
+_Avoid_: Funnel (analytics only), board (UI only)
 
 **Campaign**:
 A coordinated marketing or SEO work effort over time, often tied to a Client/Location—may group Tasks, content, and social posts.

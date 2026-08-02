@@ -1,19 +1,20 @@
 # Client portal with login is in MVP
 
-MVP includes a **client-facing portal** where Client stakeholders sign in (Clerk) and see authorized Mission Control data—at minimum **Metrics Snapshot graphs and progress over time** for their Client/Locations (ADR-0024), not only agency-internal views or export.
+MVP includes a **client-facing portal** where Client stakeholders sign in (Clerk) and use authorized Mission Control data for their Client.
 
-## Scope (MVP floor)
+**Later expansion (ADR-0032):** Client experience is **full Client CRM** (conversation-centric), not audit-only. Audit graphs/shared findings (ADR-0024/0028) remain required modules inside that experience.
+
+## Scope (MVP floor, as amended)
 
 - Authenticated **Client Users** (distinct from Agency staff roles)
 - Access scoped to their **Client** (and Locations under it)—never other Agencies’ data
-- Read-oriented portal: overtime charts, high-level Audit Loop outcomes as product allows
+- **Client CRM** + metrics graphs + shared audit findings
 - Agency staff invite/manage Client Users
 
 ## Out of scope unless later ADRs expand
 
-- Full GHL-class marketing automation inside the portal
-- Client-triggered crawls (default: agency-operated Agent)
-- Editing Agency internal notes/findings workflow beyond what is explicitly shared
+- Client-triggered crawls (default: agency-operated Agent) unless explicitly enabled
+- Access to Agency CRM or other Clients’ CRM Workspaces
 
 ## Why
 
