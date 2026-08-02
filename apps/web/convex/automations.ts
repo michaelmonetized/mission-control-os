@@ -199,16 +199,24 @@ export const runInline = mutation({
             handoff: true,
           });
           const idempotencyKey = `auto:${args.automationId}:wait:${i}:${Date.now()}`;
-          await ctx.db.insert("automationHandoffs", {
+          const delayMs = Number(step.config?.ms ?? 60_000);
+          const handoffId = await ctx.db.insert("automationHandoffs", {
             automationId: args.automationId,
             agencyId: agency._id,
             fromStep: i,
             reason: "wait_step",
             idempotencyKey,
-            payload: { context: args.context, results, delayMs: step.config?.ms ?? 60_000 },
+            payload: { context: args.context, results, delayMs },
             status: "queued",
             createdAt: Date.now(),
           });
+          // Prefer Convex scheduler for waits (ADR-0046); Trigger remains failure plane
+          const { internal } = await import("./_generated/api");
+          await ctx.scheduler.runAfter(
+            Math.max(1000, Math.min(delayMs, 7 * 864e5)),
+            internal.scheduler.markWaitComplete,
+            { handoffId },
+          );
           return {
             automationId: args.automationId,
             status: "handoff_trigger",
@@ -219,6 +227,7 @@ export const runInline = mutation({
               context: args.context,
               reason: "wait_step",
               idempotencyKey,
+              scheduled: true,
             },
           };
         } else {

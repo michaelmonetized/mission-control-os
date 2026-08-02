@@ -101,7 +101,21 @@ export async function handleApi(req: Request, pathname: string): Promise<Respons
   }
 
   if (path === "/api/automations/list" && req.method === "POST") {
-    return ok({ items: [] });
+    return ok({
+      items: [],
+      note: "Live data via Convex api.automations.list — HTTP catalog for ADR-0034/0042",
+    });
+  }
+
+  // Public CRM catalog stubs (ADR-0034) — clients should use Convex with Clerk JWT
+  if (path === "/api/crm/companies/list" && req.method === "POST") {
+    return ok({ items: [], note: "Use Convex opportunities.listCompanies" });
+  }
+  if (path === "/api/crm/opportunities/list" && req.method === "POST") {
+    return ok({ items: [], note: "Use Convex opportunities.list" });
+  }
+  if (path === "/api/connections/list" && req.method === "POST") {
+    return ok({ items: [], note: "Use Convex connections.list" });
   }
 
   if (path === "/api/social/posts/list" && req.method === "POST") {

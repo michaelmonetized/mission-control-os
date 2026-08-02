@@ -1,10 +1,23 @@
 import * as React from "react";
+import * as SeparatorPrimitive from "@radix-ui/react-separator";
 import { cn } from "@/lib/utils";
 
-/** Scaffold placeholder — expand with full shadcn implementation (issue #15). */
 export function Separator({
   className,
+  orientation = "horizontal",
+  decorative = true,
   ...props
-}: React.ComponentProps<"div">) {
-  return <div className={cn(className)} {...props} />;
+}: React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>) {
+  return (
+    <SeparatorPrimitive.Root
+      decorative={decorative}
+      orientation={orientation}
+      className={cn(
+        "shrink-0 bg-[var(--color-mocha-surface1)]",
+        orientation === "horizontal" ? "h-px w-full" : "h-full w-px",
+        className,
+      )}
+      {...props}
+    />
+  );
 }

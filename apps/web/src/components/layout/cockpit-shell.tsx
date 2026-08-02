@@ -3,6 +3,7 @@ import { OrganizationSwitcher, UserButton, useAuth } from "@clerk/react";
 import { LogoLockup } from "@/components/mc/logo";
 import { cn } from "cnfast";
 import { useIsAgencyAdmin } from "@/lib/auth-guards";
+import { AgentStatusBadge } from "@/components/layout/agent-status";
 
 const nav = [
   { to: "/app", label: "Cockpit" },
@@ -58,6 +59,9 @@ export function CockpitShell({
             <>
               <span className="text-[10px] uppercase tracking-wide text-[var(--color-mocha-subtext0)] hidden lg:inline">
                 {isAdmin ? "Admin" : orgRole === "org:member" ? "Member" : "Staff"}
+              </span>
+              <span className="hidden md:inline">
+                <AgentStatusBadge />
               </span>
               <OrganizationSwitcher
                 hidePersonal

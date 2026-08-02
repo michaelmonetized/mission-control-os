@@ -15,6 +15,8 @@ import type * as clients from "../clients.js";
 import type * as connections from "../connections.js";
 import type * as crawl from "../crawl.js";
 import type * as crm from "../crm.js";
+import type * as crons from "../crons.js";
+import type * as cronsHandlers from "../cronsHandlers.js";
 import type * as email from "../email.js";
 import type * as findings from "../findings.js";
 import type * as handoffs from "../handoffs.js";
@@ -25,7 +27,9 @@ import type * as lib_auth from "../lib/auth.js";
 import type * as notify from "../notify.js";
 import type * as opportunities from "../opportunities.js";
 import type * as portal from "../portal.js";
+import type * as scheduler from "../scheduler.js";
 import type * as social from "../social.js";
+import type * as socialPublish from "../socialPublish.js";
 import type * as tasks from "../tasks.js";
 
 import type {
@@ -42,6 +46,8 @@ declare const fullApi: ApiFromModules<{
   connections: typeof connections;
   crawl: typeof crawl;
   crm: typeof crm;
+  crons: typeof crons;
+  cronsHandlers: typeof cronsHandlers;
   email: typeof email;
   findings: typeof findings;
   handoffs: typeof handoffs;
@@ -52,7 +58,9 @@ declare const fullApi: ApiFromModules<{
   notify: typeof notify;
   opportunities: typeof opportunities;
   portal: typeof portal;
+  scheduler: typeof scheduler;
   social: typeof social;
+  socialPublish: typeof socialPublish;
   tasks: typeof tasks;
 }>;
 

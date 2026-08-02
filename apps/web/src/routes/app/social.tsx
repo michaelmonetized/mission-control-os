@@ -36,7 +36,13 @@ function SocialPage() {
   const schedule = useMutation(api.social.schedulePost);
   const disapprove = useMutation(api.social.disapprove);
   const updatePost = useMutation(api.social.updatePost);
-  const failReschedule = useMutation(api.social.markFailedAndReschedule);
+  const attemptPublish = useMutation(api.socialPublish.attemptPublish);
+  const due = useQuery(
+    api.socialPublish.listDue,
+    effectiveClientId
+      ? { clientId: effectiveClientId as Id<"clients">, beforeMs: Date.now() + 7 * 864e5 }
+      : "skip",
+  );
 
   const byDay = useMemo(() => {
     const map = new Map<string, NonNullable<typeof posts>>();
@@ -137,6 +143,12 @@ function SocialPage() {
         </CardContent>
       </Card>
 
+      {due && due.length > 0 ? (
+        <p className="text-xs text-[var(--color-mocha-peach)]">
+          {due.length} post(s) due or within look-ahead and still approved for publish.
+        </p>
+      ) : null}
+
       <Card>
         <CardHeader>
           <CardTitle>Approval Calendar</CardTitle>
@@ -207,9 +219,20 @@ function SocialPage() {
                           </Button>
                         )}
                         <Button
+                          variant="secondary"
+                          onClick={() =>
+                            void attemptPublish({ postId: p.id as Id<"socialPosts"> })
+                          }
+                        >
+                          Publish now
+                        </Button>
+                        <Button
                           variant="ghost"
                           onClick={() =>
-                            void failReschedule({ postId: p.id as Id<"socialPosts"> })
+                            void attemptPublish({
+                              postId: p.id as Id<"socialPosts">,
+                              forceFail: true,
+                            })
                           }
                         >
                           Simulate fail → reschedule

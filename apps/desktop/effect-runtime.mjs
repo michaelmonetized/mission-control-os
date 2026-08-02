@@ -1,8 +1,6 @@
 /**
- * Lightweight Effect-style orchestration for Desktop (ADR-0011).
- * Uses the Effect library when available; falls back to a sequential pipeline.
- *
- * Services: AgentPair · AgentInstall · SecretStore · HealthCheck
+ * Effect orchestration for Desktop (ADR-0011).
+ * Tries real Effect program; falls back to sequential pipeline.
  */
 import { ipcMain } from "electron";
 
@@ -26,32 +24,31 @@ export function registerEffectOrchestration(deps) {
       steps.push({ name, ok, detail, at: Date.now() });
     };
 
-    try {
-      // 1. Pair / ensure token
+    const pairFn = async () => {
       const existing = deps.readSecret();
       if (existing?.refreshToken && !opts.forcePair) {
         log("pair", true, "existing secret");
-      } else {
-        const pair = await deps.pairAgent({
-          bearer: opts.bearer,
-          deviceLabel: opts.deviceLabel,
-        });
-        if (!pair?.ok) {
-          log("pair", false, pair?.error ?? "pair failed");
-          return { ok: false, steps };
-        }
-        log("pair", true, pair.agencyId);
+        return { ok: true, agencyId: existing.agencyId };
       }
+      const pair = await deps.pairAgent({
+        bearer: opts.bearer,
+        deviceLabel: opts.deviceLabel,
+      });
+      log("pair", Boolean(pair?.ok), pair?.agencyId ?? pair?.error);
+      return pair;
+    };
 
-      // 2. Install user-level service (best-effort)
-      if (opts.install !== false) {
-        const inst = await deps.installAgent({ binPath: opts.binPath });
-        log("install", Boolean(inst?.ok), inst?.error ?? inst?.stdout?.slice?.(0, 200));
-      } else {
+    const installFn = async () => {
+      if (opts.install === false) {
         log("install", true, "skipped");
+        return { ok: true };
       }
+      const inst = await deps.installAgent({ binPath: opts.binPath });
+      log("install", Boolean(inst?.ok), inst?.error ?? "ok");
+      return inst;
+    };
 
-      // 3. Health check control plane
+    const healthFn = async () => {
       try {
         const res = await fetch(
           `${deps.controlPlane.replace(/\/$/, "")}/api/agent/heartbeat`,
@@ -62,15 +59,28 @@ export function registerEffectOrchestration(deps) {
           },
         );
         log("health", res.ok, `status ${res.status}`);
+        return res.ok;
       } catch (e) {
         log("health", false, String(e));
+        return false;
       }
+    };
 
+    try {
+      const { runAgentBootstrapEffect } = await import("./effect-program.mjs");
+      const effectResult = await runAgentBootstrapEffect({
+        pair: pairFn,
+        install: installFn,
+        health: healthFn,
+      });
+      return { ...effectResult, steps, engine: "effect" };
+    } catch {
+      // Sequential fallback
+      await pairFn();
+      await installFn();
+      await healthFn();
       const ok = steps.every((s) => s.ok || s.name === "install");
-      return { ok, steps };
-    } catch (e) {
-      log("fatal", false, String(e));
-      return { ok: false, steps };
+      return { ok, steps, engine: "sequential" };
     }
   });
 }
