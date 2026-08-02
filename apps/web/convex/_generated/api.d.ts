@@ -11,6 +11,7 @@
 import type * as agencies from "../agencies.js";
 import type * as clients from "../clients.js";
 import type * as crawl from "../crawl.js";
+import type * as crm from "../crm.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as portal from "../portal.js";
 import type * as tasks from "../tasks.js";
@@ -25,6 +26,7 @@ declare const fullApi: ApiFromModules<{
   agencies: typeof agencies;
   clients: typeof clients;
   crawl: typeof crawl;
+  crm: typeof crm;
   "lib/auth": typeof lib_auth;
   portal: typeof portal;
   tasks: typeof tasks;
