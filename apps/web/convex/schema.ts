@@ -147,6 +147,9 @@ export default defineSchema({
     domain: v.string(),
     verified: v.boolean(),
     resendDomainId: v.optional(v.string()),
+    /** SPF/DKIM/DMARC records from Resend create/get (ADR-0036) */
+    dnsRecords: v.optional(v.any()),
+    status: v.optional(v.string()),
   }).index("by_agency", ["agencyId"]),
 
   automations: defineTable({

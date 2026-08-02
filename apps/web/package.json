@@ -29,11 +29,13 @@
     "lucide-react": "^0.511.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "resend": "^6.18.1",
     "zod": "^3.25.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.0",
     "@tanstack/router-plugin": "^1.120.0",
+    "@types/node": "^26.1.2",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.5.0",
