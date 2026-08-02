@@ -117,8 +117,12 @@ Embeddable live chat for a Site/Location that creates Conversations in the appro
 _Avoid_: Intercom (vendor), popup
 
 **Automation**:
-A scoped workflow (triggers → conditions → actions) inside a CRM Workspace or Agency-wide ops—e.g. on Message received, stage change, tag added.
-_Avoid_: Agent (crawl daemon), Zap (vendor)
+A user-built **trigger → action** workflow inside a **CRM Workspace** (Mailchimp/GHL-class builder). CRM users author email/SMS **Templates** and chain them on triggers (ingest, status changed, pipeline stage changed, sale completed, deal lost, etc.)—ADR-0043.
+_Avoid_: Agent (crawl daemon), Zap (vendor), system rule (fixed product behavior like social reschedule)
+
+**Template**:
+Reusable email or SMS content (and metadata) in a CRM Workspace, used by Automations and manual sends.
+_Avoid_: Social Post (calendar), Layout (UI)
 
 **Pipeline**:
 A named board of stages for Opportunities (or other card types) inside a CRM Workspace.
