@@ -9,8 +9,12 @@ The product—the multi-surface Control Plane, Local Agent, and Audit tooling fo
 _Avoid_: Agency OS (repo codename only), BreezyApp (different product)
 
 **Agency Onboarding**:
-The guided, skippable setup spine for a new Agency (team, Email Domain, first Client, Location/Site, channels, first Project, optional crawl)—ADR-0040.
+The guided, skippable setup spine for a new Agency. **Self Client** is auto-created (the Agency is its own first Client); then team, Email Domain, Location/Site, channels, first Project, optional crawl—ADR-0040.
 _Avoid_: Sign-up only, checklist (UI only)
+
+**Self Client**:
+The Client record representing the Agency’s own business, created at Agency signup. Dogfood workspace for Client CRM, PM, social, email, and audit before/while serving external Clients.
+_Avoid_: Demo client (implies disposable fake), sandbox (implies non-production data only)
 
 **Public Relations repo**:
 The separate repository for marketing, launch, press, and public-facing content about Mission Control—not application runtime code.
