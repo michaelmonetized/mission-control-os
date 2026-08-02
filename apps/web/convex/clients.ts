@@ -41,7 +41,7 @@ export const add = mutation({
     domain: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const { clerkOrgId, identity } = await requireAgencyOrg(ctx);
     const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
     if (!agency) throw new Error("Agency not found — complete onboarding first");
 
@@ -59,6 +59,16 @@ export const add = mutation({
       kind: "client",
       agencyId: agency._id,
       clientId,
+    });
+
+    await ctx.db.insert("activityEvents", {
+      agencyId: agency._id,
+      kind: "client.created",
+      message: `Client added: ${name}`,
+      actorUserId: identity.subject,
+      entityType: "clients",
+      entityId: clientId,
+      createdAt: Date.now(),
     });
 
     const row = await ctx.db.get(clientId);

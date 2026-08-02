@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as activity from "../activity.js";
 import type * as agencies from "../agencies.js";
 import type * as agent from "../agent.js";
 import type * as automations from "../automations.js";
@@ -17,6 +18,7 @@ import type * as crawl from "../crawl.js";
 import type * as crm from "../crm.js";
 import type * as crons from "../crons.js";
 import type * as cronsHandlers from "../cronsHandlers.js";
+import type * as dashboard from "../dashboard.js";
 import type * as email from "../email.js";
 import type * as findings from "../findings.js";
 import type * as handoffs from "../handoffs.js";
@@ -33,6 +35,7 @@ import type * as scheduler from "../scheduler.js";
 import type * as social from "../social.js";
 import type * as socialPublish from "../socialPublish.js";
 import type * as tasks from "../tasks.js";
+import type * as webhooks from "../webhooks.js";
 
 import type {
   ApiFromModules,
@@ -41,6 +44,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  activity: typeof activity;
   agencies: typeof agencies;
   agent: typeof agent;
   automations: typeof automations;
@@ -50,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   crm: typeof crm;
   crons: typeof crons;
   cronsHandlers: typeof cronsHandlers;
+  dashboard: typeof dashboard;
   email: typeof email;
   findings: typeof findings;
   handoffs: typeof handoffs;
@@ -66,6 +71,7 @@ declare const fullApi: ApiFromModules<{
   social: typeof social;
   socialPublish: typeof socialPublish;
   tasks: typeof tasks;
+  webhooks: typeof webhooks;
 }>;
 
 /**

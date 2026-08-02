@@ -231,4 +231,14 @@ export default defineSchema({
   })
     .index("by_agency", ["agencyId"])
     .index("by_client", ["clientId"]),
+
+  activityEvents: defineTable({
+    agencyId: v.id("agencies"),
+    kind: v.string(),
+    message: v.string(),
+    actorUserId: v.optional(v.string()),
+    entityType: v.optional(v.string()),
+    entityId: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_agency", ["agencyId"]),
 });

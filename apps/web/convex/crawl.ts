@@ -53,6 +53,15 @@ export const queueRun = mutation({
       startedAt: Date.now(),
     });
 
+    await ctx.db.insert("activityEvents", {
+      agencyId: agency._id,
+      kind: "crawl.queued",
+      message: `Crawl queued for site ${args.siteId}`,
+      entityType: "crawlRuns",
+      entityId: crawlRunId,
+      createdAt: Date.now(),
+    });
+
     return {
       crawlRunId,
       siteId: args.siteId,

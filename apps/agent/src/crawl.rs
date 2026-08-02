@@ -105,12 +105,19 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
         .build()
         .map_err(|e| e.to_string())?;
 
+    // Soft rate limit between page fetches (open Q #20 defaults)
+    let delay_ms = 150u64;
+
     while let Some(url) = queue.pop_front() {
         if pages >= opts.max_pages {
             break;
         }
         if is_disallowed(&url, &origin, &robots_disallow) {
             continue;
+        }
+
+        if pages > 0 {
+            std::thread::sleep(std::time::Duration::from_millis(delay_ms));
         }
 
         let fetch = fetch_page(&client, &url, use_rendered, &artifacts);

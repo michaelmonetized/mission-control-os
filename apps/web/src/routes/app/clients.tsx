@@ -15,6 +15,8 @@ export const Route = createFileRoute("/app/clients")({
 function ClientsPage() {
   const clients = useQuery(api.clients.list, {});
   const add = useMutation(api.clients.add);
+  const removeClient = useMutation(api.clients.remove);
+  const updateClient = useMutation(api.clients.update);
   const addLocation = useMutation(api.hierarchy.addLocation);
   const addSite = useMutation(api.hierarchy.addSite);
   const [name, setName] = useState("");
@@ -79,10 +81,10 @@ function ClientsPage() {
 
       <ul className="space-y-2">
         {(clients ?? []).map((c) => (
-          <li key={c.id}>
+          <li key={c.id} className="flex gap-2 items-stretch">
             <button
               type="button"
-              className={`w-full mc-glass px-4 py-3 rounded-[var(--radius-md)] flex justify-between text-left ${
+              className={`flex-1 mc-glass px-4 py-3 rounded-[var(--radius-md)] flex justify-between text-left ${
                 effectiveClient === c.id ? "mc-neon-border" : ""
               }`}
               onClick={() => {
@@ -95,12 +97,54 @@ function ClientsPage() {
                 {c.isSelf ? (
                   <span className="text-xs text-[var(--color-brand-flamingo)]">Self Client</span>
                 ) : null}
+                {c.domain ? (
+                  <span className="text-xs text-[var(--color-mocha-subtext0)]"> · {c.domain}</span>
+                ) : null}
               </span>
               <span className="text-xs text-[var(--color-mocha-subtext0)] font-mono">{c.id}</span>
             </button>
+            {!c.isSelf && isAdmin ? (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (confirm(`Delete client ${c.name}?`)) {
+                    void removeClient({ clientId: c.id as Id<"clients"> });
+                  }
+                }}
+              >
+                Delete
+              </Button>
+            ) : null}
           </li>
         ))}
       </ul>
+
+      {effectiveClient ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Client domain</CardTitle>
+          </CardHeader>
+          <CardContent className="flex gap-2">
+            <Input
+              placeholder="client.com"
+              defaultValue={clients?.find((c) => c.id === effectiveClient)?.domain ?? ""}
+              id="client-domain-input"
+            />
+            <Button
+              variant="secondary"
+              onClick={() => {
+                const el = document.getElementById("client-domain-input") as HTMLInputElement | null;
+                void updateClient({
+                  clientId: effectiveClient as Id<"clients">,
+                  patch: { domain: el?.value?.trim() || undefined },
+                });
+              }}
+            >
+              Save domain
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {effectiveClient ? (
         <div className="grid md:grid-cols-2 gap-4">
