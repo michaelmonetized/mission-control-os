@@ -142,3 +142,29 @@ export const FINDING_STATUSES = [
 ] as const;
 
 export type FindingStatusApi = (typeof FINDING_STATUSES)[number];
+
+/** Finding types emitted by Local Agent (ADR-0003/0008) */
+export const FINDING_TYPES = [
+  "broken_link",
+  "missing_alt",
+  "missing_title",
+  "title_too_long",
+  "missing_h1",
+  "multiple_h1",
+  "missing_meta_description",
+  "canonical_off_origin",
+  "noindex",
+  "duplicate_title",
+  "thin_content",
+  "missing_viewport",
+] as const;
+
+export type FindingTypeApi = (typeof FINDING_TYPES)[number];
+
+export const SOCIAL_POST_STATUSES = [
+  "approved",
+  "disapproved",
+  "published",
+  "failed",
+  "scheduled",
+] as const;

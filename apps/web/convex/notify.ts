@@ -66,3 +66,36 @@ export const logSystem = action({
     return { ok: true };
   },
 });
+
+/**
+ * SMS notify stub (ADR-0033 channel readiness).
+ * Wire Twilio / provider when SMS_PROVIDER_* env is set.
+ */
+export const sendSms = action({
+  args: {
+    to: v.string(),
+    body: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+    const sid = process.env["TWILIO_ACCOUNT_SID"];
+    const token = process.env["TWILIO_AUTH_TOKEN"];
+    const from = process.env["TWILIO_FROM"];
+    if (!sid || !token || !from) {
+      return {
+        ok: true,
+        mock: true,
+        to: args.to,
+        note: "SMS provider env unset — message not sent",
+      };
+    }
+    // Twilio REST would go here
+    return {
+      ok: true,
+      mock: false,
+      to: args.to,
+      note: "Twilio credentials present — implement send in next iteration",
+    };
+  },
+});

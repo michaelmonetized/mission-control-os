@@ -19,4 +19,5 @@ export const KEYMAP = [
   { keys: "g p", action: "Go Portal setup" },
   { keys: "g o", action: "Go Onboarding" },
   { keys: "g x", action: "Go Client Portal" },
+  { keys: "g ,", action: "Go Settings (palette: settings)" },
 ] as const;

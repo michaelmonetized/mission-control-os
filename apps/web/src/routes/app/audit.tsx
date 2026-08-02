@@ -67,6 +67,8 @@ function AuditPage() {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [ignoreRobots, setIgnoreRobots] = useState(false);
+  const [selectedFindings, setSelectedFindings] = useState<string[]>([]);
+  const bulkSetStatus = useMutation(api.findings.bulkSetStatus);
 
   const history = useMemo(() => {
     return (metrics ?? [])
@@ -313,15 +315,59 @@ function AuditPage() {
           <CardDescription>Live status field (ADR-0023) · share to portal</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
+          {(findings ?? []).length > 0 ? (
+            <div className="flex flex-wrap gap-2 mb-2">
+              <Button
+                variant="secondary"
+                disabled={selectedFindings.length === 0}
+                onClick={() =>
+                  void bulkSetStatus({
+                    findingIds: selectedFindings as Id<"auditFindings">[],
+                    status: "triaged",
+                  }).then((r) => {
+                    setNote(`Bulk triaged ${r.updated}`);
+                    setSelectedFindings([]);
+                  })
+                }
+              >
+                Bulk triage ({selectedFindings.length})
+              </Button>
+              <Button
+                variant="ghost"
+                disabled={selectedFindings.length === 0}
+                onClick={() =>
+                  void bulkSetStatus({
+                    findingIds: selectedFindings as Id<"auditFindings">[],
+                    status: "false_positive",
+                  }).then(() => setSelectedFindings([]))
+                }
+              >
+                Mark false positive
+              </Button>
+            </div>
+          ) : null}
           {(findings ?? []).length === 0 ? (
             <p className="text-sm text-[var(--color-mocha-subtext0)]">No findings for run.</p>
           ) : (
             (findings ?? []).map((f) => (
               <div key={f._id} className="mc-glass px-3 py-3 rounded-md space-y-2 text-sm">
                 <div className="flex flex-wrap justify-between gap-2">
-                  <span>
-                    <strong>{f.type}</strong> · {f.severity}
-                  </span>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedFindings.includes(f._id)}
+                      onChange={(e) => {
+                        setSelectedFindings((prev) =>
+                          e.target.checked
+                            ? [...prev, f._id]
+                            : prev.filter((id) => id !== f._id),
+                        );
+                      }}
+                    />
+                    <span>
+                      <strong>{f.type}</strong> · {f.severity}
+                    </span>
+                  </label>
                   <span className="text-xs text-[var(--color-mocha-subtext0)]">{f.status}</span>
                 </div>
                 <div className="font-mono text-xs break-all">{f.url}</div>

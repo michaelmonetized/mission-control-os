@@ -16,6 +16,7 @@ const nav = [
   { to: "/app/connections", label: "Connect" },
   { to: "/app/automations", label: "Automations" },
   { to: "/app/portal", label: "Portal setup" },
+  { to: "/app/settings", label: "Settings" },
 ] as const;
 
 export function CockpitShell({

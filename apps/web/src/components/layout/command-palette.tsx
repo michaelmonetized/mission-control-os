@@ -19,6 +19,8 @@ const COMMANDS = [
   { id: "portal", label: "Go to Portal setup", to: "/app/portal", keys: "g p" },
   { id: "onboarding", label: "Agency Onboarding", to: "/onboarding", keys: "g o" },
   { id: "client-portal", label: "Open Client Portal", to: "/portal", keys: "g x" },
+  { id: "settings", label: "Settings", to: "/app/settings", keys: "g ," },
+  { id: "connections", label: "Connected Accounts", to: "/app/connections", keys: "g n" },
 ] as const;
 
 export function CommandPaletteHost() {

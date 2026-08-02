@@ -103,3 +103,19 @@ export const update = mutation({
     };
   },
 });
+
+/** Soft-block delete of Self Client (ADR-0040). */
+export const remove = mutation({
+  args: { clientId: v.id("clients") },
+  handler: async (ctx, args) => {
+    const { clerkOrgId, isAdmin } = await requireAgencyOrg(ctx);
+    if (!isAdmin) throw new Error("Admin role required");
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) throw new Error("Agency not found");
+    const client = await ctx.db.get(args.clientId);
+    if (!client || client.agencyId !== agency._id) throw new Error("client not found");
+    if (client.isSelf) throw new Error("Cannot delete Self Client");
+    await ctx.db.delete(args.clientId);
+    return { ok: true };
+  },
+});

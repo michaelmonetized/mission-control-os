@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useOrganization } from "@clerk/react";
 import { api } from "../../convex/_generated/api";
+import type { Id } from "../../convex/_generated/dataModel";
 import { AgencyGate } from "@/lib/auth-guards";
 import { CockpitShell } from "@/components/layout/cockpit-shell";
 import { Button } from "@/components/mc/button";
@@ -32,9 +33,14 @@ function Onboarding() {
   const { organization } = useOrganization();
   const ensure = useMutation(api.agencies.ensureMine);
   const setStepRemote = useMutation(api.agencies.setOnboardingStep);
+  const clients = useQuery(api.clients.list, {});
+  const addLocation = useMutation(api.hierarchy.addLocation);
+  const addSite = useMutation(api.hierarchy.addSite);
+  const addProject = useMutation(api.tasks.addProject);
   const [step, setStep] = useState(0);
   const [agencyName, setAgencyName] = useState(organization?.name ?? "Studio Example");
   const [domain, setDomain] = useState("mail.example.com");
+  const [siteOrigin, setSiteOrigin] = useState("https://example.com");
   const [saving, setSaving] = useState(false);
 
   async function persistAndAdvance(next: number) {
@@ -42,6 +48,30 @@ function Onboarding() {
     try {
       if (step === 0) {
         await ensure({ name: agencyName.trim() || undefined });
+      }
+      // Step 4 in UI (index 4) = Location / Site under Self Client
+      if (step === 4) {
+        const self = clients?.find((c) => c.isSelf);
+        if (self) {
+          const loc = await addLocation({
+            clientId: self.id as Id<"clients">,
+            name: "Primary",
+          });
+          await addSite({
+            locationId: loc.id as Id<"locations">,
+            origin: siteOrigin.trim() || "https://example.com",
+          });
+        }
+      }
+      // Step 6 = First Project
+      if (step === 6) {
+        const self = clients?.find((c) => c.isSelf);
+        if (self) {
+          await addProject({
+            clientId: self.id as Id<"clients">,
+            name: "First Project",
+          });
+        }
       }
       try {
         await setStepRemote({ step: next });
@@ -125,7 +155,16 @@ function Onboarding() {
               Sending domain
               <Input value={domain} onChange={(e) => setDomain(e.target.value)} />
               <span className="text-xs text-[var(--color-mocha-subtext0)]">
-                Next: show SPF/DKIM from Resend CLI/API provision.
+                Provision under Email ESP after onboarding — DNS records via Resend.
+              </span>
+            </label>
+          )}
+          {step === 4 && (
+            <label className="block space-y-2 text-sm">
+              Primary site origin
+              <Input value={siteOrigin} onChange={(e) => setSiteOrigin(e.target.value)} />
+              <span className="text-xs text-[var(--color-mocha-subtext0)]">
+                Creates Location + Site under Self Client.
               </span>
             </label>
           )}
