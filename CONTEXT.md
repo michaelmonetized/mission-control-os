@@ -16,6 +16,10 @@ _Avoid_: Sign-up only, checklist (UI only)
 The Client record representing the Agency’s own business, created at Agency signup. Dogfood workspace for Client CRM, PM, social, email, and audit before/while serving external Clients.
 _Avoid_: Demo client (implies disposable fake), sandbox (implies non-production data only)
 
+**Client Onboarding**:
+Guided first-run for external **Client Users** (profile, optional connections, Approval Calendar, Client CRM import; optional Client Email Domain)—ADR-0041. Distinct from Agency Onboarding / Self Client.
+_Avoid_: Portal invite only (access ≠ onboarding)
+
 **Public Relations repo**:
 The separate repository for marketing, launch, press, and public-facing content about Mission Control—not application runtime code.
 _Avoid_: Docs-only product repo (ADRs live with design/meta), Control Plane
