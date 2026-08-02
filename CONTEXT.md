@@ -34,6 +34,14 @@ _Avoid_: Customer login, guest (Clerk guest ≠ portal role), org member (Agency
 The authenticated Mission Control Surface for Client Users—progress graphs, shared audit outcomes, and related read-mostly views. Part of MVP (ADR-0025).
 _Avoid_: Marketing site, Public Relations repo
 
+**Portal Invite**:
+An email-linked invitation for a specific address to become a Client User on a Client. One access path (ADR-0027).
+_Avoid_: Magic link only (implementation detail)
+
+**Portal Allowlist**:
+Emails permitted to claim Client Portal access for a Client on sign-in without a one-off invite send. Second access path (ADR-0027).
+_Avoid_: Domain ACL (unless explicitly productized later)
+
 **Location**:
 A physical place or market unit under a Client (storefront, service area hub, franchise unit). The primary unit for local SEO work, citations, and many site/analytics bindings.
 _Avoid_: Site (a Location may have multiple Sites), branch (retail-specific), listing
