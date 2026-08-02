@@ -1,6 +1,6 @@
 # Mission Control
 
-Multi-tenant operating system for digital marketing and local SEO agencies (**Mission Control**): delivery tooling, acquisition tracking, CRM, and client-facing reporting in one product. Repo codename may remain `agency-os`.
+Multi-tenant operating system for digital marketing and local SEO agencies (**Mission Control**): technical audit, CRM, task queue, email, social calendar, connectivity, Client Portal, and multi-surface ops in one product (first ship is full breadth—ADR-0031). Repo codename may remain `agency-os`.
 
 ## Language
 
@@ -57,6 +57,32 @@ _Avoid_: Member, seat, agent (ambiguous with SEO/automation agents)
 **Site**:
 A web property (domain or origin) associated with a Location (or occasionally Client-wide). The unit of crawl, accessibility, and technical SEO audit.
 _Avoid_: Page, property (GA jargon only), URL
+
+### Agency ops modules
+
+**Task**:
+A unit of work tracked in Mission Control’s task queue—assignable, statused, optionally linked to Client, Location, Site, Audit Finding, or Campaign.
+_Avoid_: Ticket (support-only connotation), Issue (audit finding)
+
+**Contact**:
+A person related to a Client or prospect (decision-maker, billing, marketing). CRM entity; may become a Client User if granted portal access.
+_Avoid_: User (authenticated Mission Control account), lead (pipeline stage, not the person)
+
+**Pipeline**:
+A named sequence of stages for opportunities or Client relationships (e.g. lead → closed). CRM structure.
+_Avoid_: Funnel (marketing analytics only), board (UI)
+
+**Campaign**:
+A coordinated marketing or SEO work effort over time, often tied to a Client/Location—may group Tasks, content, and social posts.
+_Avoid_: Crawl Run, Ad set (paid-only)
+
+**Connected Account**:
+An external integration identity (Google, Meta, email mailbox, analytics, etc.) linked to an Agency or Client for Connectivity.
+_Avoid_: Integration (the product capability), OAuth app (platform)
+
+**Social Post**:
+A piece of content scheduled or published to social channels via the social calendar.
+_Avoid_: Buffer (vendor), update (vague)
 
 ### Technical audit
 

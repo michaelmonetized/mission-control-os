@@ -24,7 +24,7 @@ Implementation starts only after shared understanding is confirmed in the grill-
 | Topic | Decision |
 |-------|----------|
 | Tenancy | Multi-tenant SaaS; Agency → Client → Location |
-| MVP wedge | Technical audit suite (full SF + Sitebulb-class + agency ops bar) |
+| First ship | Full agency OS: audit + CRM + tasks + email + social + connectivity (ADR-0031) |
 | Crawl execution | Local Agent only (no cloud fetch fleet) |
 | Surfaces | Web, Desktop, TUI, Mobile — equal; full Audit Loop on each |
 | Stack | TanStack Start + Clerk + Convex + Resend; Electron+Effect Desktop; Swift iOS; Kotlin Android; Rust TUI+Agent |
