@@ -61,8 +61,12 @@ _Avoid_: Page, property (GA jargon only), URL
 ### Agency ops modules
 
 **Task**:
-A unit of work tracked in Mission Control’s task queue—assignable, statused, optionally linked to Client, Location, Site, Audit Finding, or Campaign.
-_Avoid_: Ticket (support-only connotation), Issue (audit finding)
+A single unit of work in Mission Control—assignable, statused, flaggable/taggable. One system for CRM nurturing (sales/support) and Client delivery PM; **flags, tags, and links** route visibility between CRM views and Client PM views (ADR-0035).
+_Avoid_: Ticket (unless support-type flag), Issue (audit finding), separate CRM-task DB
+
+**Project**:
+A delivery container under a **Client** holding many Tasks (PM tool). A company or domain may have many Projects over time. Not a CRM Opportunity.
+_Avoid_: Campaign (marketing effort), Crawl Run, Opportunity (sales deal)
 
 **CRM Workspace**:
 A scoped instance of the **CRM primitive**: either **Agency CRM** (agency sales, onboarding, service-provider relationships) or **Client CRM** (that Client’s own book of business). Same tool, API, and capabilities; different data partition and operators (ADR-0032, ADR-0034).
