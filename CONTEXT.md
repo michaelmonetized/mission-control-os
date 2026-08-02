@@ -8,6 +8,24 @@ Multi-tenant operating system for digital marketing and local SEO agencies (**Mi
 The product—the multi-surface Control Plane, Local Agent, and Audit tooling for agencies. User-facing name.
 _Avoid_: Agency OS (repo codename only), BreezyApp (different product)
 
+### Brand & design (DSD)
+
+**Sparse cockpit**:
+Visual density principle—ops power with air and progressive disclosure, not widget walls (DSD-0001).
+_Avoid_: Dense dashboard, GHL clutter as aesthetic
+
+**Glass**:
+Translucent, blurred panel material over Catppuccin Mocha bases (DSD-0002).
+_Avoid_: Flat opaque cards as default
+
+**Neon border**:
+Accent-colored glow edge for focus, selection, and live/important states (DSD-0002).
+_Avoid_: Constant full-UI rainbow glow
+
+**Skeuomorph control**:
+Selective tactile/realistic control styling (Icon Factory energy) on buttons and hardware-like affordances (DSD-0002).
+_Avoid_: Full retro skeuomorphic chrome, pure flat-only
+
 **Agency Onboarding**:
 The guided, skippable setup spine for a new Agency. **Self Client** is auto-created (the Agency is its own first Client); then team, Email Domain, Location/Site, channels, first Project, optional crawl—ADR-0040.
 _Avoid_: Sign-up only, checklist (UI only)
