@@ -25,6 +25,8 @@ import { Route as AppEmailRouteImport } from './routes/app/email'
 import { Route as AppPortalRouteImport } from './routes/app/portal'
 import { Route as AppSocialRouteImport } from './routes/app/social'
 import { Route as AppTasksRouteImport } from './routes/app/tasks'
+import { Route as SignInSplatRouteImport } from './routes/sign-in.$'
+import { Route as SignUpSplatRouteImport } from './routes/sign-up.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -106,6 +108,16 @@ const AppTasksRoute = AppTasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => AppRoute,
 } as any)
+const SignInSplatRoute = SignInSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => SignInRoute,
+} as any)
+const SignUpSplatRoute = SignUpSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => SignUpRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -113,8 +125,8 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
   '/select-agency': typeof SelectAgencyRoute
-  '/sign-in': typeof SignInRoute
-  '/sign-up': typeof SignUpRoute
+  '/sign-in': typeof SignInRouteWithChildren
+  '/sign-up': typeof SignUpRouteWithChildren
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
@@ -123,6 +135,8 @@ export interface FileRoutesByFullPath {
   '/app/portal': typeof AppPortalRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
+  '/sign-in/$': typeof SignInSplatRoute
+  '/sign-up/$': typeof SignUpSplatRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
@@ -130,8 +144,8 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
   '/select-agency': typeof SelectAgencyRoute
-  '/sign-in': typeof SignInRoute
-  '/sign-up': typeof SignUpRoute
+  '/sign-in': typeof SignInRouteWithChildren
+  '/sign-up': typeof SignUpRouteWithChildren
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
@@ -140,6 +154,8 @@ export interface FileRoutesByTo {
   '/app/portal': typeof AppPortalRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
+  '/sign-in/$': typeof SignInSplatRoute
+  '/sign-up/$': typeof SignUpSplatRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -149,8 +165,8 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
   '/select-agency': typeof SelectAgencyRoute
-  '/sign-in': typeof SignInRoute
-  '/sign-up': typeof SignUpRoute
+  '/sign-in': typeof SignInRouteWithChildren
+  '/sign-up': typeof SignUpRouteWithChildren
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
@@ -159,6 +175,8 @@ export interface FileRoutesById {
   '/app/portal': typeof AppPortalRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
+  '/sign-in/$': typeof SignInSplatRoute
+  '/sign-up/$': typeof SignUpSplatRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -179,6 +197,8 @@ export interface FileRouteTypes {
     | '/app/portal'
     | '/app/social'
     | '/app/tasks'
+    | '/sign-in/$'
+    | '/sign-up/$'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -196,6 +216,8 @@ export interface FileRouteTypes {
     | '/app/portal'
     | '/app/social'
     | '/app/tasks'
+    | '/sign-in/$'
+    | '/sign-up/$'
     | '/app'
   id:
     | '__root__'
@@ -214,6 +236,8 @@ export interface FileRouteTypes {
     | '/app/portal'
     | '/app/social'
     | '/app/tasks'
+    | '/sign-in/$'
+    | '/sign-up/$'
     | '/app/'
   fileRoutesById: FileRoutesById
 }
@@ -223,8 +247,8 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   PortalRoute: typeof PortalRoute
   SelectAgencyRoute: typeof SelectAgencyRoute
-  SignInRoute: typeof SignInRoute
-  SignUpRoute: typeof SignUpRoute
+  SignInRoute: typeof SignInRouteWithChildren
+  SignUpRoute: typeof SignUpRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -341,6 +365,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTasksRouteImport
       parentRoute: typeof AppRoute
     }
+    '/sign-in/$': {
+      id: '/sign-in/$'
+      path: '/$'
+      fullPath: '/sign-in/$'
+      preLoaderRoute: typeof SignInSplatRouteImport
+      parentRoute: typeof SignInRoute
+    }
+    '/sign-up/$': {
+      id: '/sign-up/$'
+      path: '/$'
+      fullPath: '/sign-up/$'
+      preLoaderRoute: typeof SignUpSplatRouteImport
+      parentRoute: typeof SignUpRoute
+    }
   }
 }
 
@@ -370,14 +408,36 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface SignInRouteChildren {
+  SignInSplatRoute: typeof SignInSplatRoute
+}
+
+const SignInRouteChildren: SignInRouteChildren = {
+  SignInSplatRoute: SignInSplatRoute,
+}
+
+const SignInRouteWithChildren =
+  SignInRoute._addFileChildren(SignInRouteChildren)
+
+interface SignUpRouteChildren {
+  SignUpSplatRoute: typeof SignUpSplatRoute
+}
+
+const SignUpRouteChildren: SignUpRouteChildren = {
+  SignUpSplatRoute: SignUpSplatRoute,
+}
+
+const SignUpRouteWithChildren =
+  SignUpRoute._addFileChildren(SignUpRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
   PortalRoute: PortalRoute,
   SelectAgencyRoute: SelectAgencyRoute,
-  SignInRoute: SignInRoute,
-  SignUpRoute: SignUpRoute,
+  SignInRoute: SignInRouteWithChildren,
+  SignUpRoute: SignUpRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

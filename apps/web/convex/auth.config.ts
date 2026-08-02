@@ -1,6 +1,10 @@
 /**
  * Clerk JWT validation for Convex (Agency org claims on session token).
- * Domain matches Mission Control OS dev instance (famous-salmon-94).
+ *
+ * Domain = Clerk Frontend API host for Mission Control OS (dev).
+ * When a production Clerk instance is added, append another provider entry
+ * (or replace this domain). Convex requires auth.config domains to be static
+ * or fully declared as deployment env vars before deploy.
  */
 export default {
   providers: [

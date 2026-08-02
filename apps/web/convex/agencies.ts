@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { getAgencyByClerkOrg, requireAgencyOrg, requireUser } from "./lib/auth";
+import { getAgencyByClerkOrg, orgClaims, requireAgencyOrg } from "./lib/auth";
 
 /** Current Agency row for active Clerk org (creates nothing). */
 export const getMine = query({
@@ -8,11 +8,7 @@ export const getMine = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
-    const rec = identity as Record<string, unknown>;
-    const orgId =
-      (rec.org_id as string | undefined) ??
-      (rec.orgId as string | undefined) ??
-      ((rec.o as { id?: string } | undefined)?.id);
+    const { orgId } = orgClaims(identity as Record<string, unknown>);
     if (!orgId) return null;
     return getAgencyByClerkOrg(ctx, orgId);
   },
@@ -70,9 +66,14 @@ export const ensureMine = mutation({
   },
 });
 
+const ONBOARDING_MAX_STEP = 7; // 8 steps, indices 0–7
+
 export const setOnboardingStep = mutation({
   args: { step: v.number() },
   handler: async (ctx, args) => {
+    if (!Number.isInteger(args.step) || args.step < 0 || args.step > ONBOARDING_MAX_STEP) {
+      throw new Error(`step must be an integer 0–${ONBOARDING_MAX_STEP}`);
+    }
     const { clerkOrgId } = await requireAgencyOrg(ctx);
     const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
     if (!agency) throw new Error("Agency not found — run ensureMine first");
@@ -88,25 +89,14 @@ export const whoami = query({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return { signedIn: false as const };
     const rec = identity as Record<string, unknown>;
-    const orgId =
-      (rec.org_id as string | undefined) ??
-      (rec.orgId as string | undefined) ??
-      null;
-    const orgRole =
-      (rec.org_role as string | undefined) ??
-      (rec.orgRole as string | undefined) ??
-      null;
-    const orgName =
-      (rec.org_name as string | undefined) ??
-      (rec.orgName as string | undefined) ??
-      null;
+    const { orgId, orgRole, orgName } = orgClaims(rec);
     return {
       signedIn: true as const,
       subject: identity.subject,
       email: (rec.email as string | undefined) ?? null,
-      orgId,
-      orgRole,
-      orgName,
+      orgId: orgId ?? null,
+      orgRole: orgRole ?? null,
+      orgName: orgName ?? null,
     };
   },
 });

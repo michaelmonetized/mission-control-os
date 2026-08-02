@@ -12,7 +12,7 @@ export async function requireUser(ctx: AuthCtx) {
 }
 
 /** Clerk JWT may expose org as org_id (template) or nested claims. */
-function orgClaims(identity: Record<string, unknown>) {
+export function orgClaims(identity: Record<string, unknown>) {
   const orgId =
     (identity.org_id as string | undefined) ??
     (identity.orgId as string | undefined) ??

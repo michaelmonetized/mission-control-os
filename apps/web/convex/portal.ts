@@ -43,6 +43,18 @@ export const invite = mutation({
     }
 
     const email = args.email.trim().toLowerCase();
+
+    // Idempotent invite: reuse existing grant for same client+email
+    const existing = await ctx.db
+      .query("portalGrants")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .collect();
+    const match = existing.find((g) => g.clientId === args.clientId);
+    if (match) {
+      await ctx.db.patch(match._id, { role: args.role });
+      return { grantId: match._id, email, role: args.role, existing: true };
+    }
+
     const grantId = await ctx.db.insert("portalGrants", {
       clientId: args.clientId,
       email,
@@ -50,12 +62,18 @@ export const invite = mutation({
     });
 
     // Allowlist entry for sign-in binding (ADR-0027)
-    await ctx.db.insert("portalAllowlist", {
-      clientId: args.clientId,
-      email,
-    });
+    const allow = await ctx.db
+      .query("portalAllowlist")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .collect();
+    if (!allow.some((a) => a.clientId === args.clientId)) {
+      await ctx.db.insert("portalAllowlist", {
+        clientId: args.clientId,
+        email,
+      });
+    }
 
-    return { grantId, email, role: args.role };
+    return { grantId, email, role: args.role, existing: false };
   },
 });
 
@@ -72,10 +90,16 @@ export const myGrants = query({
     const email = (identity.email as string | undefined)?.toLowerCase();
     const userId = identity.subject;
 
-    const all = await ctx.db.query("portalGrants").collect();
-    return all.filter(
-      (g) => g.clerkUserId === userId || (email && g.email === email),
-    );
+    const byUser = await ctx.db
+      .query("portalGrants")
+      .withIndex("by_clerkUser", (q) => q.eq("clerkUserId", userId))
+      .collect();
+    if (byUser.length) return byUser;
+    if (!email) return [];
+    return ctx.db
+      .query("portalGrants")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .collect();
   },
 });
 
@@ -87,10 +111,13 @@ export const claimInvite = mutation({
     const email = (identity.email as string | undefined)?.toLowerCase();
     if (!email) throw new Error("User email required to claim portal invite");
 
-    const grants = await ctx.db.query("portalGrants").collect();
+    const grants = await ctx.db
+      .query("portalGrants")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .collect();
     let claimed = 0;
     for (const g of grants) {
-      if (g.email === email && !g.clerkUserId) {
+      if (!g.clerkUserId) {
         await ctx.db.patch(g._id, { clerkUserId: identity.subject });
         claimed++;
       }

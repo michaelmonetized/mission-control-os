@@ -173,12 +173,17 @@ export default defineSchema({
     clerkUserId: v.optional(v.string()),
     email: v.string(),
     role: v.union(v.literal("admin"), v.literal("member")),
-  }).index("by_client", ["clientId"]),
+  })
+    .index("by_client", ["clientId"])
+    .index("by_email", ["email"])
+    .index("by_clerkUser", ["clerkUserId"]),
 
   portalAllowlist: defineTable({
     clientId: v.id("clients"),
     email: v.string(),
-  }).index("by_client", ["clientId"]),
+  })
+    .index("by_client", ["clientId"])
+    .index("by_email", ["email"]),
 
   connectedAccounts: defineTable({
     agencyId: v.id("agencies"),

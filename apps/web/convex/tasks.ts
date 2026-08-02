@@ -192,6 +192,11 @@ export const update = mutation({
     if (task.clientId) {
       const client = await assertClientInAgency(ctx, task.clientId, agency._id);
       if (!client) throw new Error("task not in agency");
+    } else if (task.workspaceId) {
+      const ws = await ctx.db.get(task.workspaceId);
+      if (!ws || ws.agencyId !== agency._id) throw new Error("task not in agency");
+    } else {
+      throw new Error("task not in agency");
     }
 
     const patch: Record<string, unknown> = {};
@@ -233,6 +238,17 @@ export const promoteToProject = mutation({
 
     const task = await ctx.db.get(args.taskId);
     if (!task) throw new Error("task not found");
+
+    // Source task must already belong to this agency
+    if (task.clientId) {
+      const srcClient = await assertClientInAgency(ctx, task.clientId, agency._id);
+      if (!srcClient) throw new Error("task not in agency");
+    } else if (task.workspaceId) {
+      const ws = await ctx.db.get(task.workspaceId);
+      if (!ws || ws.agencyId !== agency._id) throw new Error("task not in agency");
+    } else {
+      throw new Error("task not in agency");
+    }
 
     const project = await ctx.db.get(args.projectId);
     if (!project) throw new Error("project not found");

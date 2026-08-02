@@ -43,9 +43,18 @@ function Onboarding() {
       if (step === 0) {
         await ensure({ name: agencyName.trim() || undefined });
       }
-      await setStepRemote({ step: next }).catch(() => {
-        /* agency may not exist yet on first open */
-      });
+      try {
+        await setStepRemote({ step: next });
+      } catch (e) {
+        // First open can race before ensureMine lands — retry once after ensure
+        const msg = e instanceof Error ? e.message : String(e);
+        if (/Agency not found/i.test(msg)) {
+          await ensure({ name: agencyName.trim() || undefined });
+          await setStepRemote({ step: next });
+        } else {
+          throw e;
+        }
+      }
       setStep(next);
     } catch (e) {
       console.error(e);

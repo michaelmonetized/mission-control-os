@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-16">
+    <div className="relative min-h-dvh flex flex-col items-center justify-center px-4 py-16">
       <div className="absolute top-4 right-4">
         <Show when="signed-in">
           <UserButton />

@@ -63,6 +63,18 @@ export const queueRun = mutation({
   },
 });
 
+async function assertRunInAgency(
+  ctx: Parameters<typeof requireAgencyOrg>[0],
+  crawlRunId: import("./_generated/dataModel").Id<"crawlRuns">,
+  agencyId: import("./_generated/dataModel").Id<"agencies">,
+) {
+  const run = await ctx.db.get(crawlRunId);
+  if (!run) return null;
+  const scoped = await assertSiteInAgency(ctx, run.siteId, agencyId);
+  if (!scoped) return null;
+  return { run, ...scoped };
+}
+
 /** Agent (or control plane) streams findings into Convex (ADR-0019). */
 export const streamFinding = mutation({
   args: {
@@ -75,9 +87,11 @@ export const streamFinding = mutation({
   },
   handler: async (ctx, args) => {
     // Agent auth later via agent token; for now require signed-in agency staff
-    await requireAgencyOrg(ctx);
-    const run = await ctx.db.get(args.crawlRunId);
-    if (!run) throw new Error("crawl run not found");
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) throw new Error("Agency not found");
+    const scoped = await assertRunInAgency(ctx, args.crawlRunId, agency._id);
+    if (!scoped) throw new Error("crawl run not found");
 
     const findingId = await ctx.db.insert("auditFindings", {
       crawlRunId: args.crawlRunId,
@@ -103,9 +117,11 @@ export const completeRun = mutation({
     }),
   },
   handler: async (ctx, args) => {
-    await requireAgencyOrg(ctx);
-    const run = await ctx.db.get(args.crawlRunId);
-    if (!run) throw new Error("crawl run not found");
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) throw new Error("Agency not found");
+    const scoped = await assertRunInAgency(ctx, args.crawlRunId, agency._id);
+    if (!scoped) throw new Error("crawl run not found");
     const completedAt = Date.now();
     await ctx.db.patch(args.crawlRunId, {
       status: "completed",
@@ -113,7 +129,7 @@ export const completeRun = mutation({
     });
     await ctx.db.insert("metricsSnapshots", {
       crawlRunId: args.crawlRunId,
-      siteId: run.siteId,
+      siteId: scoped.run.siteId,
       completedAt,
       ...args.metrics,
     });
@@ -124,7 +140,11 @@ export const completeRun = mutation({
 export const findingsForRun = query({
   args: { crawlRunId: v.id("crawlRuns") },
   handler: async (ctx, args) => {
-    await requireAgencyOrg(ctx);
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) return [];
+    const scoped = await assertRunInAgency(ctx, args.crawlRunId, agency._id);
+    if (!scoped) return [];
     return ctx.db
       .query("auditFindings")
       .withIndex("by_run", (q) => q.eq("crawlRunId", args.crawlRunId))
