@@ -82,10 +82,17 @@ export async function handleApi(req: Request, pathname: string): Promise<Respons
   }
 
   if (path === "/api/agent/token" && req.method === "POST") {
+    // Dev middleware stub — production Desktop should call Convex `agent.issueToken`
+    // after Clerk session. Still returns a unique token so pairing works offline.
+    const body = await readJson(req);
+    const refreshToken = `dev_agent_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
     return ok({
-      refreshToken: "dev_refresh_placeholder",
-      expiresIn: 3600,
-      note: "Desktop writes to OS secret store (ADR-0016)",
+      refreshToken,
+      agencyId: "local_dev_agency",
+      expiresIn: 60 * 60 * 24 * 90,
+      tokenType: "agent_refresh",
+      deviceLabel: body.deviceLabel ?? "desktop",
+      note: "Vite API stub. Prefer Convex agent.issueToken when signed in (ADR-0016).",
     });
   }
 

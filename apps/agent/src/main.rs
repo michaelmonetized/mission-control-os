@@ -34,6 +34,8 @@ enum Commands {
 struct AgentConfig {
     refresh_token: Option<String>,
     agency_id: Option<String>,
+    #[serde(default)]
+    control_plane: Option<String>,
 }
 
 fn data_dir() -> PathBuf {
@@ -64,22 +66,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             tracing::info!(%control_plane, "mc-agent daemon starting (user-level service)");
             let d = data_dir();
             fs::create_dir_all(d.join("artifacts"))?;
-            // Load token from secret store path (Desktop writes ADR-0016)
+            // Load token from Desktop-written config (ADR-0016)
             let config_path = d.join("config.json");
-            if !config_path.exists() {
+            let config: AgentConfig = if config_path.exists() {
+                serde_json::from_str(&fs::read_to_string(&config_path)?)?
+            } else {
                 tracing::warn!("no config.json — pair via Desktop Agent Token first");
-            }
-            loop {
-                let url = format!(
-                    "{}/api/agent/heartbeat",
-                    control_plane.trim_end_matches('/')
+                AgentConfig::default()
+            };
+            if config.refresh_token.is_none() {
+                tracing::warn!("missing refresh_token in config — crawls will not authenticate");
+            } else {
+                tracing::info!(
+                    agency = ?config.agency_id,
+                    "agent credentials loaded"
                 );
-                match reqwest::Client::new()
-                    .post(&url)
-                    .json(&serde_json::json!({ "status": "idle" }))
-                    .send()
-                    .await
-                {
+            }
+            let cp = control_plane.clone();
+            loop {
+                let url = format!("{}/api/agent/heartbeat", cp.trim_end_matches('/'));
+                let mut req = reqwest::Client::new().post(&url).json(&serde_json::json!({
+                    "status": "idle",
+                    "agencyId": config.agency_id,
+                }));
+                if let Some(ref token) = config.refresh_token {
+                    req = req.bearer_auth(token);
+                }
+                match req.send().await {
                     Ok(r) => tracing::debug!(status = r.status().as_u16(), "heartbeat"),
                     Err(e) => tracing::warn!(error = %e, "heartbeat failed"),
                 }

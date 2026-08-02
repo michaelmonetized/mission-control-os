@@ -9,6 +9,7 @@
  */
 
 import type * as agencies from "../agencies.js";
+import type * as agent from "../agent.js";
 import type * as clients from "../clients.js";
 import type * as crawl from "../crawl.js";
 import type * as crm from "../crm.js";
@@ -26,6 +27,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   agencies: typeof agencies;
+  agent: typeof agent;
   clients: typeof clients;
   crawl: typeof crawl;
   crm: typeof crm;
