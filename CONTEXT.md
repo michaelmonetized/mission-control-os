@@ -117,8 +117,16 @@ An external integration identity (Google, Meta, email mailbox, analytics, etc.) 
 _Avoid_: Integration (the product capability), OAuth app (platform)
 
 **Social Post**:
-A piece of content scheduled or published to social channels via the social calendar.
+A piece of content on the social calendar (copy, media, link, channel, schedule). **Approved by default**; Client Users may disapprove (with notes) or edit. Publishes unless disapproved (ADR-0037).
 _Avoid_: Buffer (vendor), update (vague)
+
+**Approval Calendar**:
+Client-facing (and agency) view of Social Posts in the configurable **N-week look-ahead** window for review, edit, or disapprove—not a “must approve to post” queue.
+_Avoid_: Approval gate (explicit approve-required model—rejected)
+
+**Look-ahead Window**:
+Agency-configured number of weeks of scheduled Social Posts shown for client review before publish time.
+_Avoid_: Queue depth (implementation)
 
 **Email Domain**:
 A sending domain verified for an Agency or Client ESP workspace via DNS records issued through Resend-backed provisioning. Required to enable full email features for that workspace.
