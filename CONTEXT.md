@@ -89,8 +89,8 @@ The public, versioned HTTP API for the CRM primitive—migration and bidirection
 _Avoid_: Internal Convex mutations only, Zapier-only access
 
 **API route**:
-An HTTP endpoint under `/api/v1/<module>/<action>/…` (Vercel-style modules and actions—ADR-0042), e.g. `/api/v1/crm/add/client`, `/api/v1/tasks/list`, `/api/v1/notify/email`.
-_Avoid_: GraphQL operation, RPC service name only
+An HTTP endpoint under `/api/<module>/…` (Vercel-style; **no version in path**—ADR-0042). Prefer single-word segments (`/api/crawl/run`, `/api/clients/list`); multi-word kebabs only when needed. Resource ids and filters live in the **JSON body**, not the URL.
+_Avoid_: GraphQL operation, `/api/v1/…`, `/{clientId}` in path for normal CRUD
 
 **Contact**:
 A person in a CRM Workspace (lead, customer, vendor, etc.). May link to a Mission Control User if they have login.
