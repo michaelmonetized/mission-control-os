@@ -1,6 +1,6 @@
 # Product name: Mission Control
 
-The shipping product name is **Mission Control**. Repository path may remain `agency-os` as a technical codename; user-facing Surfaces, docs, and packages use Mission Control.
+The shipping product name is **Mission Control**. Repository path may remain `mission-control` as a technical codename; user-facing Surfaces, docs, and packages use Mission Control.
 
 ## Why
 
