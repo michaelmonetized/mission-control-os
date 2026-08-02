@@ -3,7 +3,7 @@
 Local SEO / digital marketing **agency operating system**.
 
 **Product name:** Mission Control  
-**Repo codename:** `mission-control`
+**Repo codename:** `mission-control-os`
 
 ## Intent
 

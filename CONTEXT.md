@@ -1,6 +1,6 @@
 # Mission Control
 
-Multi-tenant operating system for digital marketing and local SEO agencies (**Mission Control**): technical audit, CRM, task queue, email, social calendar, connectivity, Client Portal, and multi-surface ops in one product (first ship is full breadth—ADR-0031). Repo codename may remain `mission-control`.
+Multi-tenant operating system for digital marketing and local SEO agencies (**Mission Control**): technical audit, CRM, task queue, email, social calendar, connectivity, Client Portal, and multi-surface ops in one product (first ship is full breadth—ADR-0031). Repo codename may remain `mission-control-os`.
 
 ## Language
 
