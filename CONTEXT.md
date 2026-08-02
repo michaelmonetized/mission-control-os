@@ -30,6 +30,10 @@ _Avoid_: Random pink/cyan without tokens
 House CSS/font family name for **Neue Haas Grotesque Pro** files (`max15.ttf`…`max96.ttf` weight/style encoding)—primary UI type for Mission Control (DSD-0004).
 _Avoid_: Inter/Geist as primary, Helvetica bare (use licensed Max)
 
+**Nested radius**:
+Inner border-radius computed as `calc(var(--radius) + var(--padding))` so nested rounded elements track parent padding (DSD-0005). Base scale 8/12/16/24/32.
+_Avoid_: Flat same radius on every nest level, subtractive concentric unless DSD changes
+
 **Skeuomorph control**:
 Selective tactile/realistic control styling (Icon Factory energy) on buttons and hardware-like affordances (DSD-0002).
 _Avoid_: Full retro skeuomorphic chrome, pure flat-only
