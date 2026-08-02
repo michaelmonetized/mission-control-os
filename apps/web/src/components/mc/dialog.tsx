@@ -1,7 +1,11 @@
-import { Dialog as Ui } from "@/components/ui/dialog";
-import { cn } from "cnfast";
-import * as React from "react";
-
-export function Dialog({ className, ...props }: React.ComponentProps<"div">) {
-  return <Ui className={cn("mc-glass rounded-[var(--radius-sm)]", className)} {...props} />;
-}
+export {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+  DialogPortal,
+  DialogOverlay,
+} from "@/components/ui/dialog";

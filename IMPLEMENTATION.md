@@ -98,14 +98,14 @@ cargo run -p mc-tui
 
 | Item | Gap |
 |------|-----|
-| ADR-0006 mobile | Swift/Kotlin apps not started (issue #16) |
-| ADR-0011 Effect | Desktop bootstrap orchestration present (`effect` + pipeline); full Effect graph TBD |
-| ADR-0008 full Sitebulb depth | Expanded checks (title/h1/meta/canonical/noindex/dupes); more extractors TBD |
+| ADR-0006 mobile | **Scaffold** iOS SPM + Android Compose (`apps/ios`, `apps/android`) — Clerk/Convex wire TBD |
+| ADR-0011 Effect | Desktop bootstrap orchestration + `effect` dep; expand graph over time |
+| ADR-0008 full Sitebulb depth | Expanded checks + agent HTTP poll/claim/complete; more extractors TBD |
 | ADR-0034 HTTP CRM proxy | Catalog + Convex SoT; thin HTTP dual-write optional |
-| ADR-0046 Trigger.dev cloud | `automationHandoffs` queue + worker contract; needs Trigger project key |
+| ADR-0046 Trigger.dev cloud | Handoffs queue + `@mc/trigger-worker` dev runner; cloud key TBD |
 | ADR-0022 Playwright | Default when `require('playwright')` works; else HTTP |
 | DSD-0008 iCloud vector | Reconstructed SVG until iCloud import |
-| DSD-0010 full shadcn dump | Core mirrors; expand via `shadcn add` |
+| DSD-0010 full shadcn dump | Dialog fully mirrored; expand rest via `shadcn add` |
 | Clerk production instance | Dev keys on Vercel previews |
 | ADR-0017 multi-repo split | Deferred intentionally |
 
