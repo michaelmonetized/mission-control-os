@@ -65,8 +65,12 @@ A unit of work tracked in Mission Control’s task queue—assignable, statused,
 _Avoid_: Ticket (support-only connotation), Issue (audit finding)
 
 **CRM Workspace**:
-A scoped CRM instance: either **Agency CRM** (agency’s own book of business) or **Client CRM** (one Client’s full CRM). Same product capabilities; different data partition and operators.
+A scoped instance of the **CRM primitive**: either **Agency CRM** (agency sales, onboarding, service-provider relationships) or **Client CRM** (that Client’s own book of business). Same tool, API, and capabilities; different data partition and operators (ADR-0032, ADR-0034).
 _Avoid_: Sub-account (GHL jargon), portal (UI shell only)
+
+**CRM API**:
+The public, versioned HTTP API for the CRM primitive—migration and bidirectional sync with external CRMs, plus headless automation (ADR-0034).
+_Avoid_: Internal Convex mutations only, Zapier-only access
 
 **Contact**:
 A person in a CRM Workspace (lead, customer, vendor, etc.). May link to a Mission Control User if they have login.
@@ -85,8 +89,12 @@ A first-class multi-channel thread (email, SMS, social, form, chat, call notes, 
 _Avoid_: Thread (implementation), inbox (UI), email (one channel)
 
 **Message**:
-One item in a Conversation (inbound/outbound body, channel, timestamps, status).
+One item in a Conversation (inbound/outbound body, channel, timestamps, status). Channels in first ship: email, SMS, social DM, web form, live chat (ADR-0033).
 _Avoid_: Email (channel-specific), notification
+
+**Chat Widget**:
+Embeddable live chat for a Site/Location that creates Conversations in the appropriate CRM Workspace (usually Client CRM).
+_Avoid_: Intercom (vendor), popup
 
 **Automation**:
 A scoped workflow (triggers → conditions → actions) inside a CRM Workspace or Agency-wide ops—e.g. on Message received, stage change, tag added.
