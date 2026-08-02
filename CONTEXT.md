@@ -42,6 +42,10 @@ _Avoid_: Magic link only (implementation detail)
 Emails permitted to claim Client Portal access for a Client on sign-in without a one-off invite send. Second access path (ADR-0027).
 _Avoid_: Domain ACL (unless explicitly productized later)
 
+**Shared Finding**:
+An Audit Finding or Open Issue Agency staff have marked visible in the Client Portal. Default is not shared.
+_Avoid_: Public finding, published report (broader deliverable)
+
 **Location**:
 A physical place or market unit under a Client (storefront, service area hub, franchise unit). The primary unit for local SEO work, citations, and many site/analytics bindings.
 _Avoid_: Site (a Location may have multiple Sites), branch (retail-specific), listing
