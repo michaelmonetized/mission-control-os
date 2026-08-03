@@ -33,7 +33,7 @@ docs/adr · docs/dsd
 | **0003** Audit wedge | Crawl + a11y-class findings | `crawl` + `findings` + Audit UI |
 | **0004** Local agent only | No cloud crawler | `mc-agent crawl` / daemon |
 | **0005** Multi-surface CP | Web/Desktop/TUI/Mobile | Web live; Desktop/TUI; iOS/Android module scaffolds + Clerk checklists |
-| **0006** All surfaces equal | Same capabilities | Shared protocol + Convex; TUI/Desktop stubs wired |
+| **0006** All surfaces equal | Same capabilities | Shared protocol + Convex; TUI modules include Pipeline/Activity |
 | **0007** Full audit loop | Every surface | Web + Agent; TUI navigation; portal graphs |
 | **0008** Crawl depth | SF+Sitebulb-class | HTTP crawl + alt/broken/title/meta/viewport/mixed/lang/og/charset; Playwright path |
 | **0009** Lakebed | **Superseded** by 0010 | N/A |

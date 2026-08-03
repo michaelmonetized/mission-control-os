@@ -36,13 +36,15 @@ function CockpitHome() {
         after onboarding.
       </p>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 mb-8">
         {[
           ["Clients", summary?.clients],
           ["Open tasks", summary?.openTasks],
+          ["Open deals", summary?.openDeals],
           ["Queued crawls", summary?.queuedCrawls],
           ["Open findings", summary?.openFindings],
           ["Approved posts", summary?.approvedPosts],
+          ["Handoffs", summary?.queuedHandoffs],
         ].map(([label, value]) => (
           <Card key={String(label)} className="mc-elev-1">
             <CardContent className="pt-4 pb-3">

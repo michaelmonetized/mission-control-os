@@ -71,7 +71,14 @@ function AuditPage() {
   const [note, setNote] = useState<string | null>(null);
   const [ignoreRobots, setIgnoreRobots] = useState(false);
   const [selectedFindings, setSelectedFindings] = useState<string[]>([]);
+  const [severityFilter, setSeverityFilter] = useState<string>("all");
   const bulkSetStatus = useMutation(api.findings.bulkSetStatus);
+
+  const filteredFindings = useMemo(() => {
+    const rows = findings ?? [];
+    if (severityFilter === "all") return rows;
+    return rows.filter((f) => f.severity === severityFilter);
+  }, [findings, severityFilter]);
 
   const history = useMemo(() => {
     return (metrics ?? [])
@@ -392,7 +399,17 @@ function AuditPage() {
         </CardHeader>
         <CardContent className="space-y-2">
           {(findings ?? []).length > 0 ? (
-            <div className="flex flex-wrap gap-2 mb-2">
+            <div className="flex flex-wrap gap-2 mb-2 items-center">
+              <select
+                className="rounded border border-[var(--color-mocha-surface1)] bg-[var(--color-mocha-surface0)] px-2 py-1 text-xs"
+                value={severityFilter}
+                onChange={(e) => setSeverityFilter(e.target.value)}
+              >
+                <option value="all">All severities</option>
+                <option value="high">high</option>
+                <option value="medium">medium</option>
+                <option value="low">low</option>
+              </select>
               <Button
                 variant="secondary"
                 disabled={selectedFindings.length === 0}
@@ -422,10 +439,10 @@ function AuditPage() {
               </Button>
             </div>
           ) : null}
-          {(findings ?? []).length === 0 ? (
+          {filteredFindings.length === 0 ? (
             <p className="text-sm text-[var(--color-mocha-subtext0)]">No findings for run.</p>
           ) : (
-            (findings ?? []).map((f) => (
+            filteredFindings.map((f) => (
               <div key={f._id} className="mc-glass px-3 py-3 rounded-md space-y-2 text-sm">
                 <div className="flex flex-wrap justify-between gap-2">
                   <label className="flex items-center gap-2">

@@ -20,12 +20,15 @@ const MODULES: &[&str] = &[
     "Cockpit",
     "Clients",
     "CRM",
+    "Pipeline",
     "Tasks",
     "Audit",
     "Social",
     "Email",
     "Automations",
+    "Activity",
     "Portal",
+    "Settings",
 ];
 
 fn main() {

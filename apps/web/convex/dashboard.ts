@@ -14,6 +14,8 @@ export const summary = query({
         queuedCrawls: 0,
         approvedPosts: 0,
         openFindings: 0,
+        openDeals: 0,
+        queuedHandoffs: 0,
       };
     }
 
@@ -67,12 +69,35 @@ export const summary = query({
       }
     }
 
+    const workspaces = await ctx.db
+      .query("crmWorkspaces")
+      .withIndex("by_agency", (q) => q.eq("agencyId", agency._id))
+      .collect();
+    let openDeals = 0;
+    for (const ws of workspaces) {
+      const opps = await ctx.db
+        .query("opportunities")
+        .withIndex("by_workspace", (q) => q.eq("workspaceId", ws._id))
+        .collect();
+      openDeals += opps.filter((o) => o.stage !== "won" && o.stage !== "lost").length;
+    }
+
+    const handoffs = await ctx.db
+      .query("automationHandoffs")
+      .withIndex("by_agency", (q) => q.eq("agencyId", agency._id))
+      .collect();
+    const queuedHandoffs = handoffs.filter(
+      (h) => h.status === "queued" || h.status === "processing",
+    ).length;
+
     return {
       clients: clients.length,
       openTasks,
       queuedCrawls,
       approvedPosts,
       openFindings,
+      openDeals,
+      queuedHandoffs,
     };
   },
 });

@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth, useOrganization, useUser } from "@clerk/react";
-import { useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
+import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
 import { Badge } from "@/components/mc/badge";
+import { Button } from "@/components/mc/button";
+import { Input } from "@/components/mc/input";
 import { KEYMAP } from "@/lib/keymap";
 import { Separator } from "@/components/mc/separator";
 
@@ -17,6 +20,27 @@ function SettingsPage() {
   const { user } = useUser();
   const agency = useQuery(api.agencies.getMine, {});
   const who = useQuery(api.agencies.whoami, {});
+  const fireWebhook = useAction(api.webhooks.fire);
+  const [hookUrl, setHookUrl] = useState("https://httpbin.org/post");
+  const [hookNote, setHookNote] = useState<string | null>(null);
+  const [hookBusy, setHookBusy] = useState(false);
+
+  async function testWebhook() {
+    setHookBusy(true);
+    setHookNote(null);
+    try {
+      const res = await fireWebhook({
+        url: hookUrl,
+        payload: { ping: true, agencyId: agency?._id },
+        idempotencyKey: `settings-test-${Date.now()}`,
+      });
+      setHookNote(JSON.stringify(res));
+    } catch (e) {
+      setHookNote(e instanceof Error ? e.message : "Failed");
+    } finally {
+      setHookBusy(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -66,6 +90,26 @@ function SettingsPage() {
       </div>
 
       <Separator />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Webhook probe</CardTitle>
+          <CardDescription>Automation action catalog (ADR-0043) · failures → Trigger handoff</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Input
+            value={hookUrl}
+            onChange={(e) => setHookUrl(e.target.value)}
+            placeholder="https://example.com/hook"
+          />
+          <Button onClick={() => void testWebhook()} disabled={hookBusy || !hookUrl.trim()}>
+            {hookBusy ? "Sending…" : "Fire test webhook"}
+          </Button>
+          {hookNote ? (
+            <pre className="text-[10px] mc-glass p-2 rounded-md overflow-x-auto">{hookNote}</pre>
+          ) : null}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
