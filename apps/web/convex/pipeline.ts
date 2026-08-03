@@ -14,7 +14,14 @@ export const board = query({
   handler: async (ctx, args) => {
     const { clerkOrgId } = await requireAgencyOrg(ctx);
     const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
-    if (!agency) return { stages: [...STAGES], columns: {} as Record<string, unknown[]> };
+    if (!agency)
+      return {
+        stages: [...STAGES],
+        columns: Object.fromEntries(STAGES.map((s) => [s, []])) as Record<
+          string,
+          { id: string; name: string; value?: number; stage: string }[]
+        >,
+      };
 
     const workspaces = await ctx.db
       .query("crmWorkspaces")

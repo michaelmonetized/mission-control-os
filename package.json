@@ -12,6 +12,8 @@
     "build": "bun run --filter @mc/web build",
     "typecheck": "bun run --filter '*' typecheck",
     "agent": "cargo run --manifest-path apps/agent/Cargo.toml",
-    "desktop": "bun run --filter @mc/desktop dev"
+    "agent:build": "cargo build --release --manifest-path apps/agent/Cargo.toml",
+    "desktop": "bun run --filter @mc/desktop dev",
+    "desktop:dist": "bun run --filter @mc/desktop dist"
   }
 }

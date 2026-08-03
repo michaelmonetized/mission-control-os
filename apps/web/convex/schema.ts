@@ -241,4 +241,21 @@ export default defineSchema({
     entityId: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_agency", ["agencyId"]),
+
+  /** Agency SaaS subscriptions & billing (ADR-0001 / ADR-0031) */
+  subscriptions: defineTable({
+    agencyId: v.id("agencies"),
+    stripeCustomerId: v.string(),
+    stripeSubscriptionId: v.string(),
+    plan: v.union(v.literal("starter"), v.literal("pro"), v.literal("enterprise")),
+    status: v.union(
+      v.literal("active"),
+      v.literal("past_due"),
+      v.literal("canceled"),
+      v.literal("trialing"),
+    ),
+    currentPeriodEnd: v.number(),
+  })
+    .index("by_agency", ["agencyId"])
+    .index("by_stripeSub", ["stripeSubscriptionId"]),
 });

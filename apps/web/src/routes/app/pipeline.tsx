@@ -128,7 +128,7 @@ function PipelinePage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {(board?.columns?.[stage] ?? []).map((o) => (
+              {((board?.columns?.[stage] as { id: string; name: string; value?: number; stage: string }[]) ?? []).map((o) => (
                 <div key={o.id} className="mc-glass px-2 py-2 rounded-md text-sm space-y-1">
                   <div className="font-medium">{o.name}</div>
                   {o.value != null ? (
