@@ -1,478 +1,316 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Play, Pause, Compass, Monitor, Smartphone, FastForward, RotateCcw, ChevronDown, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+
+/* ─── Scene data ─── */
 
 export interface SceneData {
   id: number;
-  title: string;
   eyebrow: string;
   headline: string;
   body: string;
-  pills: string[];
   imageSrc: string;
-  stats: { label: string; value: string }[];
 }
 
 export const SCENES: SceneData[] = [
   {
     id: 0,
-    eyebrow: "SCENE 01 // COCKPIT HQ",
-    title: "The Launchpad",
-    headline: "Sparse Ops Command for Local SEO Agencies",
-    body: "Built to mog legacy bloated tools. Monitor agency health, live crawls, team velocity, and revenue pipelines from one unified glass cockpit.",
-    pills: ["Catppuccin Glass", "Vite Cockpit", "Clerk Multi-Org", "Real-Time Telemetry"],
+    eyebrow: "Command Center",
+    headline: "Your entire agency.\nOne cockpit.",
+    body: "Every audit, every client, every dollar — live in one glass dashboard. No more juggling six tabs to see if you're profitable.",
     imageSrc: "/diorama/scene_1.jpg",
-    stats: [
-      { label: "Latency", value: "< 12ms" },
-      { label: "Surfaces", value: "5 Native" },
-      { label: "Architecture", value: "Convex + Rust" }
-    ]
   },
   {
     id: 1,
-    eyebrow: "SCENE 02 // ENGINE BAY",
-    title: "The Scanner Bay",
-    headline: "Local Agent Daemon & Rendered Crawls",
-    body: "High-speed headless browser rendering powered by local Rust daemon. Audit technical SEO, schema graphs, backlink matrix, and local SERP rankings at native speeds.",
-    pills: ["Rust Daemon", "Rendered DOM", "SERP Matrix", "Zero Cloud Overhead"],
+    eyebrow: "Site Scanner",
+    headline: "Crawl any site.\nLocally. Instantly.",
+    body: "A Rust daemon on your machine renders pages and audits them at 480 pages per second. No per-crawl bills. No API limits. Just raw speed.",
     imageSrc: "/diorama/scene_2.jpg",
-    stats: [
-      { label: "Crawl Speed", value: "480 p/s" },
-      { label: "Local Agent", value: "Active" },
-      { label: "Engine", value: "Chromium / Rust" }
-    ]
   },
   {
     id: 2,
-    eyebrow: "SCENE 03 // MATRIX HUB",
-    title: "The Matrix Hub",
-    headline: "Dual CRM & Autonomous Pipeline Engine",
-    body: "Separate workspaces for agency operations and client management. Trigger automated audits, email sequences, and task boards as soon as leads land.",
-    pills: ["Dual CRM", "Kanban Automations", "Resend ESP", "Trigger.dev"],
+    eyebrow: "Dual Pipeline",
+    headline: "Two CRMs.\nZero confusion.",
+    body: "One workspace runs your agency. The other faces your clients. Leads flow in, audits fire automatically, deals close themselves.",
     imageSrc: "/diorama/scene_3.jpg",
-    stats: [
-      { label: "Lead Response", value: "Instant" },
-      { label: "Pipelines", value: "Dual Workspace" },
-      { label: "Workflows", value: "100% Async" }
-    ]
   },
   {
     id: 3,
-    eyebrow: "SCENE 04 // TRANSMISSION",
-    title: "The Transmission Array",
-    headline: "Multi-Surface Sync Fabric",
-    body: "One centralized sync protocol powering Web, Electron Desktop, Rust TUI, iOS, and Android. Never lose state whether in the terminal or on the field.",
-    pills: ["Electron Shell", "Rust TUI", "React Native iOS/Android", "Sync Fabric"],
+    eyebrow: "Every Surface",
+    headline: "Desktop. Terminal.\nPhone. Everywhere.",
+    body: "Web, Electron, a Rust TUI, iOS, Android — one sync fabric keeps them all in lockstep. Start a task at your desk, finish it on site.",
     imageSrc: "/diorama/scene_4.jpg",
-    stats: [
-      { label: "Platforms", value: "Web · Desktop · Mobile · TUI" },
-      { label: "Sync Latency", value: "Real-time" },
-      { label: "Offline First", value: "SQLite / Local" }
-    ]
   },
   {
     id: 4,
-    eyebrow: "SCENE 05 // EXECUTIVE LOUNGE",
-    title: "The Client Portal",
-    headline: "White-Labeled Client Experience",
-    body: "Give clients transparent ROI dashboards, executive rank reports, live task updates, and instant action approvals without giving up backend control.",
-    pills: ["White-Label Portal", "Executive Reports", "Client Approvals", "Shareable Links"],
+    eyebrow: "Client Portal",
+    headline: "Your brand.\nTheir dashboard.",
+    body: "White-labeled reporting your clients actually open. Live rankings, task approvals, and ROI proof — on your domain, under your logo.",
     imageSrc: "/diorama/scene_5.jpg",
-    stats: [
-      { label: "Client Satisfaction", value: "99.4%" },
-      { label: "Report Gen", value: "Automated" },
-      { label: "Portal Access", value: "Custom Domain" }
-    ]
-  }
+  },
 ];
 
-interface ScrollWorldEngineProps {
-  progress: number; // 0 to 1
-  onSeek?: (p: number) => void;
-  isMobileView: boolean;
-  setIsMobileView: (val: boolean) => void;
+/* ─── Easing ─── */
+
+function easeOutCubic(t: number) {
+  return 1 - Math.pow(1 - t, 3);
 }
 
-export function ScrollWorldEngine({
-  progress,
-  onSeek,
-  isMobileView,
-  setIsMobileView
-}: ScrollWorldEngineProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const imagesRef = useRef<HTMLImageElement[]>([]);
+function easeInOutQuad(t: number) {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
+function clamp(v: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, v));
+}
+
+/* ─── Main component ─── */
+
+export function ScrollWorld() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
   const [imagesLoaded, setImagesLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1);
+  const imageRefs = useRef<HTMLImageElement[]>([]);
 
-  // Preload diorama images
+  /* Preload images */
   useEffect(() => {
-    let loadedCount = 0;
-    const imgs: HTMLImageElement[] = [];
-
-    SCENES.forEach((scene, index) => {
+    let loaded = 0;
+    const images: HTMLImageElement[] = [];
+    SCENES.forEach((s, i) => {
       const img = new Image();
-      img.src = scene.imageSrc;
+      img.src = s.imageSrc;
       img.onload = () => {
-        loadedCount++;
-        if (loadedCount === SCENES.length) {
-          setImagesLoaded(true);
-        }
+        loaded++;
+        if (loaded === SCENES.length) setImagesLoaded(true);
       };
-      imgs[index] = img;
+      images[i] = img;
     });
-    imagesRef.current = imgs;
+    imageRefs.current = images;
   }, []);
 
-  // Handle auto-flight play loop
+  /* Scroll → progress. The container is (N+1) viewports tall; scrolling
+     through it maps linearly to 0..1 progress. */
   useEffect(() => {
-    if (!isPlaying) return;
-    const interval = setInterval(() => {
-      if (onSeek) {
-        const next = progress + 0.003 * speed;
-        onSeek(next >= 1 ? 0 : next);
-      }
-    }, 16);
-    return () => clearInterval(interval);
-  }, [isPlaying, speed, onSeek, progress]);
+    const onScroll = () => {
+      const el = containerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const travel = el.scrollHeight - window.innerHeight;
+      if (travel <= 0) return;
+      const raw = -rect.top / travel;
+      setProgress(clamp(raw, 0, 1));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  // Render 3D scrub camera trajectory onto canvas
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+  /* Which scene is active + local fraction within that scene */
+  const N = SCENES.length;
+  const scaled = progress * N; // 0..N
+  const sceneIdx = clamp(Math.floor(scaled), 0, N - 1);
+  const frac = scaled - sceneIdx; // 0..1 within scene
 
-    const width = canvas.width;
-    const height = canvas.height;
+  /* Camera transform per scene driven by frac.
+     Architecture B "fly through": dive in → pull out → hop → land on next.
+     We split each scene's fraction:
+       0.00–0.55  dive in  (zoom 1→1.35, slight drift)
+       0.55–0.80  pull out (zoom 1.35→0.85, opacity cross-starts)
+       0.80–1.00  arrive   (next scene fading in, zoom 0.85→1)
+  */
+  const getSceneStyle = useCallback(
+    (idx: number): React.CSSProperties => {
+      if (idx === sceneIdx) {
+        // Active scene
+        let scale: number;
+        let opacity: number;
+        let translateY: number;
+        let translateX: number;
 
-    ctx.clearRect(0, 0, width, height);
+        if (frac < 0.55) {
+          // Dive in
+          const t = frac / 0.55;
+          const e = easeOutCubic(t);
+          scale = 1 + e * 0.35;
+          opacity = 1;
+          translateY = e * -3; // slight upward drift
+          translateX = e * (idx % 2 === 0 ? -2 : 2);
+        } else if (frac < 0.8) {
+          // Pull out
+          const t = (frac - 0.55) / 0.25;
+          const e = easeInOutQuad(t);
+          scale = 1.35 - e * 0.5;
+          opacity = 1 - e * 0.6;
+          translateY = -3 + e * 8;
+          translateX = (idx % 2 === 0 ? -2 : 2) * (1 - e);
+        } else {
+          // Fade out
+          const t = (frac - 0.8) / 0.2;
+          opacity = 0.4 - t * 0.4;
+          scale = 0.85 - t * 0.1;
+          translateY = 5 + t * 5;
+          translateX = 0;
+        }
 
-    // Compute active scene & flight connector phase
-    const totalScenes = SCENES.length;
-    const scaledP = progress * (totalScenes - 1);
-    const sceneIndex = Math.min(Math.floor(scaledP), totalScenes - 1);
-    const nextSceneIndex = Math.min(sceneIndex + 1, totalScenes - 1);
-    const sceneFraction = scaledP - sceneIndex; // 0 to 1 between scenes
-
-    // Architecture B camera mechanics:
-    // In-scene phase (0 to 0.45): Camera dives into sceneIndex diorama, zoom in, subtle tilt rotation
-    // Connector phase (0.45 to 0.85): Camera pulls up into high aerial hop, arc pitch elevation, horizontal pan
-    // Arrival phase (0.85 to 1.0): Camera descends and lands on nextSceneIndex diorama
-
-    const currentImg = imagesRef.current[sceneIndex];
-    const nextImg = imagesRef.current[nextSceneIndex];
-
-    // Background atmosphere gradient
-    const bgGrad = ctx.createRadialGradient(
-      width / 2,
-      height / 2,
-      width * 0.1,
-      width / 2,
-      height / 2,
-      width * 0.8
-    );
-    bgGrad.addColorStop(0, "#1e1e2e");
-    bgGrad.addColorStop(0.5, "#181825");
-    bgGrad.addColorStop(1, "#11111b");
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, width, height);
-
-    // Draw particle grid lines for 3D depth feeling
-    ctx.save();
-    ctx.strokeStyle = "rgba(137, 220, 235, 0.06)";
-    ctx.lineWidth = 1;
-    const gridSpacing = 40;
-    const gridOffset = (progress * 800) % gridSpacing;
-    for (let x = -width; x < width * 2; x += gridSpacing) {
-      ctx.beginPath();
-      ctx.moveTo(x + gridOffset, 0);
-      ctx.lineTo(x + gridOffset - 200, height);
-      ctx.stroke();
-    }
-    for (let y = 0; y < height; y += gridSpacing) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // Render diorama camera transformations
-    if (imagesLoaded && currentImg && currentImg.complete) {
-      ctx.save();
-
-      // Architecture B flight calculation
-      let scale = 1.0;
-      let offsetX = 0;
-      let offsetY = 0;
-      let alphaCurrent = 1;
-      let alphaNext = 0;
-      let blurPx = 0;
-      let rotDeg = 0;
-
-      if (sceneFraction < 0.4) {
-        // Deep Dive inside scene
-        const diveT = sceneFraction / 0.4; // 0 to 1
-        scale = 1.05 + diveT * 0.18; // Zooms in
-        offsetY = diveT * 15;
-        rotDeg = (diveT * 1.5) * (sceneIndex % 2 === 0 ? 1 : -1);
-      } else if (sceneFraction < 0.85) {
-        // Aerial Connector Hop
-        const hopT = (sceneFraction - 0.4) / 0.45; // 0 to 1
-        // Parabolic arc for aerial height
-        const arcHeight = Math.sin(hopT * Math.PI);
-        scale = 1.23 - arcHeight * 0.35; // Camera pulls back high into the air
-        offsetY = -arcHeight * 60;
-        offsetX = (hopT - 0.5) * 80 * (sceneIndex % 2 === 0 ? 1 : -1);
-        rotDeg = (1.5 + arcHeight * 6) * (sceneIndex % 2 === 0 ? -1 : 1);
-        blurPx = arcHeight * 4;
-
-        // Crossfade to next image halfway through connector
-        alphaNext = Math.min(1, Math.max(0, (hopT - 0.2) / 0.6));
-        alphaCurrent = 1 - alphaNext;
+        return {
+          transform: `scale(${scale}) translate(${translateX}%, ${translateY}%)`,
+          opacity,
+          zIndex: 2,
+          transition: "none",
+        };
+      } else if (idx === sceneIdx + 1 && frac > 0.65) {
+        // Next scene arriving
+        const t = (frac - 0.65) / 0.35;
+        const e = easeOutCubic(t);
+        return {
+          transform: `scale(${0.8 + e * 0.2}) translate(0%, ${(1 - e) * 10}%)`,
+          opacity: e,
+          zIndex: 3,
+          transition: "none",
+        };
       } else {
-        // Descent Landing
-        const landT = (sceneFraction - 0.85) / 0.15; // 0 to 1
-        scale = 0.88 + landT * 0.17;
-        offsetY = (1 - landT) * 30;
-        rotDeg = (1 - landT) * -2;
-        alphaCurrent = 0;
-        alphaNext = 1;
+        return { transform: "scale(0.8)", opacity: 0, zIndex: 0 };
       }
+    },
+    [sceneIdx, frac],
+  );
 
-      // Apply blur if active
-      if (blurPx > 0.5) {
-        ctx.filter = `blur(${blurPx}px)`;
-      }
-
-      // Draw current scene diorama image
-      if (alphaCurrent > 0) {
-        ctx.save();
-        ctx.globalAlpha = alphaCurrent;
-
-        ctx.translate(width / 2 + offsetX, height / 2 + offsetY);
-        ctx.rotate((rotDeg * Math.PI) / 180);
-        ctx.scale(scale, scale);
-
-        // Aspect fit / crop
-        const imgRatio = currentImg.width / currentImg.height;
-        const canvasRatio = width / height;
-        let drawW = width;
-        let drawH = height;
-        if (canvasRatio > imgRatio) {
-          drawW = width * 1.05;
-          drawH = drawW / imgRatio;
+  /* Text overlay visibility — show when we're in the dive-in phase */
+  const getTextStyle = useCallback(
+    (idx: number): React.CSSProperties => {
+      if (idx === sceneIdx) {
+        // Text is visible during dive (0..0.5), then fades
+        if (frac < 0.12) {
+          const t = frac / 0.12;
+          return { opacity: easeOutCubic(t), transform: `translateY(${(1 - t) * 30}px)` };
+        } else if (frac < 0.5) {
+          return { opacity: 1, transform: "translateY(0)" };
         } else {
-          drawH = height * 1.05;
-          drawW = drawH * imgRatio;
+          const t = (frac - 0.5) / 0.2;
+          return { opacity: clamp(1 - t, 0, 1), transform: `translateY(${-t * 40}px)` };
         }
-
-        ctx.drawImage(currentImg, -drawW / 2, -drawH / 2, drawW, drawH);
-        ctx.restore();
       }
+      return { opacity: 0, transform: "translateY(40px)" };
+    },
+    [sceneIdx, frac],
+  );
 
-      // Draw next scene diorama image (during connector crossfade)
-      if (alphaNext > 0 && nextImg && nextImg.complete) {
-        ctx.save();
-        ctx.globalAlpha = alphaNext;
-
-        ctx.translate(width / 2 + offsetX * 0.5, height / 2 + offsetY * 0.5);
-        ctx.rotate((-rotDeg * 0.5 * Math.PI) / 180);
-        ctx.scale(scale * 1.02, scale * 1.02);
-
-        const imgRatio = nextImg.width / nextImg.height;
-        const canvasRatio = width / height;
-        let drawW = width;
-        let drawH = height;
-        if (canvasRatio > imgRatio) {
-          drawW = width * 1.05;
-          drawH = drawW / imgRatio;
-        } else {
-          drawH = height * 1.05;
-          drawW = drawH * imgRatio;
-        }
-
-        ctx.drawImage(nextImg, -drawW / 2, -drawH / 2, drawW, drawH);
-        ctx.restore();
-      }
-
-      ctx.restore();
-    }
-
-    // Overlay 3D camera HUD wireframes
-    ctx.save();
-    // Sky blue camera lens reticle
-    ctx.strokeStyle = "rgba(137, 220, 235, 0.35)";
-    ctx.lineWidth = 1.5;
-    const cx = width / 2;
-    const cy = height / 2;
-
-    // Corner reticles
-    const rSize = 30;
-    const padding = 24;
-
-    // Top-left
-    ctx.beginPath();
-    ctx.moveTo(padding, padding + rSize);
-    ctx.lineTo(padding, padding);
-    ctx.lineTo(padding + rSize, padding);
-    ctx.stroke();
-
-    // Top-right
-    ctx.beginPath();
-    ctx.moveTo(width - padding - rSize, padding);
-    ctx.lineTo(width - padding, padding);
-    ctx.lineTo(width - padding, padding + rSize);
-    ctx.stroke();
-
-    // Bottom-left
-    ctx.beginPath();
-    ctx.moveTo(padding, height - padding - rSize);
-    ctx.lineTo(padding, height - padding);
-    ctx.lineTo(padding + rSize, height - padding);
-    ctx.stroke();
-
-    // Bottom-right
-    ctx.beginPath();
-    ctx.moveTo(width - padding - rSize, height - padding);
-    ctx.lineTo(width - padding, height - padding);
-    ctx.lineTo(width - padding, height - padding - rSize);
-    ctx.stroke();
-
-    // Flight Telemetry HUD overlay text
-    ctx.fillStyle = "rgba(242, 205, 205, 0.85)";
-    ctx.font = "11px monospace";
-    ctx.fillText(`CAM_POS: [SCENE_0${sceneIndex + 1} -> 0${nextSceneIndex + 1}]`, padding + 10, padding + 20);
-    ctx.fillText(`SCRUB_ALT: ${(100 + Math.sin(progress * Math.PI * 4) * 45).toFixed(1)}m`, padding + 10, padding + 36);
-    ctx.fillText(`FOV: 65° · ISO 400`, width - padding - 130, padding + 20);
-
-    ctx.restore();
-  }, [progress, isMobileView, imagesLoaded]);
-
-  const activeScene = SCENES[Math.min(Math.floor(progress * (SCENES.length - 1)), SCENES.length - 1)];
+  /* Progress dots */
+  const dotProgress = progress * N;
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-[var(--color-brand-sky)]/20 mc-glass shadow-2xl">
-      {/* 3D Camera Canvas Container */}
-      <div className="relative w-full aspect-[16/9] md:aspect-[21/9] bg-black overflow-hidden flex items-center justify-center">
-        <canvas
-          ref={canvasRef}
-          width={isMobileView ? 720 : 1280}
-          height={isMobileView ? 1280 : 720}
-          className={`w-full h-full object-cover transition-all duration-500 ${isMobileView ? "max-w-[380px] mx-auto aspect-[9/16] rounded-xl border border-sky-400/30" : ""}`}
+    <div
+      ref={containerRef}
+      style={{ height: `${(N + 1) * 100}vh` }}
+      className="relative"
+    >
+      {/* Sticky viewport — this is the "screen" the camera renders into */}
+      <div className="sticky top-0 h-dvh w-full overflow-hidden bg-[#0c0c14]">
+        {/* Ambient glow */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `radial-gradient(ellipse 80% 60% at 50% 50%, rgba(137,220,235,0.07) 0%, transparent 70%)`,
+          }}
         />
 
-        {/* Loading overlay if images loading */}
-        {!imagesLoaded && (
-          <div className="absolute inset-0 bg-[#1e1e2e] flex flex-col items-center justify-center gap-3">
-            <Sparkles className="w-8 h-8 text-[var(--color-brand-sky)] animate-spin" />
-            <span className="text-xs font-mono text-[var(--color-mocha-subtext0)]">
-              Loading 3D Diorama Assets...
-            </span>
-          </div>
-        )}
-
-        {/* Floating Active Scene Badge */}
-        <div className="absolute top-4 left-4 z-10 hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1e1e2e]/80 backdrop-blur-md border border-[var(--color-brand-sky)]/30 text-xs font-mono text-[var(--color-brand-sky)] shadow-lg">
-          <span className="w-2 h-2 rounded-full bg-[var(--color-brand-sky)] animate-pulse" />
-          <span>{activeScene.eyebrow}</span>
-        </div>
-
-        {/* Viewport Aspect Mode Switcher (Desktop 16:9 vs Mobile 9:16) */}
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-1 bg-[#181825]/90 backdrop-blur-md p-1 rounded-lg border border-white/10 text-xs font-mono">
-          <button
-            onClick={() => setIsMobileView(false)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded transition-colors ${!isMobileView ? "bg-[var(--color-brand-sky)] text-[var(--color-mocha-crust)] font-bold" : "text-[var(--color-mocha-subtext0)] hover:text-white"}`}
+        {/* Scene images — all stacked, only one visible at a time */}
+        {SCENES.map((scene, idx) => (
+          <div
+            key={scene.id}
+            className="absolute inset-0 will-change-transform"
+            style={getSceneStyle(idx)}
           >
-            <Monitor className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Desktop (16:9)</span>
-          </button>
-          <button
-            onClick={() => setIsMobileView(true)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded transition-colors ${isMobileView ? "bg-[var(--color-brand-sky)] text-[var(--color-mocha-crust)] font-bold" : "text-[var(--color-mocha-subtext0)] hover:text-white"}`}
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Mobile (9:16)</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Interactive Camera Scrub Controller Bar */}
-      <div className="p-4 bg-[#181825]/90 backdrop-blur-xl border-t border-white/10 flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="p-2.5 rounded-xl bg-[var(--color-brand-sky)] text-[var(--color-mocha-crust)] hover:opacity-90 transition-transform active:scale-95 shadow-md"
-              title={isPlaying ? "Pause Camera Autopilot" : "Play Camera Autopilot"}
-            >
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-            </button>
-            <button
-              onClick={() => {
-                if (onSeek) onSeek(0);
+            <img
+              src={scene.imageSrc}
+              alt=""
+              className="h-full w-full object-cover"
+              loading={idx < 2 ? "eager" : "lazy"}
+            />
+            {/* Vignette overlay for depth */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse 70% 60% at 50% 50%, transparent 30%, rgba(12,12,20,0.65) 100%)",
               }}
-              className="p-2 rounded-lg bg-[var(--color-mocha-surface0)] text-[var(--color-mocha-subtext0)] hover:text-white hover:bg-[var(--color-mocha-surface1)] transition-colors"
-              title="Reset Camera Position"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
+            />
+          </div>
+        ))}
 
-            <div className="hidden md:flex items-center gap-1.5 text-xs font-mono text-[var(--color-mocha-subtext0)] bg-[var(--color-mocha-mantle)] px-2.5 py-1 rounded-md border border-white/5">
-              <FastForward className="w-3.5 h-3.5 text-[var(--color-brand-flamingo)]" />
-              <span>Speed:</span>
-              {[0.5, 1, 2].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSpeed(s)}
-                  className={`px-1.5 py-0.5 rounded ${speed === s ? "bg-[var(--color-brand-flamingo)] text-[var(--color-mocha-crust)] font-bold" : "hover:text-white"}`}
-                >
-                  {s}x
-                </button>
-              ))}
+        {/* Text overlays — glass panels floating over the scene */}
+        {SCENES.map((scene, idx) => (
+          <div
+            key={`text-${scene.id}`}
+            className="pointer-events-none absolute inset-0 flex items-end justify-start p-8 sm:p-12 lg:p-20"
+            style={getTextStyle(idx)}
+          >
+            <div className="pointer-events-auto max-w-lg">
+              {/* Eyebrow */}
+              <span className="mb-3 inline-block rounded-full border border-[#89dceb]/30 bg-[#89dceb]/10 px-3 py-1 text-[11px] font-medium tracking-widest text-[#89dceb] backdrop-blur-md uppercase">
+                {scene.eyebrow}
+              </span>
+
+              {/* Headline */}
+              <h2 className="mt-2 text-3xl font-black leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl whitespace-pre-line drop-shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
+                {scene.headline}
+              </h2>
+
+              {/* Body */}
+              <p className="mt-4 max-w-md text-base leading-relaxed text-[#a6adc8] sm:text-lg drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
+                {scene.body}
+              </p>
             </div>
           </div>
+        ))}
 
-          {/* Timeline Section Node Indicators */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            {SCENES.map((sc, idx) => {
-              const sceneStart = idx / (SCENES.length - 1);
-              const isActive = Math.abs(progress - sceneStart) < 0.12;
+        {/* Minimal progress dots — right edge */}
+        <div className="absolute right-6 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-3 sm:right-8">
+          {SCENES.map((_, idx) => {
+            const isActive = idx === sceneIdx;
+            return (
+              <button
+                key={idx}
+                onClick={() => {
+                  const el = containerRef.current;
+                  if (!el) return;
+                  const travel = el.scrollHeight - window.innerHeight;
+                  const target = (idx / N) * travel + el.offsetTop;
+                  window.scrollTo({ top: target, behavior: "smooth" });
+                }}
+                className="group relative flex h-3 w-3 items-center justify-center"
+                aria-label={`Go to scene ${idx + 1}`}
+              >
+                <span
+                  className="block rounded-full transition-all duration-500"
+                  style={{
+                    width: isActive ? 10 : 6,
+                    height: isActive ? 10 : 6,
+                    backgroundColor: isActive
+                      ? "#89dceb"
+                      : "rgba(205,214,244,0.25)",
+                    boxShadow: isActive
+                      ? "0 0 12px rgba(137,220,235,0.6)"
+                      : "none",
+                  }}
+                />
+              </button>
+            );
+          })}
+        </div>
 
-              return (
-                <button
-                  key={sc.id}
-                  onClick={() => onSeek && onSeek(sceneStart)}
-                  className={`px-2 py-1 rounded-md text-xs font-mono transition-all flex items-center gap-1 ${
-                    isActive
-                      ? "bg-[var(--color-brand-sky)] text-[var(--color-mocha-crust)] font-bold shadow-md"
-                      : "bg-[var(--color-mocha-surface0)] text-[var(--color-mocha-subtext0)] hover:bg-[var(--color-mocha-surface1)]"
-                  }`}
-                >
-                  <span>0{idx + 1}</span>
-                  <span className="hidden lg:inline">{sc.title}</span>
-                </button>
-              );
-            })}
+        {/* Scroll cue — only at the very start */}
+        {progress < 0.04 && (
+          <div className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 flex flex-col items-center gap-2 animate-pulse">
+            <span className="text-xs font-medium tracking-widest text-[#a6adc8] uppercase">
+              Scroll to explore
+            </span>
+            <svg width="20" height="28" viewBox="0 0 20 28" fill="none" className="text-[#89dceb]">
+              <rect x="1" y="1" width="18" height="26" rx="9" stroke="currentColor" strokeWidth="1.5" />
+              <circle cx="10" cy="9" r="2" fill="currentColor">
+                <animate attributeName="cy" values="9;18;9" dur="2s" repeatCount="indefinite" />
+              </circle>
+            </svg>
           </div>
-        </div>
-
-        {/* Scrub Slider Input */}
-        <div className="relative flex items-center gap-3">
-          <Compass className="w-4 h-4 text-[var(--color-brand-sky)] shrink-0 animate-spin-slow" />
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.001}
-            value={progress}
-            onChange={(e) => onSeek && onSeek(parseFloat(e.target.value))}
-            className="w-full h-2 bg-[var(--color-mocha-surface0)] rounded-lg appearance-none cursor-pointer accent-[var(--color-brand-sky)]"
-          />
-          <span className="text-xs font-mono text-[var(--color-brand-sky)] shrink-0 w-12 text-right">
-            {(progress * 100).toFixed(0)}%
-          </span>
-        </div>
+        )}
       </div>
     </div>
   );
