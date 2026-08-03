@@ -173,6 +173,8 @@ export const FINDING_TYPES = [
   "empty_h1",
   "title_too_short",
   "missing_favicon",
+  "missing_structured_data",
+  "missing_hreflang",
 ] as const;
 
 export type FindingTypeApi = (typeof FINDING_TYPES)[number];

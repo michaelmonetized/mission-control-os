@@ -6,6 +6,8 @@ import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/mc/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/mc/card";
 import { Badge } from "@/components/mc/badge";
+import { Input } from "@/components/mc/input";
+import { Alert, AlertDescription } from "@/components/mc/alert";
 
 export const Route = createFileRoute("/app/pipeline")({
   component: PipelinePage,
@@ -14,6 +16,9 @@ export const Route = createFileRoute("/app/pipeline")({
 function PipelinePage() {
   const [scope, setScope] = useState<"agency" | "client">("agency");
   const [clientId, setClientId] = useState("");
+  const [name, setName] = useState("");
+  const [value, setValue] = useState("");
+  const [note, setNote] = useState<string | null>(null);
   const clients = useQuery(api.clients.list, {});
   const board = useQuery(
     api.pipeline.board,
@@ -24,6 +29,29 @@ function PipelinePage() {
         : "skip",
   );
   const setStage = useMutation(api.opportunities.setStage);
+  const addOpp = useMutation(api.opportunities.add);
+
+  async function createDeal() {
+    if (!name.trim()) return;
+    if (scope === "client" && !clientId) {
+      setNote("Select a client for Client CRM pipeline");
+      return;
+    }
+    try {
+      const res = await addOpp({
+        kind: scope,
+        clientId: scope === "client" ? (clientId as Id<"clients">) : undefined,
+        name: name.trim(),
+        stage: "qualified",
+        value: value ? Number(value) : undefined,
+      });
+      setNote(`Created opportunity ${res.id}`);
+      setName("");
+      setValue("");
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Failed");
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -31,6 +59,11 @@ function PipelinePage() {
       <p className="text-sm text-[var(--color-mocha-subtext0)]">
         Opportunity board · drag via stage menu · won creates delivery Client
       </p>
+      {note ? (
+        <Alert variant="success">
+          <AlertDescription>{note}</AlertDescription>
+        </Alert>
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <Button
           variant={scope === "agency" ? "default" : "secondary"}
@@ -59,6 +92,31 @@ function PipelinePage() {
           </select>
         ) : null}
       </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">New opportunity</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Input
+            className="min-w-[12rem] flex-1"
+            placeholder="Deal name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && void createDeal()}
+          />
+          <Input
+            className="w-28"
+            placeholder="Value $"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            inputMode="decimal"
+          />
+          <Button onClick={() => void createDeal()} disabled={!name.trim()}>
+            Add deal
+          </Button>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {(board?.stages ?? []).map((stage) => (

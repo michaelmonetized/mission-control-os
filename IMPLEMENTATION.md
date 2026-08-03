@@ -35,7 +35,7 @@ docs/adr · docs/dsd
 | **0005** Multi-surface CP | Web/Desktop/TUI/Mobile | Web live; Desktop/TUI; iOS/Android module scaffolds + Clerk checklists |
 | **0006** All surfaces equal | Same capabilities | Shared protocol + Convex; TUI modules include Pipeline/Activity |
 | **0007** Full audit loop | Every surface | Web + Agent; TUI navigation; portal graphs |
-| **0008** Crawl depth | SF+Sitebulb-class | HTTP crawl + alt/broken/title/meta/viewport/mixed/lang/og/charset; Playwright path |
+| **0008** Crawl depth | SF+Sitebulb-class | HTTP crawl + SEO/a11y extractors incl. structured data/hreflang; Playwright path |
 | **0009** Lakebed | **Superseded** by 0010 | N/A |
 | **0010** Stack | TanStack + Clerk + Convex + Rust | Live |
 | **0011** Desktop Electron+Effect | Cross-platform | Electron shell + pairing; Effect graph pair→install→health(retry)→heartbeat |
@@ -58,7 +58,7 @@ docs/adr · docs/dsd
 | **0031** Full agency OS | | Module routes + schema |
 | **0032–0033** Dual CRM + channels | | `crm.ts` + CRM UI |
 | **0034** Public CRM API | | protocol paths + public-crm-api.ts + Vite dual-write store |
-| **0035** Tasks/projects | | `tasks.ts` + Tasks UI |
+| **0035** Tasks/projects | | `tasks.ts` + list + kanban board |
 | **0036** Resend ESP | | `email.ts` provision/verify |
 | **0037–0038** Social calendar | | `social.ts` + UI |
 | **0039** Connected accounts | | `connections.ts` + UI |
@@ -105,7 +105,7 @@ cargo run -p mc-tui
 | ADR-0046 Trigger.dev cloud | Handoffs queue + `@mc/trigger-worker` dev runner; cloud key TBD |
 | ADR-0022 Playwright | Default when `require('playwright')` works; else HTTP |
 | DSD-0008 iCloud vector | Reconstructed SVG until iCloud import |
-| DSD-0010 full shadcn dump | Dialog/Select/Tabs/Switch/Progress/Skeleton mirrored; expand rest via `shadcn add` |
+| DSD-0010 full shadcn dump | Dialog/Select/Tabs/Switch/Progress/Skeleton/Alert/Tooltip mirrored |
 | Clerk production instance | Dev keys on Vercel previews |
 | ADR-0017 multi-repo split | Deferred intentionally |
 | ADR-0011 Effect | Graph expanded; richer daemon lifecycle TBD |

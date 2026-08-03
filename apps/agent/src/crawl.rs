@@ -351,6 +351,38 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
             );
         }
 
+        // structured data / JSON-LD (Sitebulb-class SEO)
+        if !lower_html.contains("application/ld+json")
+            && !lower_html.contains("itemtype=")
+        {
+            push_finding(
+                &mut findings,
+                "missing_structured_data",
+                "low",
+                &url,
+                "no JSON-LD or microdata itemtype",
+            );
+        }
+
+        // hreflang for international SEO (only flag homepage-ish roots lightly)
+        let path = url.trim_end_matches('/');
+        let is_rootish = path == origin.trim_end_matches('/')
+            || path.ends_with("/index.html")
+            || path.ends_with("/en")
+            || path.ends_with("/en-us");
+        if is_rootish
+            && !lower_html.contains("hreflang=")
+            && !lower_html.contains("rel=\"alternate\"")
+        {
+            push_finding(
+                &mut findings,
+                "missing_hreflang",
+                "low",
+                &url,
+                "root page missing hreflang/alternate links",
+            );
+        }
+
         // enqueue same-origin links
         for link in extract_hrefs(&html) {
             if link.starts_with("mailto:") || link.starts_with("tel:") || link.starts_with("javascript:") {

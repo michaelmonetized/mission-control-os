@@ -26,6 +26,7 @@ import { Route as AppCrmRouteImport } from './routes/app/crm'
 import { Route as AppEmailRouteImport } from './routes/app/email'
 import { Route as AppPipelineRouteImport } from './routes/app/pipeline'
 import { Route as AppPortalRouteImport } from './routes/app/portal'
+import { Route as AppReportsRouteImport } from './routes/app/reports'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppSocialRouteImport } from './routes/app/social'
 import { Route as AppTasksRouteImport } from './routes/app/tasks'
@@ -118,6 +119,11 @@ const AppPortalRoute = AppPortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => AppRoute,
 } as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/app/email': typeof AppEmailRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
+  '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/app/email': typeof AppEmailRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
+  '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
@@ -216,6 +224,7 @@ export interface FileRoutesById {
   '/app/email': typeof AppEmailRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
+  '/app/reports': typeof AppReportsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
     | '/app/email'
     | '/app/pipeline'
     | '/app/portal'
+    | '/app/reports'
     | '/app/settings'
     | '/app/social'
     | '/app/tasks'
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/app/email'
     | '/app/pipeline'
     | '/app/portal'
+    | '/app/reports'
     | '/app/settings'
     | '/app/social'
     | '/app/tasks'
@@ -292,6 +303,7 @@ export interface FileRouteTypes {
     | '/app/email'
     | '/app/pipeline'
     | '/app/portal'
+    | '/app/reports'
     | '/app/settings'
     | '/app/social'
     | '/app/tasks'
@@ -432,6 +444,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPortalRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/settings': {
       id: '/app/settings'
       path: '/settings'
@@ -487,6 +506,7 @@ interface AppRouteChildren {
   AppEmailRoute: typeof AppEmailRoute
   AppPipelineRoute: typeof AppPipelineRoute
   AppPortalRoute: typeof AppPortalRoute
+  AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSocialRoute: typeof AppSocialRoute
   AppTasksRoute: typeof AppTasksRoute
@@ -503,6 +523,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppEmailRoute: AppEmailRoute,
   AppPipelineRoute: AppPipelineRoute,
   AppPortalRoute: AppPortalRoute,
+  AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSocialRoute: AppSocialRoute,
   AppTasksRoute: AppTasksRoute,

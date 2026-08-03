@@ -214,10 +214,68 @@ function TasksPage() {
         </CardContent>
       </Card>
 
+      {/* Kanban board (ADR-0035 PM view) */}
       <div>
         <h2 className="text-lg font-medium mb-3">
-          Tasks {tasks === undefined ? "…" : `(${tasks.length})`}
+          Board {tasks === undefined ? "…" : `(${tasks.length})`}
         </h2>
+        {tasks === undefined ? (
+          <p className="text-sm text-[var(--color-mocha-subtext0)]">Loading…</p>
+        ) : tasks.length === 0 ? (
+          <p className="text-sm text-[var(--color-mocha-subtext0)]">No tasks in this lens.</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            {(["todo", "in_progress", "blocked", "done"] as const).map((status) => {
+              const col = (tasks ?? []).filter((t) => {
+                if (status === "todo") return t.status === "todo" || t.status === "open" || !t.status;
+                return t.status === status;
+              });
+              return (
+                <Card key={status} className="min-h-40">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm capitalize flex justify-between">
+                      <span>{status.replace("_", " ")}</span>
+                      <span className="text-[var(--color-mocha-subtext0)] font-normal">
+                        {col.length}
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {col.map((t) => (
+                      <div key={t.id} className="mc-glass px-2 py-2 rounded-md text-sm space-y-1">
+                        <div className="font-medium leading-snug">{t.title}</div>
+                        <div className="text-[10px] text-[var(--color-mocha-subtext0)]">
+                          {t.flags.join(", ")}
+                          {t.clientId ? ` · ${clientName(t.clientId)}` : ""}
+                        </div>
+                        <select
+                          className="w-full text-[10px] rounded border border-[var(--color-mocha-surface1)] bg-[var(--color-mocha-surface0)] px-1 py-0.5"
+                          value={t.status === "open" ? "todo" : t.status}
+                          onChange={(e) =>
+                            void updateTask({
+                              taskId: t.id as Id<"tasks">,
+                              patch: { status: e.target.value },
+                            })
+                          }
+                        >
+                          {["todo", "in_progress", "blocked", "done"].map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 className="text-lg font-medium mb-3">List</h2>
         {tasks === undefined ? (
           <p className="text-sm text-[var(--color-mocha-subtext0)]">Loading…</p>
         ) : tasks.length === 0 ? (
