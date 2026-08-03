@@ -129,6 +129,15 @@ export const API = {
     domainsProvision: "/api/email/domains/provision",
     domainsVerify: "/api/email/domains/verify",
   },
+  pipeline: {
+    board: "/api/pipeline/board",
+  },
+  search: {
+    agency: "/api/search",
+  },
+  activity: {
+    list: "/api/activity/list",
+  },
 } as const;
 
 /** Finding status set (ADR-0023) */
@@ -157,6 +166,11 @@ export const FINDING_TYPES = [
   "duplicate_title",
   "thin_content",
   "missing_viewport",
+  "mixed_content",
+  "missing_html_lang",
+  "missing_og_title",
+  "missing_charset",
+  "empty_h1",
 ] as const;
 
 export type FindingTypeApi = (typeof FINDING_TYPES)[number];
@@ -167,4 +181,22 @@ export const SOCIAL_POST_STATUSES = [
   "published",
   "failed",
   "scheduled",
+] as const;
+
+export const OPPORTUNITY_STAGES = [
+  "qualified",
+  "proposal",
+  "negotiation",
+  "won",
+  "lost",
+] as const;
+
+export const AUTOMATION_TRIGGERS = [
+  "ingest.contact",
+  "status.changed",
+  "pipeline.stage_changed",
+  "deal.won",
+  "deal.lost",
+  "message.received",
+  "tag.added",
 ] as const;

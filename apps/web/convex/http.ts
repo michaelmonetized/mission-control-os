@@ -17,11 +17,23 @@ function unauthorized() {
 
 function checkAgentSecret(req: Request) {
   const secret = process.env.MC_AGENT_SECRET;
-  if (!secret) return true; // open in dev if unset (still rate-limit at edge later)
+  if (!secret) return true; // open in dev if unset
   const auth = req.headers.get("Authorization") ?? "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
   return token === secret;
 }
+
+http.route({
+  path: "/agent/health",
+  method: "GET",
+  handler: httpAction(async () => {
+    return Response.json({
+      ok: true,
+      service: "mission-control-agent-http",
+      ts: Date.now(),
+    });
+  }),
+});
 
 http.route({
   path: "/agent/heartbeat",
@@ -85,7 +97,6 @@ http.route({
         message?: string;
       }[];
     };
-    // Bulk stream from agent crawl result
     if (body.crawlRunId && Array.isArray(body.findings)) {
       const ids: unknown[] = [];
       for (const f of body.findings) {
@@ -99,7 +110,7 @@ http.route({
           });
           ids.push(res.findingId);
         } catch {
-          /* continue other findings */
+          /* continue */
         }
       }
       return Response.json({ ok: true, data: { count: ids.length, ids } });

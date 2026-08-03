@@ -251,6 +251,77 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
             );
         }
 
+        // mixed content on https pages
+        if url.starts_with("https://") && html.to_ascii_lowercase().contains("src=\"http://") {
+            push_finding(
+                &mut findings,
+                "mixed_content",
+                "medium",
+                &url,
+                "page loads http:// assets over https",
+            );
+        }
+
+        // missing lang attribute
+        if !html.to_ascii_lowercase().contains("<html")
+            || (!html.to_ascii_lowercase().contains("lang=")
+                && html.to_ascii_lowercase().contains("<html"))
+        {
+            let lower = html.to_ascii_lowercase();
+            if let Some(i) = lower.find("<html") {
+                let snippet = &lower[i..].chars().take(80).collect::<String>();
+                if !snippet.contains("lang=") {
+                    push_finding(
+                        &mut findings,
+                        "missing_html_lang",
+                        "low",
+                        &url,
+                        "html element missing lang attribute",
+                    );
+                }
+            }
+        }
+
+        let lower_html = html.to_ascii_lowercase();
+
+        // missing Open Graph title (social share readiness)
+        if !lower_html.contains("property=\"og:title\"")
+            && !lower_html.contains("property='og:title'")
+        {
+            push_finding(
+                &mut findings,
+                "missing_og_title",
+                "low",
+                &url,
+                "no og:title meta for social previews",
+            );
+        }
+
+        // missing charset
+        if !lower_html.contains("charset=") {
+            push_finding(
+                &mut findings,
+                "missing_charset",
+                "low",
+                &url,
+                "no charset declaration",
+            );
+        }
+
+        // empty heading elements (a11y/SEO)
+        if lower_html.contains("<h1></h1>")
+            || lower_html.contains("<h1 />")
+            || lower_html.contains("<h1/>")
+        {
+            push_finding(
+                &mut findings,
+                "empty_h1",
+                "medium",
+                &url,
+                "empty h1 element",
+            );
+        }
+
         // enqueue same-origin links
         for link in extract_hrefs(&html) {
             if link.starts_with("mailto:") || link.starts_with("tel:") || link.starts_with("javascript:") {

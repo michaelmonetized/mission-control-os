@@ -66,12 +66,36 @@ export function registerEffectOrchestration(deps) {
       }
     };
 
+    const heartbeatFn = async () => {
+      try {
+        const secret = deps.readSecret();
+        const res = await fetch(
+          `${deps.controlPlane.replace(/\/$/, "")}/api/agent/heartbeat`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              source: "desktop-effect-heartbeat",
+              agencyId: secret?.agencyId,
+            }),
+          },
+        );
+        const ok = res.ok;
+        log("heartbeat", ok, `status ${res.status}`);
+        return { ok };
+      } catch (e) {
+        log("heartbeat", false, String(e));
+        return { ok: false };
+      }
+    };
+
     try {
       const { runAgentBootstrapEffect } = await import("./effect-program.mjs");
       const effectResult = await runAgentBootstrapEffect({
         pair: pairFn,
         install: installFn,
         health: healthFn,
+        heartbeat: heartbeatFn,
       });
       return { ...effectResult, steps, engine: "effect" };
     } catch {
@@ -79,6 +103,7 @@ export function registerEffectOrchestration(deps) {
       await pairFn();
       await installFn();
       await healthFn();
+      await heartbeatFn();
       const ok = steps.every((s) => s.ok || s.name === "install");
       return { ok, steps, engine: "sequential" };
     }

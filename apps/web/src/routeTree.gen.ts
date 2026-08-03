@@ -17,12 +17,14 @@ import { Route as SelectAgencyRouteImport } from './routes/select-agency'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppActivityRouteImport } from './routes/app/activity'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
 import { Route as AppAutomationsRouteImport } from './routes/app/automations'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
 import { Route as AppConnectionsRouteImport } from './routes/app/connections'
 import { Route as AppCrmRouteImport } from './routes/app/crm'
 import { Route as AppEmailRouteImport } from './routes/app/email'
+import { Route as AppPipelineRouteImport } from './routes/app/pipeline'
 import { Route as AppPortalRouteImport } from './routes/app/portal'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppSocialRouteImport } from './routes/app/social'
@@ -71,6 +73,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppActivityRoute = AppActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAuditRoute = AppAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -99,6 +106,11 @@ const AppCrmRoute = AppCrmRouteImport.update({
 const AppEmailRoute = AppEmailRouteImport.update({
   id: '/email',
   path: '/email',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPipelineRoute = AppPipelineRouteImport.update({
+  id: '/pipeline',
+  path: '/pipeline',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPortalRoute = AppPortalRouteImport.update({
@@ -145,12 +157,14 @@ export interface FileRoutesByFullPath {
   '/select-agency': typeof SelectAgencyRoute
   '/sign-in': typeof SignInRouteWithChildren
   '/sign-up': typeof SignUpRouteWithChildren
+  '/app/activity': typeof AppActivityRoute
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
+  '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/social': typeof AppSocialRoute
@@ -167,12 +181,14 @@ export interface FileRoutesByTo {
   '/select-agency': typeof SelectAgencyRoute
   '/sign-in': typeof SignInRouteWithChildren
   '/sign-up': typeof SignUpRouteWithChildren
+  '/app/activity': typeof AppActivityRoute
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
+  '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/social': typeof AppSocialRoute
@@ -191,12 +207,14 @@ export interface FileRoutesById {
   '/select-agency': typeof SelectAgencyRoute
   '/sign-in': typeof SignInRouteWithChildren
   '/sign-up': typeof SignUpRouteWithChildren
+  '/app/activity': typeof AppActivityRoute
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
   '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
+  '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/social': typeof AppSocialRoute
@@ -216,12 +234,14 @@ export interface FileRouteTypes {
     | '/select-agency'
     | '/sign-in'
     | '/sign-up'
+    | '/app/activity'
     | '/app/audit'
     | '/app/automations'
     | '/app/clients'
     | '/app/connections'
     | '/app/crm'
     | '/app/email'
+    | '/app/pipeline'
     | '/app/portal'
     | '/app/settings'
     | '/app/social'
@@ -238,12 +258,14 @@ export interface FileRouteTypes {
     | '/select-agency'
     | '/sign-in'
     | '/sign-up'
+    | '/app/activity'
     | '/app/audit'
     | '/app/automations'
     | '/app/clients'
     | '/app/connections'
     | '/app/crm'
     | '/app/email'
+    | '/app/pipeline'
     | '/app/portal'
     | '/app/settings'
     | '/app/social'
@@ -261,12 +283,14 @@ export interface FileRouteTypes {
     | '/select-agency'
     | '/sign-in'
     | '/sign-up'
+    | '/app/activity'
     | '/app/audit'
     | '/app/automations'
     | '/app/clients'
     | '/app/connections'
     | '/app/crm'
     | '/app/email'
+    | '/app/pipeline'
     | '/app/portal'
     | '/app/settings'
     | '/app/social'
@@ -345,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/activity': {
+      id: '/app/activity'
+      path: '/activity'
+      fullPath: '/app/activity'
+      preLoaderRoute: typeof AppActivityRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/audit': {
       id: '/app/audit'
       path: '/audit'
@@ -385,6 +416,13 @@ declare module '@tanstack/react-router' {
       path: '/email'
       fullPath: '/app/email'
       preLoaderRoute: typeof AppEmailRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pipeline': {
+      id: '/app/pipeline'
+      path: '/pipeline'
+      fullPath: '/app/pipeline'
+      preLoaderRoute: typeof AppPipelineRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/portal': {
@@ -440,12 +478,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppActivityRoute: typeof AppActivityRoute
   AppAuditRoute: typeof AppAuditRoute
   AppAutomationsRoute: typeof AppAutomationsRoute
   AppClientsRoute: typeof AppClientsRoute
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppCrmRoute: typeof AppCrmRoute
   AppEmailRoute: typeof AppEmailRoute
+  AppPipelineRoute: typeof AppPipelineRoute
   AppPortalRoute: typeof AppPortalRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSocialRoute: typeof AppSocialRoute
@@ -454,12 +494,14 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppActivityRoute: AppActivityRoute,
   AppAuditRoute: AppAuditRoute,
   AppAutomationsRoute: AppAutomationsRoute,
   AppClientsRoute: AppClientsRoute,
   AppConnectionsRoute: AppConnectionsRoute,
   AppCrmRoute: AppCrmRoute,
   AppEmailRoute: AppEmailRoute,
+  AppPipelineRoute: AppPipelineRoute,
   AppPortalRoute: AppPortalRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSocialRoute: AppSocialRoute,

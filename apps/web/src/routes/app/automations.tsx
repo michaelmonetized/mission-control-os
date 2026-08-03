@@ -41,6 +41,7 @@ function AutomationsPage() {
   const setEnabled = useMutation(api.automations.setEnabled);
   const runInline = useMutation(api.automations.runInline);
   const handoffs = useQuery(api.handoffs.listQueued, {});
+  const handoffHistory = useQuery(api.handoffs.listRecent, { limit: 20 });
   const markHandoff = useMutation(api.handoffs.mark);
 
   const [name, setName] = useState("Welcome sequence");
@@ -219,6 +220,32 @@ function AutomationsPage() {
                 >
                   Mark done
                 </Button>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Handoff history</CardTitle>
+          <CardDescription>Recent Trigger.dev jobs · all statuses</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          {(handoffHistory ?? []).length === 0 ? (
+            <p className="text-[var(--color-mocha-subtext0)]">No handoffs yet.</p>
+          ) : (
+            (handoffHistory ?? []).map((h) => (
+              <div
+                key={h.id}
+                className="mc-glass px-3 py-2 rounded-md flex flex-wrap justify-between gap-2"
+              >
+                <span>
+                  {h.status} · step {h.fromStep} · {h.reason}
+                </span>
+                <time className="text-[10px] text-[var(--color-mocha-subtext0)]">
+                  {new Date(h.createdAt).toLocaleString()}
+                </time>
               </div>
             ))
           )}

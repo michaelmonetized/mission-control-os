@@ -68,6 +68,32 @@ export const listQueued = query({
   },
 });
 
+/** Full handoff history for ops UI (ADR-0046). */
+export const listRecent = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) return [];
+    const rows = await ctx.db
+      .query("automationHandoffs")
+      .withIndex("by_agency", (q) => q.eq("agencyId", agency._id))
+      .collect();
+    return rows
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .slice(0, args.limit ?? 40)
+      .map((r) => ({
+        id: r._id,
+        automationId: r.automationId,
+        fromStep: r.fromStep,
+        reason: r.reason,
+        status: r.status,
+        idempotencyKey: r.idempotencyKey,
+        createdAt: r.createdAt,
+      }));
+  },
+});
+
 export const mark = mutation({
   args: {
     handoffId: v.id("automationHandoffs"),

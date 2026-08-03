@@ -26,6 +26,12 @@ export const PUBLIC_CRM_API = {
     list: "/api/automations/list",
     run: "/api/automations/run",
   },
+  pipeline: {
+    board: "/api/pipeline/board",
+  },
+  search: {
+    agency: "/api/search",
+  },
 } as const;
 
 export type PublicCrmListBody = {

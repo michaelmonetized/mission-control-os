@@ -13,6 +13,7 @@ export const Route = createFileRoute("/app/")({
 const modules = [
   { to: "/app/clients", title: "Clients", desc: "Agency → Client → Location → Site" },
   { to: "/app/crm", title: "CRM", desc: "Dual workspace · conversations · automations" },
+  { to: "/app/pipeline", title: "Pipeline", desc: "Opportunity stages · won → Client" },
   { to: "/app/tasks", title: "Tasks & Projects", desc: "CRM nurture vs Client PM" },
   { to: "/app/audit", title: "Audit", desc: "Crawl Runs · findings · metrics graphs" },
   { to: "/app/social", title: "Social", desc: "Default-approved look-ahead calendar" },
@@ -20,6 +21,7 @@ const modules = [
   { to: "/app/connections", title: "Connected Accounts", desc: "Agency or Client ownership" },
   { to: "/app/portal", title: "Client Portal", desc: "Graphs + shared findings + Client CRM" },
   { to: "/app/automations", title: "Automations", desc: "Trigger → action · templates" },
+  { to: "/app/activity", title: "Activity", desc: "Agency-wide event trail" },
 ] as const;
 
 function CockpitHome() {

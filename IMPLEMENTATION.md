@@ -35,10 +35,10 @@ docs/adr · docs/dsd
 | **0005** Multi-surface CP | Web/Desktop/TUI/Mobile | Web live; Desktop/TUI; mobile deferred scaffold |
 | **0006** All surfaces equal | Same capabilities | Shared protocol + Convex; TUI/Desktop stubs wired |
 | **0007** Full audit loop | Every surface | Web + Agent; TUI navigation; portal graphs |
-| **0008** Crawl depth | SF+Sitebulb-class | HTTP crawl + missing alt/broken links; Playwright path |
+| **0008** Crawl depth | SF+Sitebulb-class | HTTP crawl + alt/broken/title/meta/viewport/mixed/lang/og/charset; Playwright path |
 | **0009** Lakebed | **Superseded** by 0010 | N/A |
 | **0010** Stack | TanStack + Clerk + Convex + Rust | Live |
-| **0011** Desktop Electron+Effect | Cross-platform | Electron shell + pairing; Effect runtime TODO |
+| **0011** Desktop Electron+Effect | Cross-platform | Electron shell + pairing; Effect graph pair→install→health(retry)→heartbeat |
 | **0012/0013** User-level daemon | LaunchAgent/systemd/user task | `apps/agent/install/*` |
 | **0014** Mission Control | Name | Branding |
 | **0015** Clerk orgs = Agency | | ClerkProvider + AgencyGate |
@@ -57,7 +57,7 @@ docs/adr · docs/dsd
 | **0030** Beyond audit | Full OS | CRM/tasks/social/email/auto |
 | **0031** Full agency OS | | Module routes + schema |
 | **0032–0033** Dual CRM + channels | | `crm.ts` + CRM UI |
-| **0034** Public CRM API | | protocol paths + public-crm-api.ts |
+| **0034** Public CRM API | | protocol paths + public-crm-api.ts + Vite dual-write store |
 | **0035** Tasks/projects | | `tasks.ts` + Tasks UI |
 | **0036** Resend ESP | | `email.ts` provision/verify |
 | **0037–0038** Social calendar | | `social.ts` + UI |
@@ -81,7 +81,7 @@ docs/adr · docs/dsd
 | 0007–0010 shadcn mirror | components/ui + mc mirrors |
 | 0008 Media kit source | docs/dsd/media + public/brand |
 | 0009 φ scale | tokens from cna |
-| **0011 Command palette** | ⌘K + vim j/k CommandPaletteHost |
+| **0011 Command palette** | ⌘K + vim j/k + live client/task/contact search |
 
 ## Run
 
@@ -100,14 +100,15 @@ cargo run -p mc-tui
 |------|-----|
 | ADR-0006 mobile | **Scaffold** iOS SPM + Android Compose (`apps/ios`, `apps/android`) — Clerk/Convex wire TBD |
 | ADR-0011 Effect | Desktop bootstrap orchestration + `effect` dep; expand graph over time |
-| ADR-0008 full Sitebulb depth | Expanded checks + agent HTTP poll/claim/complete; more extractors TBD |
-| ADR-0034 HTTP CRM proxy | Catalog + Convex SoT; thin HTTP dual-write optional |
+| ADR-0008 full Sitebulb depth | Deeper extractors live; more Sitebulb-class (CWV, structured data) TBD |
+| ADR-0034 HTTP CRM proxy | Vite dual-write contacts/companies/opps/conversations; Convex remains SoT |
 | ADR-0046 Trigger.dev cloud | Handoffs queue + `@mc/trigger-worker` dev runner; cloud key TBD |
 | ADR-0022 Playwright | Default when `require('playwright')` works; else HTTP |
 | DSD-0008 iCloud vector | Reconstructed SVG until iCloud import |
-| DSD-0010 full shadcn dump | Dialog fully mirrored; expand rest via `shadcn add` |
+| DSD-0010 full shadcn dump | Dialog/Select/Tabs/Switch mirrored; expand rest via `shadcn add` |
 | Clerk production instance | Dev keys on Vercel previews |
 | ADR-0017 multi-repo split | Deferred intentionally |
+| ADR-0011 Effect | Graph expanded; richer daemon lifecycle TBD |
 
 ## Cost control
 

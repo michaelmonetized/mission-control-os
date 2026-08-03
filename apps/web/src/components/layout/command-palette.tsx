@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "convex/react";
+import { useAuth } from "@clerk/react";
+import { api } from "../../../convex/_generated/api";
 import { cn } from "cnfast";
 
 /**
@@ -11,11 +14,13 @@ const COMMANDS = [
   { id: "cockpit", label: "Go to Cockpit", to: "/app", keys: "g c" },
   { id: "clients", label: "Go to Clients", to: "/app/clients", keys: "g l" },
   { id: "crm", label: "Go to CRM", to: "/app/crm", keys: "g r" },
+  { id: "pipeline", label: "Go to Pipeline", to: "/app/pipeline", keys: "g i" },
   { id: "tasks", label: "Go to Tasks", to: "/app/tasks", keys: "g t" },
   { id: "audit", label: "Go to Audit", to: "/app/audit", keys: "g a" },
   { id: "social", label: "Go to Social", to: "/app/social", keys: "g s" },
   { id: "email", label: "Go to Email ESP", to: "/app/email", keys: "g e" },
   { id: "auto", label: "Go to Automations", to: "/app/automations", keys: "g u" },
+  { id: "activity", label: "Go to Activity", to: "/app/activity", keys: "g v" },
   { id: "portal", label: "Go to Portal setup", to: "/app/portal", keys: "g p" },
   { id: "onboarding", label: "Agency Onboarding", to: "/onboarding", keys: "g o" },
   { id: "client-portal", label: "Open Client Portal", to: "/portal", keys: "g x" },
@@ -23,22 +28,70 @@ const COMMANDS = [
   { id: "connections", label: "Connected Accounts", to: "/app/connections", keys: "g n" },
 ] as const;
 
+type PaletteItem = {
+  id: string;
+  label: string;
+  to: string;
+  keys?: string;
+  kind?: string;
+};
+
 export function CommandPaletteHost() {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [idx, setIdx] = useState(0);
   const navigate = useNavigate();
+  const { orgId, isLoaded } = useAuth();
+  const search = useQuery(
+    api.search.agencySearch,
+    open && isLoaded && orgId && q.trim().length >= 2 ? { q: q.trim() } : "skip",
+  );
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return [...COMMANDS];
-    return COMMANDS.filter(
-      (c) =>
-        c.label.toLowerCase().includes(needle) ||
-        c.keys.includes(needle) ||
-        c.id.includes(needle),
-    );
-  }, [q]);
+    const cmds: PaletteItem[] = !needle
+      ? [...COMMANDS]
+      : COMMANDS.filter(
+          (c) =>
+            c.label.toLowerCase().includes(needle) ||
+            c.keys.includes(needle) ||
+            c.id.includes(needle),
+        );
+    const hits: PaletteItem[] = [];
+    for (const c of search?.clients ?? []) {
+      hits.push({
+        id: `client-${c.id}`,
+        label: `Client: ${c.name}`,
+        to: "/app/clients",
+        kind: "client",
+      });
+    }
+    for (const t of search?.tasks ?? []) {
+      hits.push({
+        id: `task-${t.id}`,
+        label: `Task: ${t.title}`,
+        to: "/app/tasks",
+        kind: "task",
+      });
+    }
+    for (const c of search?.contacts ?? []) {
+      hits.push({
+        id: `contact-${c.id}`,
+        label: `Contact: ${c.name}`,
+        to: "/app/crm",
+        kind: "contact",
+      });
+    }
+    for (const o of search?.opportunities ?? []) {
+      hits.push({
+        id: `opp-${o.id}`,
+        label: `Deal: ${o.name} (${o.stage})`,
+        to: "/app/pipeline",
+        kind: "opportunity",
+      });
+    }
+    return [...hits, ...cmds];
+  }, [q, search]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
