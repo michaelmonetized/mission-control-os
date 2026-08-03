@@ -138,6 +138,12 @@ export const API = {
   activity: {
     list: "/api/activity/list",
   },
+  reports: {
+    list: "/api/reports/list",
+  },
+  jobs: {
+    crawlQueued: "/api/agent/crawl/jobs",
+  },
 } as const;
 
 /** Finding status set (ADR-0023) */

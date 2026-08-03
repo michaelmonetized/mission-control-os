@@ -17,6 +17,7 @@ const COMMANDS = [
   { id: "pipeline", label: "Go to Pipeline", to: "/app/pipeline", keys: "g i" },
   { id: "tasks", label: "Go to Tasks", to: "/app/tasks", keys: "g t" },
   { id: "audit", label: "Go to Audit", to: "/app/audit", keys: "g a" },
+  { id: "jobs", label: "Go to Agent jobs", to: "/app/jobs", keys: "g j" },
   { id: "reports", label: "Go to Reports", to: "/app/reports", keys: "g d" },
   { id: "social", label: "Go to Social", to: "/app/social", keys: "g s" },
   { id: "email", label: "Go to Email ESP", to: "/app/email", keys: "g e" },

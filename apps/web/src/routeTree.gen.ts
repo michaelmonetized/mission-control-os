@@ -24,6 +24,7 @@ import { Route as AppClientsRouteImport } from './routes/app/clients'
 import { Route as AppConnectionsRouteImport } from './routes/app/connections'
 import { Route as AppCrmRouteImport } from './routes/app/crm'
 import { Route as AppEmailRouteImport } from './routes/app/email'
+import { Route as AppJobsRouteImport } from './routes/app/jobs'
 import { Route as AppPipelineRouteImport } from './routes/app/pipeline'
 import { Route as AppPortalRouteImport } from './routes/app/portal'
 import { Route as AppReportsRouteImport } from './routes/app/reports'
@@ -109,6 +110,11 @@ const AppEmailRoute = AppEmailRouteImport.update({
   path: '/email',
   getParentRoute: () => AppRoute,
 } as any)
+const AppJobsRoute = AppJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPipelineRoute = AppPipelineRouteImport.update({
   id: '/pipeline',
   path: '/pipeline',
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
+  '/app/jobs': typeof AppJobsRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
   '/app/reports': typeof AppReportsRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
+  '/app/jobs': typeof AppJobsRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
   '/app/reports': typeof AppReportsRoute
@@ -222,6 +230,7 @@ export interface FileRoutesById {
   '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
+  '/app/jobs': typeof AppJobsRoute
   '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
   '/app/reports': typeof AppReportsRoute
@@ -250,6 +259,7 @@ export interface FileRouteTypes {
     | '/app/connections'
     | '/app/crm'
     | '/app/email'
+    | '/app/jobs'
     | '/app/pipeline'
     | '/app/portal'
     | '/app/reports'
@@ -275,6 +285,7 @@ export interface FileRouteTypes {
     | '/app/connections'
     | '/app/crm'
     | '/app/email'
+    | '/app/jobs'
     | '/app/pipeline'
     | '/app/portal'
     | '/app/reports'
@@ -301,6 +312,7 @@ export interface FileRouteTypes {
     | '/app/connections'
     | '/app/crm'
     | '/app/email'
+    | '/app/jobs'
     | '/app/pipeline'
     | '/app/portal'
     | '/app/reports'
@@ -430,6 +442,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEmailRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/jobs': {
+      id: '/app/jobs'
+      path: '/jobs'
+      fullPath: '/app/jobs'
+      preLoaderRoute: typeof AppJobsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/pipeline': {
       id: '/app/pipeline'
       path: '/pipeline'
@@ -504,6 +523,7 @@ interface AppRouteChildren {
   AppConnectionsRoute: typeof AppConnectionsRoute
   AppCrmRoute: typeof AppCrmRoute
   AppEmailRoute: typeof AppEmailRoute
+  AppJobsRoute: typeof AppJobsRoute
   AppPipelineRoute: typeof AppPipelineRoute
   AppPortalRoute: typeof AppPortalRoute
   AppReportsRoute: typeof AppReportsRoute
@@ -521,6 +541,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppConnectionsRoute: AppConnectionsRoute,
   AppCrmRoute: AppCrmRoute,
   AppEmailRoute: AppEmailRoute,
+  AppJobsRoute: AppJobsRoute,
   AppPipelineRoute: AppPipelineRoute,
   AppPortalRoute: AppPortalRoute,
   AppReportsRoute: AppReportsRoute,

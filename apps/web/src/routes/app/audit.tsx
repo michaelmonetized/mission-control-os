@@ -73,6 +73,7 @@ function AuditPage() {
   const [selectedFindings, setSelectedFindings] = useState<string[]>([]);
   const [severityFilter, setSeverityFilter] = useState<string>("all");
   const bulkSetStatus = useMutation(api.findings.bulkSetStatus);
+  const bulkSetShared = useMutation(api.findings.bulkSetShared);
 
   const filteredFindings = useMemo(() => {
     const rows = findings ?? [];
@@ -436,6 +437,21 @@ function AuditPage() {
                 }
               >
                 Mark false positive
+              </Button>
+              <Button
+                variant="secondary"
+                disabled={selectedFindings.length === 0}
+                onClick={() =>
+                  void bulkSetShared({
+                    findingIds: selectedFindings as Id<"auditFindings">[],
+                    shared: true,
+                  }).then((r) => {
+                    setNote(`Shared ${r.updated} findings with portal`);
+                    setSelectedFindings([]);
+                  })
+                }
+              >
+                Share to portal
               </Button>
             </div>
           ) : null}

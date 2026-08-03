@@ -12,6 +12,7 @@ const nav = [
   { to: "/app/pipeline", label: "Pipeline" },
   { to: "/app/tasks", label: "Tasks" },
   { to: "/app/audit", label: "Audit" },
+  { to: "/app/jobs", label: "Jobs" },
   { to: "/app/reports", label: "Reports" },
   { to: "/app/social", label: "Social" },
   { to: "/app/email", label: "Email" },

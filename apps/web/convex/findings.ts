@@ -99,6 +99,28 @@ export const bulkSetStatus = mutation({
   },
 });
 
+export const bulkSetShared = mutation({
+  args: {
+    findingIds: v.array(v.id("auditFindings")),
+    shared: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) throw new Error("Agency not found");
+    let updated = 0;
+    for (const id of args.findingIds.slice(0, 100)) {
+      const finding = await ctx.db.get(id);
+      if (!finding) continue;
+      const scoped = await assertRunInAgency(ctx, finding.crawlRunId, agency._id);
+      if (!scoped) continue;
+      await ctx.db.patch(id, { shared: args.shared });
+      updated += 1;
+    }
+    return { updated };
+  },
+});
+
 export const setShared = mutation({
   args: {
     findingId: v.id("auditFindings"),

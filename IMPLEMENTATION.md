@@ -52,7 +52,7 @@ docs/adr · docs/dsd
 | **0023** Finding statuses | open…false_positive | `findings.setStatus` + Audit UI |
 | **0024** Metrics time series | | `metricsSnapshots` + bars + sparklines + CSV export |
 | **0025–0027** Portal login/invite | | `/portal` + grants/allowlist |
-| **0028** Portal graphs + shared | | portal metrics + shared findings |
+| **0028** Portal graphs + shared | | portal sparklines + shared findings + CSV |
 | **0029** Convex + Vercel | | Deployed; main builds off |
 | **0030** Beyond audit | Full OS | CRM/tasks/social/email/auto |
 | **0031** Full agency OS | | Module routes + schema |

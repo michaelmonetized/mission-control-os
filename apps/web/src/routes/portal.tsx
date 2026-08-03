@@ -7,6 +7,8 @@ import { PortalGate } from "@/lib/auth-guards";
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/mc/card";
 import { Button } from "@/components/mc/button";
 import { LogoLockup } from "@/components/mc/logo";
+import { Sparkline } from "@/components/mc/sparkline";
+import { downloadCsv } from "@/lib/export-csv";
 import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/portal")({
@@ -108,29 +110,53 @@ function ClientPortalHome() {
                 <CardTitle>Audit graphs</CardTitle>
                 <CardDescription>Metrics snapshots for your sites</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 {history.length === 0 ? (
                   <p className="text-sm text-[var(--color-mocha-subtext0)]">No metrics yet.</p>
                 ) : (
-                  <div className="flex items-end gap-2 h-32">
-                    {history.map((h, i) => (
-                      <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                        <div className="w-full flex gap-0.5 items-end h-24">
-                          <div
-                            className="flex-1 rounded-t bg-[var(--color-brand-sky)]"
-                            style={{ height: `${(h.broken / maxB) * 100}%` }}
-                          />
-                          <div
-                            className="flex-1 rounded-t bg-[var(--color-brand-flamingo)]"
-                            style={{
-                              height: `${(h.alt / Math.max(...history.map((x) => x.alt), 1)) * 100}%`,
-                            }}
-                          />
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="mc-glass rounded-md p-3">
+                        <div className="text-[10px] text-[var(--color-mocha-subtext0)] mb-1">
+                          Broken links
                         </div>
-                        <span className="text-[10px] text-[var(--color-mocha-subtext0)]">{h.date}</span>
+                        <Sparkline values={history.map((h) => h.broken)} width={180} height={32} />
                       </div>
-                    ))}
-                  </div>
+                      <div className="mc-glass rounded-md p-3">
+                        <div className="text-[10px] text-[var(--color-mocha-subtext0)] mb-1">
+                          Missing alt
+                        </div>
+                        <Sparkline
+                          values={history.map((h) => h.alt)}
+                          width={180}
+                          height={32}
+                          stroke="var(--color-brand-flamingo)"
+                          fill="color-mix(in oklab, var(--color-brand-flamingo) 18%, transparent)"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-end gap-2 h-32">
+                      {history.map((h, i) => (
+                        <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                          <div className="w-full flex gap-0.5 items-end h-24">
+                            <div
+                              className="flex-1 rounded-t bg-[var(--color-brand-sky)]"
+                              style={{ height: `${(h.broken / maxB) * 100}%` }}
+                            />
+                            <div
+                              className="flex-1 rounded-t bg-[var(--color-brand-flamingo)]"
+                              style={{
+                                height: `${(h.alt / Math.max(...history.map((x) => x.alt), 1)) * 100}%`,
+                              }}
+                            />
+                          </div>
+                          <span className="text-[10px] text-[var(--color-mocha-subtext0)]">
+                            {h.date}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -157,9 +183,28 @@ function ClientPortalHome() {
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Shared findings</CardTitle>
-                <CardDescription>Agency chose to share these with you</CardDescription>
+              <CardHeader className="flex flex-row items-start justify-between gap-2">
+                <div>
+                  <CardTitle>Shared findings</CardTitle>
+                  <CardDescription>Agency chose to share these with you</CardDescription>
+                </div>
+                <Button
+                  variant="secondary"
+                  disabled={(shared ?? []).length === 0}
+                  onClick={() =>
+                    downloadCsv(
+                      "portal-shared-findings.csv",
+                      (shared ?? []).map((f) => ({
+                        type: f.type,
+                        severity: f.severity,
+                        status: f.status,
+                        url: f.url,
+                      })),
+                    )
+                  }
+                >
+                  CSV
+                </Button>
               </CardHeader>
               <CardContent className="space-y-2">
                 {(shared ?? []).length === 0 ? (

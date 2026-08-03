@@ -16,6 +16,7 @@ const modules = [
   { to: "/app/pipeline", title: "Pipeline", desc: "Opportunity stages · won → Client" },
   { to: "/app/tasks", title: "Tasks & Projects", desc: "CRM nurture vs Client PM" },
   { to: "/app/audit", title: "Audit", desc: "Crawl Runs · findings · metrics graphs" },
+  { to: "/app/jobs", title: "Agent jobs", desc: "Queued crawls for Local Agent" },
   { to: "/app/reports", title: "Reports", desc: "Saved audit snapshots · CSV export" },
   { to: "/app/social", title: "Social", desc: "Default-approved look-ahead calendar" },
   { to: "/app/email", title: "Email ESP", desc: "Resend domains · Agency + Client" },
