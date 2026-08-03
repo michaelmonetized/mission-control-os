@@ -5,6 +5,9 @@ import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/mc/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
+import { Sparkline } from "@/components/mc/sparkline";
+import { Progress } from "@/components/mc/progress";
+import { downloadCsv } from "@/lib/export-csv";
 
 export const Route = createFileRoute("/app/audit")({
   component: AuditPage,
@@ -200,6 +203,45 @@ function AuditPage() {
         >
           Save report snapshot
         </Button>
+        <Button
+          variant="secondary"
+          disabled={(findings ?? []).length === 0}
+          onClick={() => {
+            downloadCsv(
+              `findings-${latestRun || "export"}.csv`,
+              (findings ?? []).map((f) => ({
+                id: f._id,
+                type: f.type,
+                severity: f.severity,
+                status: f.status,
+                url: f.url,
+                message: f.message ?? "",
+                shared: f.shared,
+              })),
+            );
+            setNote("Findings CSV downloaded");
+          }}
+        >
+          Export findings CSV
+        </Button>
+        <Button
+          variant="ghost"
+          disabled={history.length === 0}
+          onClick={() => {
+            downloadCsv(
+              `metrics-${effectiveSite || "site"}.csv`,
+              history.map((h) => ({
+                date: h.date,
+                brokenLinks: h.brokenLinks,
+                missingAlt: h.missingAlt,
+                pages: h.pages,
+              })),
+            );
+            setNote("Metrics CSV downloaded");
+          }}
+        >
+          Export metrics CSV
+        </Button>
       </div>
 
       <Card>
@@ -212,6 +254,26 @@ function AuditPage() {
             <p className="text-sm text-[var(--color-mocha-subtext0)]">No snapshots yet.</p>
           ) : (
             <>
+              <div className="grid sm:grid-cols-3 gap-4 mb-4">
+                <div className="mc-glass rounded-md p-3">
+                  <div className="text-xs text-[var(--color-mocha-subtext0)] mb-1">Broken links</div>
+                  <Sparkline values={history.map((h) => h.brokenLinks)} width={200} height={36} />
+                </div>
+                <div className="mc-glass rounded-md p-3">
+                  <div className="text-xs text-[var(--color-mocha-subtext0)] mb-1">Missing alt</div>
+                  <Sparkline
+                    values={history.map((h) => h.missingAlt)}
+                    width={200}
+                    height={36}
+                    stroke="var(--color-brand-flamingo)"
+                    fill="color-mix(in oklab, var(--color-brand-flamingo) 18%, transparent)"
+                  />
+                </div>
+                <div className="mc-glass rounded-md p-3">
+                  <div className="text-xs text-[var(--color-mocha-subtext0)] mb-1">Pages retrieved</div>
+                  <Sparkline values={history.map((h) => h.pages)} width={200} height={36} />
+                </div>
+              </div>
               <div className="flex items-end gap-3 h-40">
                 {history.map((h, i) => (
                   <div key={`${h.date}-${i}`} className="flex-1 flex flex-col items-center gap-1">
@@ -239,6 +301,20 @@ function AuditPage() {
                 <span className="text-[var(--color-brand-sky)]">■</span> broken links{" "}
                 <span className="text-[var(--color-brand-flamingo)]">■</span> missing alt
               </p>
+              {history.length > 0 ? (
+                <div className="mt-4 space-y-1">
+                  <div className="flex justify-between text-[10px] text-[var(--color-mocha-subtext0)]">
+                    <span>Latest pages</span>
+                    <span>{history[history.length - 1]?.pages ?? 0}</span>
+                  </div>
+                  <Progress
+                    value={Math.min(
+                      100,
+                      ((history[history.length - 1]?.pages ?? 0) / 50) * 100,
+                    )}
+                  />
+                </div>
+              ) : null}
             </>
           )}
         </CardContent>

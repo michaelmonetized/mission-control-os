@@ -322,6 +322,35 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
             );
         }
 
+        // title too short (SEO heuristic)
+        {
+            let title = extract_title(&html);
+            let t = title.trim();
+            if !t.is_empty() && t.chars().count() < 10 {
+                push_finding(
+                    &mut findings,
+                    "title_too_short",
+                    "low",
+                    &url,
+                    format!("title length {} < 10", t.chars().count()),
+                );
+            }
+        }
+
+        // missing favicon hint
+        if !lower_html.contains("rel=\"icon\"")
+            && !lower_html.contains("rel='icon'")
+            && !lower_html.contains("rel=\"shortcut icon\"")
+        {
+            push_finding(
+                &mut findings,
+                "missing_favicon",
+                "low",
+                &url,
+                "no favicon link rel",
+            );
+        }
+
         // enqueue same-origin links
         for link in extract_hrefs(&html) {
             if link.starts_with("mailto:") || link.starts_with("tel:") || link.starts_with("javascript:") {

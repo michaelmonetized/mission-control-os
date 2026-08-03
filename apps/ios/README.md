@@ -25,7 +25,15 @@ MissionControl/
 
 ## Status
 
-Scaffold only. Next: Xcode project / SPM package with Clerk + Convex wiring.
+Scaffold with full module list (matches web cockpit). Next: ClerkKit AuthView + org session + Convex.
+
+### Clerk wire checklist
+
+1. Add `ClerkKit` / `ClerkKitUI` SPM deps
+2. `Clerk.configure(publishableKey:)` in app entry
+3. `AuthView` for sign-in; OrganizationSwitcher for Agency
+4. Client portal users: **no** Agency org membership (ADR-0026) — separate portal surface
+5. Convex: JWT template `convex` (same as web) + Swift client or HTTP Control Plane
 
 ```bash
 # When Package is buildable:

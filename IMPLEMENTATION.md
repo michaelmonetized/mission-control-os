@@ -32,7 +32,7 @@ docs/adr · docs/dsd
 | **0002** Hierarchy | Agency → Client → Location → Site | `hierarchy.ts` + Clients UI |
 | **0003** Audit wedge | Crawl + a11y-class findings | `crawl` + `findings` + Audit UI |
 | **0004** Local agent only | No cloud crawler | `mc-agent crawl` / daemon |
-| **0005** Multi-surface CP | Web/Desktop/TUI/Mobile | Web live; Desktop/TUI; mobile deferred scaffold |
+| **0005** Multi-surface CP | Web/Desktop/TUI/Mobile | Web live; Desktop/TUI; iOS/Android module scaffolds + Clerk checklists |
 | **0006** All surfaces equal | Same capabilities | Shared protocol + Convex; TUI/Desktop stubs wired |
 | **0007** Full audit loop | Every surface | Web + Agent; TUI navigation; portal graphs |
 | **0008** Crawl depth | SF+Sitebulb-class | HTTP crawl + alt/broken/title/meta/viewport/mixed/lang/og/charset; Playwright path |
@@ -50,7 +50,7 @@ docs/adr · docs/dsd
 | **0021** Robots + override | | robots.txt parse + ignore flag |
 | **0022** JS render default | | Playwright when available; HTTP fallback |
 | **0023** Finding statuses | open…false_positive | `findings.setStatus` + Audit UI |
-| **0024** Metrics time series | | `metricsSnapshots` + graphs |
+| **0024** Metrics time series | | `metricsSnapshots` + bars + sparklines + CSV export |
 | **0025–0027** Portal login/invite | | `/portal` + grants/allowlist |
 | **0028** Portal graphs + shared | | portal metrics + shared findings |
 | **0029** Convex + Vercel | | Deployed; main builds off |
@@ -105,7 +105,7 @@ cargo run -p mc-tui
 | ADR-0046 Trigger.dev cloud | Handoffs queue + `@mc/trigger-worker` dev runner; cloud key TBD |
 | ADR-0022 Playwright | Default when `require('playwright')` works; else HTTP |
 | DSD-0008 iCloud vector | Reconstructed SVG until iCloud import |
-| DSD-0010 full shadcn dump | Dialog/Select/Tabs/Switch mirrored; expand rest via `shadcn add` |
+| DSD-0010 full shadcn dump | Dialog/Select/Tabs/Switch/Progress/Skeleton mirrored; expand rest via `shadcn add` |
 | Clerk production instance | Dev keys on Vercel previews |
 | ADR-0017 multi-repo split | Deferred intentionally |
 | ADR-0011 Effect | Graph expanded; richer daemon lifecycle TBD |
