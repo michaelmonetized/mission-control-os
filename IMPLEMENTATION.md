@@ -6,7 +6,7 @@ Goal: **every ADR and DSD fully satisfied** in code. Monorepo is pragmatic (ADR-
 
 ```
 apps/web          — TanStack Router + Vite + Clerk + Convex + design system + /api
-apps/desktop      — Electron + safeStorage Agent Token + install IPC
+apps/desktop      — Electron + Effect lifecycle + safeStorage Agent Token + install IPC
 apps/agent        — Rust Local Agent (daemon, crawl, installers)
 apps/tui          — Rust Mocha ANSI cockpit
 packages/tokens   — Mocha, Flamingo/Sky, φ scale, Max CSS, glass
@@ -28,21 +28,21 @@ docs/adr · docs/dsd
 
 | ADR | Decision | Implementation |
 |-----|----------|----------------|
-| **0001** Multi-tenant SaaS | Agencies from day one | Clerk orgs + Convex `agencies` |
+| **0001** Multi-tenant SaaS | Agencies from day one | Clerk orgs + Convex `agencies` + Stripe billing schema/UI |
 | **0002** Hierarchy | Agency → Client → Location → Site | `hierarchy.ts` + Clients UI |
 | **0003** Audit wedge | Crawl + a11y-class findings | `crawl` + `findings` + Audit UI |
 | **0004** Local agent only | No cloud crawler | `mc-agent crawl` / daemon |
 | **0005** Multi-surface CP | Web/Desktop/TUI/Mobile | Web live; Desktop/TUI; iOS/Android module scaffolds + Clerk checklists |
 | **0006** All surfaces equal | Same capabilities | Shared protocol + Convex; TUI modules include Pipeline/Activity |
 | **0007** Full audit loop | Every surface | Web + Agent; TUI navigation; portal graphs |
-| **0008** Crawl depth | SF+Sitebulb-class | HTTP crawl + SEO/a11y extractors incl. structured data/hreflang; Playwright path |
+| **0008** Crawl depth | SF+Sitebulb-class | Extractors + clusters/fix-next + run comparison + schedules when agent online + CWV heuristics |
 | **0009** Lakebed | **Superseded** by 0010 | N/A |
 | **0010** Stack | TanStack + Clerk + Convex + Rust | Live |
-| **0011** Desktop Electron+Effect | Cross-platform | Electron shell + pairing; Effect graph pair→install→health(retry)→heartbeat |
+| **0011** Desktop Electron+Effect | Cross-platform | Bootstrap + status + restart + unpair Effect graphs |
 | **0012/0013** User-level daemon | LaunchAgent/systemd/user task | `apps/agent/install/*` |
 | **0014** Mission Control | Name | Branding |
 | **0015** Clerk orgs = Agency | | ClerkProvider + AgencyGate |
-| **0016** Agent token via Desktop | | `agent.issueToken` + safeStorage + config.json |
+| **0016** Agent token via Desktop | | `agent.issueToken` + safeStorage + config.json + unpair wipe |
 | **0017** Multi-repo | Later | Monorepo OK |
 | **0018** Protocol repo | Shared contracts | `packages/protocol` |
 | **0019** Artifacts local / results Convex | | Agent artifacts + streamFinding |
@@ -50,12 +50,12 @@ docs/adr · docs/dsd
 | **0021** Robots + override | | robots.txt parse + ignore flag |
 | **0022** JS render default | | Playwright when available; HTTP fallback |
 | **0023** Finding statuses | open…false_positive | `findings.setStatus` + Audit UI |
-| **0024** Metrics time series | | `metricsSnapshots` + bars + sparklines + CSV export |
+| **0024** Metrics time series | | snapshots + bars + sparklines + CSV + run comparison deltas |
 | **0025–0027** Portal login/invite | | `/portal` + grants/allowlist |
 | **0028** Portal graphs + shared | | portal sparklines + shared findings + CSV |
-| **0029** Convex + Vercel | | Deployed; main builds off |
+| **0029** Convex + Vercel | | Deployed; main builds off; serverless `/api` |
 | **0030** Beyond audit | Full OS | CRM/tasks/social/email/auto |
-| **0031** Full agency OS | | Module routes + schema |
+| **0031** Full agency OS | | Module routes + schema + billing plans |
 | **0032–0033** Dual CRM + channels | | `crm.ts` + CRM UI |
 | **0034** Public CRM API | | protocol paths + public-crm-api.ts + Vite dual-write store |
 | **0035** Tasks/projects | | `tasks.ts` + list + kanban board |
@@ -63,10 +63,10 @@ docs/adr · docs/dsd
 | **0037–0038** Social calendar | | `social.ts` + UI |
 | **0039** Connected accounts | | `connections.ts` + UI |
 | **0040–0041** Onboarding | | Agency onboarding + portal claim |
-| **0042** API paths | no version | protocol + vite middleware |
+| **0042** API paths | no version | protocol + vite middleware + Vercel serverless |
 | **0043–0044** Automations | | builder UI + automations.ts |
-| **0045** Admin/Member | | org roles + portal roles |
-| **0046** Inline then Trigger | | `runInline` + trigger-handoff.ts |
+| **0045** Admin/Member | | org roles + portal roles + billing admin gate |
+| **0046** Inline then Trigger | | handoffs + `/trigger/handoffs` claim/complete + `@mc/trigger-worker` poll |
 
 ## DSD matrix
 
@@ -78,7 +78,7 @@ docs/adr · docs/dsd
 | 0004 Neue Haas / Max | public/max fonts + max.css |
 | 0005 Radius nesting | --radius-* tokens |
 | 0006 Launch keyhole | brand SVGs + LogoLockup |
-| 0007–0010 shadcn mirror | components/ui + mc mirrors |
+| 0007–0010 shadcn mirror | `ui/*` bases + `mc/*` product wrappers (progress/skeleton/alert/tooltip/sheet included) |
 | 0008 Media kit source | docs/dsd/media + public/brand |
 | 0009 φ scale | tokens from cna |
 | **0011 Command palette** | ⌘K + vim j/k + live client/task/contact search |
@@ -90,6 +90,7 @@ bun install
 # apps/web/.env.local — Clerk + Convex + RESEND from ~/Projects/.env.shared
 cd apps/web && bunx convex dev   # terminal 1
 bun run dev:web                  # terminal 2
+bun run dev:trigger              # optional ADR-0046 worker
 cargo run -p mc-agent -- crawl --origin https://example.com --mode http_only
 cargo run -p mc-tui
 ```
@@ -98,17 +99,16 @@ cargo run -p mc-tui
 
 | Item | Gap |
 |------|-----|
-| ADR-0006 mobile | **Scaffold** iOS SPM + Android Compose (`apps/ios`, `apps/android`) — Clerk/Convex wire TBD |
-| ADR-0011 Effect | Desktop bootstrap orchestration + `effect` dep; expand graph over time |
-| ADR-0008 full Sitebulb depth | Deeper extractors live; more Sitebulb-class (CWV, structured data) TBD |
+| ADR-0006 mobile | Scaffold only — ClerkKit / Clerk Android + Convex live queries TBD |
+| ADR-0008 full Lighthouse CWV | Heuristics (CLS/images, render-blocking, lazy) live; full Lighthouse/Playwright CWV TBD |
+| ADR-0008 site structure viz | Link graph not yet visualised (metrics + clusters cover prioritisation) |
 | ADR-0034 HTTP CRM proxy | Vite dual-write contacts/companies/opps/conversations; Convex remains SoT |
-| ADR-0046 Trigger.dev cloud | Handoffs queue + `@mc/trigger-worker` dev runner; cloud key TBD |
+| ADR-0046 Trigger.dev cloud | Claim/complete HTTP + local worker live; `@trigger.dev/sdk` cloud deploy needs `TRIGGER_SECRET_KEY` |
 | ADR-0022 Playwright | Default when `require('playwright')` works; else HTTP |
 | DSD-0008 iCloud vector | Reconstructed SVG until iCloud import |
-| DSD-0010 full shadcn dump | Dialog/Select/Tabs/Switch/Progress/Skeleton/Alert/Tooltip mirrored |
 | Clerk production instance | Dev keys on Vercel previews |
+| Stripe Checkout | Schema + mock activate + webhook upsert; Checkout session + Stripe.js TBD |
 | ADR-0017 multi-repo split | Deferred intentionally |
-| ADR-0011 Effect | Graph expanded; richer daemon lifecycle TBD |
 
 ## Cost control
 

@@ -258,6 +258,34 @@ export async function handleApi(req: Request, pathname: string): Promise<Respons
     });
   }
 
+  if (path === "/api/schedules/list" && req.method === "POST") {
+    return ok({ items: [], note: "Use Convex schedules.list" });
+  }
+
+  if (path === "/api/schedules/upsert" && req.method === "POST") {
+    const body = await readJson(req);
+    return ok({
+      id: `sched_${Date.now()}`,
+      siteId: body.siteId,
+      intervalHours: Number(body.intervalHours ?? 24),
+      nextRunAt: Date.now() + Number(body.intervalHours ?? 24) * 3600_000,
+      note: "Vite stub — Convex schedules.upsert is SoT",
+    }, 201);
+  }
+
+  if (path === "/api/billing/mine" && req.method === "POST") {
+    return ok({
+      plan: null,
+      status: "none",
+      catalog: {
+        starter: { label: "Starter", priceMonthly: 99, seats: 3 },
+        pro: { label: "Agency Pro", priceMonthly: 299, seats: 15 },
+        enterprise: { label: "Enterprise", priceMonthly: 699, seats: 100 },
+      },
+      note: "Use Convex billing.getMine",
+    });
+  }
+
   if (path.startsWith("/api/")) {
     return err("not_found", `No handler for ${path}`, 404);
   }

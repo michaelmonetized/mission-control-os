@@ -383,6 +383,42 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
             );
         }
 
+        // CWV-adjacent heuristics without full Lighthouse (ADR-0008 Sitebulb-class depth)
+        // large images without width/height → CLS risk
+        for img in extract_imgs_no_dimensions(&html) {
+            push_finding(
+                &mut findings,
+                "large_image_no_dimensions",
+                "medium",
+                &url,
+                format!("img missing width/height (CLS risk): {img}"),
+            );
+        }
+        // render-blocking classic scripts in head (no async/defer)
+        let blocking_scripts = count_render_blocking_scripts_in_head(&html);
+        if blocking_scripts > 0 {
+            push_finding(
+                &mut findings,
+                "render_blocking_script",
+                "medium",
+                &url,
+                format!("{blocking_scripts} classic script(s) in <head> without async/defer"),
+            );
+        }
+        // many images, none lazy — LCP/bandwidth heuristic
+        let img_count = lower_html.matches("<img").count();
+        let lazy_count = lower_html.matches("loading=\"lazy\"").count()
+            + lower_html.matches("loading='lazy'").count();
+        if img_count >= 8 && lazy_count == 0 {
+            push_finding(
+                &mut findings,
+                "missing_lazy_loading",
+                "low",
+                &url,
+                format!("{img_count} images with no loading=lazy"),
+            );
+        }
+
         // enqueue same-origin links
         for link in extract_hrefs(&html) {
             if link.starts_with("mailto:") || link.starts_with("tel:") || link.starts_with("javascript:") {
@@ -571,6 +607,56 @@ fn extract_imgs_missing_alt(html: &str) -> Vec<String> {
         }
     }
     out
+}
+
+/// Images without width+height attributes (CLS risk — CWV-adjacent).
+fn extract_imgs_no_dimensions(html: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let lower = html.to_ascii_lowercase();
+    let mut idx = 0;
+    while let Some(rel) = lower[idx..].find("<img") {
+        let start = idx + rel;
+        let end = lower[start..].find('>').map(|e| start + e).unwrap_or(html.len());
+        let tag = &html[start..end.min(html.len())];
+        let tlow = tag.to_ascii_lowercase();
+        let has_w = tlow.contains("width=");
+        let has_h = tlow.contains("height=");
+        if !(has_w && has_h) {
+            out.push(tag.chars().take(120).collect());
+        }
+        idx = end + 1;
+        if idx >= html.len() {
+            break;
+        }
+    }
+    // Cap noise — sample first few per page
+    out.truncate(5);
+    out
+}
+
+/// Classic scripts in `<head>` without async/defer (render-blocking heuristic).
+fn count_render_blocking_scripts_in_head(html: &str) -> usize {
+    let lower = html.to_ascii_lowercase();
+    let head_end = lower.find("</head>").unwrap_or(lower.len().min(50_000));
+    let head = &lower[..head_end];
+    let mut count = 0usize;
+    let mut idx = 0;
+    while let Some(rel) = head[idx..].find("<script") {
+        let start = idx + rel;
+        let end = head[start..].find('>').map(|e| start + e).unwrap_or(head.len());
+        let tag = &head[start..end.min(head.len())];
+        let is_module = tag.contains("type=\"module\"") || tag.contains("type='module'");
+        let async_or_defer = tag.contains("async") || tag.contains("defer");
+        let has_src = tag.contains("src=");
+        if has_src && !async_or_defer && !is_module {
+            count += 1;
+        }
+        idx = end + 1;
+        if idx >= head.len() {
+            break;
+        }
+    }
+    count
 }
 
 fn extract_title(html: &str) -> String {

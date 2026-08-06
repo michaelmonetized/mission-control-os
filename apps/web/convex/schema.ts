@@ -258,4 +258,35 @@ export default defineSchema({
   })
     .index("by_agency", ["agencyId"])
     .index("by_stripeSub", ["stripeSubscriptionId"]),
+
+  /**
+   * Scheduled crawl runs when an Agent is online (ADR-0008 agency ops).
+   * Cron enqueues queueRun when due + recent agent presence.
+   */
+  crawlSchedules: defineTable({
+    agencyId: v.id("agencies"),
+    siteId: v.id("sites"),
+    intervalHours: v.number(),
+    mode: v.string(),
+    ignoreRobots: v.boolean(),
+    enabled: v.boolean(),
+    nextRunAt: v.number(),
+    lastQueuedAt: v.optional(v.number()),
+  })
+    .index("by_agency", ["agencyId"])
+    .index("by_site", ["siteId"])
+    .index("by_next", ["nextRunAt"]),
+
+  /**
+   * Agent online presence from heartbeats (ADR-0012 / 0008 scheduled runs).
+   * Keyed by agency so schedules know a daemon is live.
+   */
+  agentPresence: defineTable({
+    agencyId: v.id("agencies"),
+    deviceLabel: v.optional(v.string()),
+    lastSeenAt: v.number(),
+    source: v.optional(v.string()),
+  })
+    .index("by_agency", ["agencyId"])
+    .index("by_lastSeen", ["lastSeenAt"]),
 });

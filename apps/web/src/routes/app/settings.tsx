@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth, useOrganization, useUser } from "@clerk/react";
-import { useAction, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
@@ -20,10 +20,14 @@ function SettingsPage() {
   const { user } = useUser();
   const agency = useQuery(api.agencies.getMine, {});
   const who = useQuery(api.agencies.whoami, {});
+  const billing = useQuery(api.billing.getMine, {});
+  const mockActivate = useMutation(api.billing.mockActivate);
+  const cancelBilling = useMutation(api.billing.cancelMine);
   const fireWebhook = useAction(api.webhooks.fire);
   const [hookUrl, setHookUrl] = useState("https://httpbin.org/post");
   const [hookNote, setHookNote] = useState<string | null>(null);
   const [hookBusy, setHookBusy] = useState(false);
+  const [billNote, setBillNote] = useState<string | null>(null);
 
   async function testWebhook() {
     setHookBusy(true);
@@ -90,6 +94,72 @@ function SettingsPage() {
       </div>
 
       <Separator />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Billing</CardTitle>
+          <CardDescription>
+            Direct Stripe subscriptions (ADR-0001 / 0031) · Starter $99 · Pro $299 · Enterprise $699
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span>
+              Plan:{" "}
+              <Badge variant="secondary">
+                {billing?.plan ? billing.plan : "none"}
+              </Badge>
+            </span>
+            <span className="text-[var(--color-mocha-subtext0)]">
+              status {billing?.status ?? "—"}
+              {billing?.currentPeriodEnd
+                ? ` · renews ${new Date(billing.currentPeriodEnd).toLocaleDateString()}`
+                : ""}
+            </span>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-2">
+            {(["starter", "pro", "enterprise"] as const).map((plan) => {
+              const meta = billing?.catalog?.[plan];
+              return (
+                <div key={plan} className="mc-glass rounded-md p-3 space-y-2">
+                  <div className="font-medium capitalize">{meta?.label ?? plan}</div>
+                  <div className="text-xs text-[var(--color-mocha-subtext0)]">
+                    ${meta?.priceMonthly ?? "—"}/mo · {meta?.seats ?? "—"} seats
+                  </div>
+                  <Button
+                    variant={billing?.plan === plan ? "default" : "secondary"}
+                    disabled={orgRole !== "org:admin" && orgRole !== "admin"}
+                    onClick={() =>
+                      void mockActivate({ plan }).then((r) =>
+                        setBillNote(`Activated ${r.plan}${r.mock ? " (mock)" : ""}`),
+                      )
+                    }
+                  >
+                    {billing?.plan === plan ? "Active" : "Activate"}
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-xs text-[var(--color-mocha-subtext0)]">
+            Mock activate for dev. Production: Stripe Checkout + webhook →{" "}
+            <code className="text-[var(--color-brand-sky)]">billing.upsertFromStripe</code>.
+          </p>
+          {billing?.plan ? (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                void cancelBilling().then(() => setBillNote("Subscription canceled"))
+              }
+            >
+              Cancel subscription
+            </Button>
+          ) : null}
+          {billNote ? (
+            <p className="text-xs text-[var(--color-brand-sky)]">{billNote}</p>
+          ) : null}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

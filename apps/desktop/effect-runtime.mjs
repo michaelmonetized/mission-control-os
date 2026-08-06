@@ -1,8 +1,14 @@
 /**
  * Effect orchestration for Desktop (ADR-0011).
- * Tries real Effect program; falls back to sequential pipeline.
+ * Bootstrap + status + restart + unpair graphs; sequential fallback if Effect fails.
  */
-import { ipcMain } from "electron";
+import { ipcMain, app } from "electron";
+import path from "node:path";
+import fs from "node:fs";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
 
 /**
  * @typedef {{ refreshToken?: string, agencyId?: string, deviceLabel?: string, issuedAt?: number }} AgentSecret
@@ -18,6 +24,78 @@ import { ipcMain } from "electron";
  * }} deps
  */
 export function registerEffectOrchestration(deps) {
+  const healthFn = async () => {
+    try {
+      const res = await fetch(
+        `${deps.controlPlane.replace(/\/$/, "")}/api/agent/heartbeat`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ source: "desktop-effect" }),
+        },
+      );
+      return res.ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const heartbeatFn = async () => {
+    try {
+      const secret = deps.readSecret();
+      const res = await fetch(
+        `${deps.controlPlane.replace(/\/$/, "")}/api/agent/heartbeat`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            source: "desktop-effect-heartbeat",
+            agencyId: secret?.agencyId,
+            deviceLabel: secret?.deviceLabel,
+          }),
+        },
+      );
+      return { ok: res.ok };
+    } catch {
+      return { ok: false };
+    }
+  };
+
+  const stopFn = async () => {
+    // Best-effort: launchctl unload / systemctl --user stop when install scripts present
+    try {
+      if (process.platform === "darwin") {
+        const plist = path.join(
+          app.getPath("home"),
+          "Library/LaunchAgents/com.missioncontrol.agent.plist",
+        );
+        if (fs.existsSync(plist)) {
+          await execFileAsync("launchctl", ["unload", plist]).catch(() => null);
+        }
+      }
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: String(e) };
+    }
+  };
+
+  const unpairFn = async () => {
+    try {
+      // Wipe secret store via empty write if main supports clear — rewrite empty
+      const secretsPath = path.join(app.getPath("userData"), "agent-secrets.bin");
+      if (fs.existsSync(secretsPath)) fs.unlinkSync(secretsPath);
+      const agentDir =
+        process.platform === "darwin"
+          ? path.join(app.getPath("home"), "Library/Application Support/MissionControl/Agent")
+          : path.join(app.getPath("home"), ".local/share/mission-control-agent");
+      const cfg = path.join(agentDir, "config.json");
+      if (fs.existsSync(cfg)) fs.unlinkSync(cfg);
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: String(e) };
+    }
+  };
+
   ipcMain.handle("mc:orchestrateAgentBootstrap", async (_evt, opts = {}) => {
     const steps = [];
     const log = (name, ok, detail) => {
@@ -48,45 +126,16 @@ export function registerEffectOrchestration(deps) {
       return inst;
     };
 
-    const healthFn = async () => {
-      try {
-        const res = await fetch(
-          `${deps.controlPlane.replace(/\/$/, "")}/api/agent/heartbeat`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ source: "desktop-effect" }),
-          },
-        );
-        log("health", res.ok, `status ${res.status}`);
-        return res.ok;
-      } catch (e) {
-        log("health", false, String(e));
-        return false;
-      }
+    const healthWrapped = async () => {
+      const ok = await healthFn();
+      log("health", ok, ok ? "ok" : "unhealthy");
+      return ok;
     };
 
-    const heartbeatFn = async () => {
-      try {
-        const secret = deps.readSecret();
-        const res = await fetch(
-          `${deps.controlPlane.replace(/\/$/, "")}/api/agent/heartbeat`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              source: "desktop-effect-heartbeat",
-              agencyId: secret?.agencyId,
-            }),
-          },
-        );
-        const ok = res.ok;
-        log("heartbeat", ok, `status ${res.status}`);
-        return { ok };
-      } catch (e) {
-        log("heartbeat", false, String(e));
-        return { ok: false };
-      }
+    const heartbeatWrapped = async () => {
+      const hb = await heartbeatFn();
+      log("heartbeat", Boolean(hb?.ok), hb?.ok ? "ok" : "fail");
+      return hb;
     };
 
     try {
@@ -94,18 +143,89 @@ export function registerEffectOrchestration(deps) {
       const effectResult = await runAgentBootstrapEffect({
         pair: pairFn,
         install: installFn,
-        health: healthFn,
-        heartbeat: heartbeatFn,
+        health: healthWrapped,
+        heartbeat: heartbeatWrapped,
       });
       return { ...effectResult, steps, engine: "effect" };
     } catch {
-      // Sequential fallback
       await pairFn();
       await installFn();
-      await healthFn();
-      await heartbeatFn();
+      await healthWrapped();
+      await heartbeatWrapped();
       const ok = steps.every((s) => s.ok || s.name === "install");
       return { ok, steps, engine: "sequential" };
+    }
+  });
+
+  ipcMain.handle("mc:orchestrateAgentStatus", async () => {
+    const steps = [];
+    try {
+      const { runAgentStatusEffect } = await import("./effect-program.mjs");
+      const healthWrapped = async () => {
+        const ok = await healthFn();
+        steps.push({ name: "health", ok, at: Date.now() });
+        return ok;
+      };
+      const heartbeatWrapped = async () => {
+        const hb = await heartbeatFn();
+        steps.push({ name: "heartbeat", ok: Boolean(hb?.ok), at: Date.now() });
+        return hb;
+      };
+      const result = await runAgentStatusEffect({
+        health: healthWrapped,
+        heartbeat: heartbeatWrapped,
+      });
+      return { ...result, steps, engine: "effect" };
+    } catch {
+      const ok = await healthFn();
+      steps.push({ name: "health", ok, at: Date.now() });
+      return { ok, result: { healthOk: ok, online: ok }, steps, engine: "sequential" };
+    }
+  });
+
+  ipcMain.handle("mc:orchestrateAgentRestart", async (_evt, opts = {}) => {
+    const steps = [];
+    try {
+      const { runAgentRestartEffect } = await import("./effect-program.mjs");
+      const result = await runAgentRestartEffect({
+        stop: async () => {
+          const r = await stopFn();
+          steps.push({ name: "stop", ok: r.ok, at: Date.now() });
+          return r;
+        },
+        install: async () => {
+          const inst = await deps.installAgent({ binPath: opts.binPath });
+          steps.push({ name: "install", ok: Boolean(inst?.ok), at: Date.now() });
+          return inst;
+        },
+        health: async () => {
+          const ok = await healthFn();
+          steps.push({ name: "health", ok, at: Date.now() });
+          return ok;
+        },
+        heartbeat: async () => {
+          const hb = await heartbeatFn();
+          steps.push({ name: "heartbeat", ok: Boolean(hb?.ok), at: Date.now() });
+          return hb;
+        },
+        pair: async () => ({ ok: true }),
+      });
+      return { ...result, steps, engine: "effect" };
+    } catch (e) {
+      return { ok: false, error: String(e), steps, engine: "sequential" };
+    }
+  });
+
+  ipcMain.handle("mc:orchestrateAgentUnpair", async () => {
+    try {
+      const { runAgentUnpairEffect } = await import("./effect-program.mjs");
+      return {
+        ...(await runAgentUnpairEffect({ unpair: unpairFn })),
+        engine: "effect",
+      };
+    } catch {
+      const r = await unpairFn();
+      return { ok: r.ok, result: r, engine: "sequential" };
     }
   });
 }

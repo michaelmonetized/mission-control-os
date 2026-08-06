@@ -15,4 +15,12 @@ crons.interval(
   {},
 );
 
+// Queue due crawl schedules when agent is online (ADR-0008)
+crons.interval(
+  "crawl schedules tick",
+  { minutes: 15 },
+  internal.schedules.tickDue,
+  {},
+);
+
 export default crons;

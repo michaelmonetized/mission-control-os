@@ -66,12 +66,29 @@ function AuditPage() {
     api.findings.listOpenIssues,
     effectiveSite ? { siteId: effectiveSite as Id<"sites"> } : "skip",
   );
+  const clusters = useQuery(
+    api.findings.clusterForRun,
+    latestRun ? { crawlRunId: latestRun as Id<"crawlRuns"> } : "skip",
+  );
+  const fixNext = useQuery(
+    api.findings.fixNext,
+    effectiveSite ? { siteId: effectiveSite as Id<"sites">, limit: 8 } : "skip",
+  );
+  const comparison = useQuery(
+    api.crawl.compareSnapshots,
+    effectiveSite ? { siteId: effectiveSite as Id<"sites"> } : "skip",
+  );
+  const agentOnline = useQuery(api.schedules.agentOnline, {});
+  const schedules = useQuery(api.schedules.list, {});
+  const upsertSchedule = useMutation(api.schedules.upsert);
+  const removeSchedule = useMutation(api.schedules.remove);
 
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [ignoreRobots, setIgnoreRobots] = useState(false);
   const [selectedFindings, setSelectedFindings] = useState<string[]>([]);
   const [severityFilter, setSeverityFilter] = useState<string>("all");
+  const [scheduleHours, setScheduleHours] = useState(24);
   const bulkSetStatus = useMutation(api.findings.bulkSetStatus);
   const bulkSetShared = useMutation(api.findings.bulkSetShared);
 
@@ -142,11 +159,25 @@ function AuditPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Audit</h1>
-      <p className="text-[var(--color-mocha-subtext0)] max-w-2xl">
-        Local Agent only · rendered default · robots respect · artifacts cleaned · findings status in
-        Convex (ADR-0004/0019–0024).
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">Audit</h1>
+          <p className="text-[var(--color-mocha-subtext0)] max-w-2xl">
+            Local Agent only · rendered default · robots respect · artifacts cleaned · findings status
+            in Convex (ADR-0004/0019–0024) · Sitebulb-class clusters & fix-next (ADR-0008).
+          </p>
+        </div>
+        <div
+          className={`text-xs px-3 py-1.5 rounded-full mc-glass ${
+            agentOnline?.online ? "mc-neon-border text-[var(--color-brand-sky)]" : "text-[var(--color-mocha-subtext0)]"
+          }`}
+        >
+          Agent {agentOnline?.online ? "online" : "offline"}
+          {agentOnline?.lastSeenAt
+            ? ` · seen ${new Date(agentOnline.lastSeenAt).toLocaleTimeString()}`
+            : ""}
+        </div>
+      </div>
       {note ? <p className="text-sm text-[var(--color-brand-sky)]">{note}</p> : null}
 
       <div className="flex flex-wrap gap-3 items-end">
@@ -251,6 +282,175 @@ function AuditPage() {
           Export metrics CSV
         </Button>
       </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Fix next</CardTitle>
+            <CardDescription>Prioritised open issues (ADR-0008 Sitebulb insight)</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {(fixNext ?? []).length === 0 ? (
+              <p className="text-[var(--color-mocha-subtext0)]">No open issues ranked yet.</p>
+            ) : (
+              (fixNext ?? []).map((f) => (
+                <div key={f.type} className="mc-glass px-3 py-2 rounded-md flex justify-between gap-2">
+                  <div>
+                    <strong>{f.type.replace(/_/g, " ")}</strong>
+                    <span className="block text-xs text-[var(--color-mocha-subtext0)]">{f.why}</span>
+                  </div>
+                  <span className="text-[var(--color-brand-flamingo)] font-mono text-xs">
+                    ×{f.count} · {Math.round(f.score)}
+                  </span>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Issue clusters</CardTitle>
+            <CardDescription>This run · type grouping + priority score</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {(clusters ?? []).length === 0 ? (
+              <p className="text-[var(--color-mocha-subtext0)]">Select a run with findings.</p>
+            ) : (
+              (clusters ?? []).slice(0, 8).map((c) => (
+                <div key={c.type} className="flex justify-between gap-2 mc-glass px-3 py-2 rounded-md">
+                  <span>
+                    {c.type} · <span className="text-[var(--color-brand-sky)]">{c.maxSeverity}</span>
+                  </span>
+                  <span className="font-mono text-xs">
+                    ×{c.count} · p{c.priority}
+                  </span>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {comparison?.latest ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Run comparison</CardTitle>
+            <CardDescription>
+              Latest vs previous snapshot (ADR-0008 / 0024)
+              {comparison.improving === true
+                ? " · improving"
+                : comparison.improving === false
+                  ? " · regressions"
+                  : ""}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid sm:grid-cols-4 gap-3 text-sm">
+              {(
+                [
+                  ["Broken links", comparison.latest.brokenLinks, comparison.delta?.brokenLinks],
+                  ["Missing alt", comparison.latest.missingAlt, comparison.delta?.missingAlt],
+                  ["Dup %", comparison.latest.duplicatePercent, comparison.delta?.duplicatePercent],
+                  ["Pages", comparison.latest.pagesRetrieved, comparison.delta?.pagesRetrieved],
+                ] as const
+              ).map(([label, val, d]) => (
+                <div key={label} className="mc-glass rounded-md p-3">
+                  <div className="text-xs text-[var(--color-mocha-subtext0)]">{label}</div>
+                  <div className="text-lg font-semibold">{val}</div>
+                  {d != null ? (
+                    <div
+                      className={`text-xs font-mono ${
+                        d <= 0 && label !== "Pages"
+                          ? "text-[var(--color-brand-sky)]"
+                          : d > 0 && label !== "Pages"
+                            ? "text-[var(--color-brand-flamingo)]"
+                            : "text-[var(--color-mocha-subtext0)]"
+                      }`}
+                    >
+                      {d > 0 ? `+${d}` : d} vs prev
+                    </div>
+                  ) : (
+                    <div className="text-xs text-[var(--color-mocha-subtext0)]">first run</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Scheduled crawls</CardTitle>
+          <CardDescription>
+            Queue when Agent is online (ADR-0008) · cron every 15m
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2 items-end">
+            <label className="text-xs space-y-1">
+              Interval (hours)
+              <input
+                type="number"
+                min={1}
+                max={720}
+                className="block w-24 rounded border border-[var(--color-mocha-surface1)] bg-[var(--color-mocha-surface0)] px-2 py-1"
+                value={scheduleHours}
+                onChange={(e) => setScheduleHours(Number(e.target.value) || 24)}
+              />
+            </label>
+            <Button
+              variant="secondary"
+              disabled={!effectiveSite}
+              onClick={() =>
+                void upsertSchedule({
+                  siteId: effectiveSite as Id<"sites">,
+                  intervalHours: scheduleHours,
+                  mode: "rendered",
+                  ignoreRobots,
+                  enabled: true,
+                }).then((r) =>
+                  setNote(
+                    `Schedule saved · next ${new Date(r.nextRunAt).toLocaleString()}`,
+                  ),
+                )
+              }
+            >
+              Schedule this site
+            </Button>
+          </div>
+          <ul className="space-y-1 text-sm">
+            {(schedules ?? []).length === 0 ? (
+              <li className="text-[var(--color-mocha-subtext0)]">No schedules.</li>
+            ) : (
+              (schedules ?? []).map((s) => (
+                <li
+                  key={s.id}
+                  className="mc-glass px-3 py-2 rounded-md flex flex-wrap justify-between gap-2"
+                >
+                  <span className="font-mono text-xs">
+                    site …{s.siteId.slice(-6)} · every {s.intervalHours}h ·{" "}
+                    {s.enabled ? "on" : "off"}
+                    <span className="block text-[var(--color-mocha-subtext0)]">
+                      next {new Date(s.nextRunAt).toLocaleString()}
+                    </span>
+                  </span>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      void removeSchedule({ scheduleId: s.id as Id<"crawlSchedules"> }).then(() =>
+                        setNote("Schedule removed"),
+                      )
+                    }
+                  >
+                    Remove
+                  </Button>
+                </li>
+              ))
+            )}
+          </ul>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

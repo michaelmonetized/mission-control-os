@@ -144,6 +144,18 @@ export const API = {
   jobs: {
     crawlQueued: "/api/agent/crawl/jobs",
   },
+  trigger: {
+    handoffs: "/trigger/handoffs",
+    claim: "/trigger/handoffs/claim",
+    complete: "/trigger/handoffs/complete",
+  },
+  schedules: {
+    list: "/api/schedules/list",
+    upsert: "/api/schedules/upsert",
+  },
+  billing: {
+    mine: "/api/billing/mine",
+  },
 } as const;
 
 /** Finding status set (ADR-0023) */
@@ -181,6 +193,10 @@ export const FINDING_TYPES = [
   "missing_favicon",
   "missing_structured_data",
   "missing_hreflang",
+  /** CWV-adjacent (ADR-0008) — not full Lighthouse */
+  "large_image_no_dimensions",
+  "render_blocking_script",
+  "missing_lazy_loading",
 ] as const;
 
 export type FindingTypeApi = (typeof FINDING_TYPES)[number];

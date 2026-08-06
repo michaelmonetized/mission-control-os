@@ -202,6 +202,62 @@ export const metricsForSite = query({
   },
 });
 
+/**
+ * Historical crawl run comparison (ADR-0008 Sitebulb + ADR-0024).
+ * Returns latest two snapshots + deltas for the site.
+ */
+export const compareSnapshots = query({
+  args: { siteId: v.id("sites") },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) return null;
+    const scoped = await assertSiteInAgency(ctx, args.siteId, agency._id);
+    if (!scoped) return null;
+    const rows = await ctx.db
+      .query("metricsSnapshots")
+      .withIndex("by_site", (q) => q.eq("siteId", args.siteId))
+      .collect();
+    const sorted = rows.slice().sort((a, b) => b.completedAt - a.completedAt);
+    const latest = sorted[0];
+    const previous = sorted[1];
+    if (!latest) return null;
+    const delta = previous
+      ? {
+          brokenLinks: latest.brokenLinks - previous.brokenLinks,
+          missingAlt: latest.missingAlt - previous.missingAlt,
+          duplicatePercent: latest.duplicatePercent - previous.duplicatePercent,
+          pagesRetrieved: latest.pagesRetrieved - previous.pagesRetrieved,
+        }
+      : null;
+    return {
+      latest: {
+        crawlRunId: latest.crawlRunId,
+        completedAt: latest.completedAt,
+        brokenLinks: latest.brokenLinks,
+        missingAlt: latest.missingAlt,
+        duplicatePercent: latest.duplicatePercent,
+        pagesRetrieved: latest.pagesRetrieved,
+      },
+      previous: previous
+        ? {
+            crawlRunId: previous.crawlRunId,
+            completedAt: previous.completedAt,
+            brokenLinks: previous.brokenLinks,
+            missingAlt: previous.missingAlt,
+            duplicatePercent: previous.duplicatePercent,
+            pagesRetrieved: previous.pagesRetrieved,
+          }
+        : null,
+      delta,
+      improving:
+        delta != null
+          ? delta.brokenLinks <= 0 && delta.missingAlt <= 0
+          : null,
+    };
+  },
+});
+
 /** Portal metrics — grant must cover site's client (ADR-0028). */
 export const metricsForPortalSite = query({
   args: { siteId: v.id("sites") },

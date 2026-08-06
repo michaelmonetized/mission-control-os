@@ -57,7 +57,10 @@ fun CockpitScreen() {
       .padding(16.dp),
   ) {
     Text("Mission Control", color = BrandSky, style = MaterialTheme.typography.headlineMedium)
-    Text("Android surface scaffold · Clerk + Convex TBD", color = MochaText.copy(alpha = 0.7f))
+    Text(
+      "Android surface scaffold · Clerk + Convex TBD · modules match web (ADR-0005/0006)",
+      color = MochaText.copy(alpha = 0.7f),
+    )
     Spacer(Modifier.height(16.dp))
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
       items(modules) { mod ->

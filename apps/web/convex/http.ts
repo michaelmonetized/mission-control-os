@@ -38,9 +38,90 @@ http.route({
 http.route({
   path: "/agent/heartbeat",
   method: "POST",
-  handler: httpAction(async (_ctx, req) => {
+  handler: httpAction(async (ctx, req) => {
     if (!checkAgentSecret(req)) return unauthorized();
+    const body = (await req.json().catch(() => ({}))) as {
+      agencyId?: string;
+      deviceLabel?: string;
+      source?: string;
+    };
+    if (body.agencyId) {
+      try {
+        await ctx.runMutation(internal.schedules.touchPresence, {
+          agencyId: body.agencyId as any,
+          deviceLabel: body.deviceLabel,
+          source: body.source ?? "heartbeat",
+        });
+      } catch {
+        /* ignore bad agencyId */
+      }
+    }
     return Response.json({ ok: true, ts: Date.now() });
+  }),
+});
+
+/** Trigger.dev / local worker handoff plane (ADR-0046). */
+http.route({
+  path: "/trigger/handoffs",
+  method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    if (!checkAgentSecret(req)) return unauthorized();
+    const items = await ctx.runQuery(internal.handoffs.listQueuedInternal, {
+      limit: 20,
+    });
+    return Response.json({ ok: true, data: { items } });
+  }),
+});
+
+http.route({
+  path: "/trigger/handoffs/claim",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!checkAgentSecret(req)) return unauthorized();
+    const body = (await req.json().catch(() => ({}))) as { handoffId?: string };
+    if (!body.handoffId) {
+      return Response.json({ ok: false, error: "handoffId required" }, { status: 400 });
+    }
+    try {
+      const job = await ctx.runMutation(internal.handoffs.claimInternal, {
+        handoffId: body.handoffId as any,
+      });
+      return Response.json({ ok: true, data: job });
+    } catch (e) {
+      return Response.json(
+        { ok: false, error: e instanceof Error ? e.message : String(e) },
+        { status: 400 },
+      );
+    }
+  }),
+});
+
+http.route({
+  path: "/trigger/handoffs/complete",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!checkAgentSecret(req)) return unauthorized();
+    const body = (await req.json().catch(() => ({}))) as {
+      handoffId?: string;
+      status?: "done" | "failed";
+      note?: string;
+    };
+    if (!body.handoffId) {
+      return Response.json({ ok: false, error: "handoffId required" }, { status: 400 });
+    }
+    try {
+      const res = await ctx.runMutation(internal.handoffs.completeInternal, {
+        handoffId: body.handoffId as any,
+        status: body.status === "failed" ? "failed" : "done",
+        note: body.note,
+      });
+      return Response.json({ ok: true, data: res });
+    } catch (e) {
+      return Response.json(
+        { ok: false, error: e instanceof Error ? e.message : String(e) },
+        { status: 400 },
+      );
+    }
   }),
 });
 

@@ -10,4 +10,11 @@ contextBridge.exposeInMainWorld("mcDesktop", {
   /** Effect-style bootstrap: pair → install → health (ADR-0011) */
   orchestrateAgentBootstrap: (opts) =>
     ipcRenderer.invoke("mc:orchestrateAgentBootstrap", opts ?? {}),
+  /** Daemon presence poll */
+  orchestrateAgentStatus: () => ipcRenderer.invoke("mc:orchestrateAgentStatus"),
+  /** stop → reinstall → health */
+  orchestrateAgentRestart: (opts) =>
+    ipcRenderer.invoke("mc:orchestrateAgentRestart", opts ?? {}),
+  /** Clear pairing secrets */
+  orchestrateAgentUnpair: () => ipcRenderer.invoke("mc:orchestrateAgentUnpair"),
 });

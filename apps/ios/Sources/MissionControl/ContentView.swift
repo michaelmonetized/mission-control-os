@@ -60,6 +60,9 @@ private struct ModulePlaceholder: View {
       Text("Wire Convex query + Clerk org session for live data.")
         .font(.footnote)
         .foregroundStyle(.tertiary)
+      Text("Parity modules match web cockpit (ADR-0005/0006). Billing + schedules next on Convex.")
+        .font(.caption2)
+        .foregroundStyle(.tertiary)
       Spacer()
     }
     .frame(maxWidth: .infinity, alignment: .leading)

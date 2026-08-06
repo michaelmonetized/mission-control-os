@@ -1,7 +1,12 @@
 /**
  * Local Trigger.dev-style worker (ADR-0046).
- * Polls Convex handoffs when CONVEX_URL + MC_AGENT_SECRET (or CONVEX_DEPLOY_KEY) set;
- * otherwise runs mock resume loop for development.
+ * Polls Convex `/trigger/handoffs`, claims, resumes (delay), completes.
+ *
+ * Env:
+ *   CONVEX_URL / VITE_CONVEX_URL — Convex site URL (https://….convex.site)
+ *   MC_AGENT_SECRET — shared secret (same as agent HTTP)
+ *   MC_TRIGGER_POLL_MS — poll interval (default 15000)
+ *   TRIGGER_SECRET_KEY — when set, logs prod-deploy hint for @trigger.dev/sdk
  *
  * Production: replace with @trigger.dev/sdk task `mc-automation-resume`.
  */
@@ -19,6 +24,13 @@ const intervalMs = Number(process.env.MC_TRIGGER_POLL_MS ?? 15_000);
 const convexUrl = (process.env.CONVEX_URL ?? process.env.VITE_CONVEX_URL ?? "").replace(/\/$/, "");
 const agentSecret = process.env.MC_AGENT_SECRET ?? "";
 
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+    ...(agentSecret ? { Authorization: `Bearer ${agentSecret}` } : {}),
+  };
+}
+
 /**
  * @param {unknown} payload
  */
@@ -34,8 +46,7 @@ async function resume(payload) {
 }
 
 /**
- * Optional HTTP poll against Convex agent routes when configured.
- * Handoffs remain agency-scoped via Convex; this is a local resume loop.
+ * Claim + complete handoffs from Convex HTTP surface.
  */
 async function pollHandoffs() {
   if (!convexUrl) {
@@ -43,16 +54,76 @@ async function pollHandoffs() {
     return;
   }
   try {
-    // Prefer handoff-style endpoint if deployed; fall back to agent health as liveness.
-    const health = await fetch(`${convexUrl}/agent/health`, {
-      headers: agentSecret ? { Authorization: `Bearer ${agentSecret}` } : {},
+    const listRes = await fetch(`${convexUrl}/trigger/handoffs`, {
+      headers: authHeaders(),
     });
-    if (!health.ok) {
-      console.log(`[trigger-worker] convex health ${health.status}`);
+    if (!listRes.ok) {
+      // Fallback liveness when routes not deployed yet
+      const health = await fetch(`${convexUrl}/agent/health`, {
+        headers: authHeaders(),
+      });
+      console.log(
+        `[trigger-worker] handoffs ${listRes.status}; health ${health.status}`,
+      );
       return;
     }
-    const body = await health.json().catch(() => ({}));
-    console.log(`[trigger-worker] convex ok · ${body.service ?? "convex"}`);
+    const body = await listRes.json().catch(() => ({}));
+    const items = body?.data?.items ?? [];
+    if (items.length === 0) {
+      console.log("[trigger-worker] no queued handoffs");
+      return;
+    }
+
+    for (const item of items.slice(0, 5)) {
+      const claimRes = await fetch(`${convexUrl}/trigger/handoffs/claim`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ handoffId: item.id }),
+      });
+      if (!claimRes.ok) {
+        console.log(`[trigger-worker] claim failed ${item.id}: ${claimRes.status}`);
+        continue;
+      }
+      const claimed = await claimRes.json().catch(() => ({}));
+      const data = claimed?.data ?? item;
+      const delayMs =
+        typeof data?.payload?.delayMs === "number"
+          ? data.payload.delayMs
+          : undefined;
+
+      try {
+        await resume({
+          automationId: String(data.automationId),
+          fromStep: Number(data.fromStep ?? 0),
+          reason: String(data.reason ?? "resume"),
+          idempotencyKey: String(data.idempotencyKey ?? item.id),
+          delayMs,
+        });
+        const done = await fetch(`${convexUrl}/trigger/handoffs/complete`, {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            handoffId: item.id,
+            status: "done",
+            note: "trigger-worker resume",
+          }),
+        });
+        console.log(
+          `[trigger-worker] completed ${item.id} → ${done.status}`,
+        );
+      } catch (e) {
+        await fetch(`${convexUrl}/trigger/handoffs/complete`, {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            handoffId: item.id,
+            status: "failed",
+            note: e instanceof Error ? e.message : String(e),
+          }),
+        });
+        console.log(`[trigger-worker] failed ${item.id}: ${e}`);
+      }
+    }
   } catch (e) {
     console.log(`[trigger-worker] poll error: ${e instanceof Error ? e.message : String(e)}`);
   }
@@ -63,20 +134,21 @@ function start() {
   console.log(
     process.env.TRIGGER_SECRET_KEY
       ? "[trigger-worker] TRIGGER_SECRET_KEY present — use Trigger cloud deploy for prod"
-      : "[trigger-worker] mock mode — no TRIGGER_SECRET_KEY",
+      : "[trigger-worker] local claim loop — set TRIGGER_SECRET_KEY for cloud",
   );
   if (convexUrl) {
     console.log(`[trigger-worker] CONVEX_URL=${convexUrl}`);
   }
 
-  // Demo tick so `bun run dev` shows life
   setInterval(() => {
     console.log(`[trigger-worker] heartbeat ${new Date().toISOString()}`);
     void pollHandoffs();
   }, intervalMs);
+
+  // Immediate first poll
+  void pollHandoffs();
 }
 
-// Only auto-start when executed as main (not when imported by tests)
 const isMain =
   typeof process !== "undefined" &&
   process.argv[1] &&
@@ -86,5 +158,4 @@ if (isMain) {
   start();
 }
 
-// Export for tests
 export { resume, Payload, pollHandoffs, start };

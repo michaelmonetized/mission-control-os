@@ -59,6 +59,133 @@ export const listOpenIssues = query({
   },
 });
 
+const SEVERITY_WEIGHT: Record<string, number> = {
+  critical: 100,
+  high: 40,
+  medium: 10,
+  low: 3,
+  info: 1,
+};
+
+/**
+ * Sitebulb-class issue clustering for a crawl run (ADR-0008).
+ * Groups findings by type with count + max severity.
+ */
+export const clusterForRun = query({
+  args: { crawlRunId: v.id("crawlRuns") },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) return [];
+    const scoped = await assertRunInAgency(ctx, args.crawlRunId, agency._id);
+    if (!scoped) return [];
+    const rows = await ctx.db
+      .query("auditFindings")
+      .withIndex("by_run", (q) => q.eq("crawlRunId", args.crawlRunId))
+      .collect();
+
+    const map = new Map<
+      string,
+      { type: string; count: number; severities: Record<string, number>; sampleUrl: string }
+    >();
+    for (const f of rows) {
+      const cur = map.get(f.type) ?? {
+        type: f.type,
+        count: 0,
+        severities: {},
+        sampleUrl: f.url,
+      };
+      cur.count += 1;
+      cur.severities[f.severity] = (cur.severities[f.severity] ?? 0) + 1;
+      map.set(f.type, cur);
+    }
+
+    return [...map.values()]
+      .map((c) => {
+        const maxSev =
+          (["critical", "high", "medium", "low", "info"] as const).find(
+            (s) => (c.severities[s] ?? 0) > 0,
+          ) ?? "low";
+        const priority =
+          (SEVERITY_WEIGHT[maxSev] ?? 1) * Math.log2(c.count + 1);
+        return {
+          type: c.type,
+          count: c.count,
+          maxSeverity: maxSev,
+          severities: c.severities,
+          sampleUrl: c.sampleUrl,
+          priority: Math.round(priority * 10) / 10,
+        };
+      })
+      .sort((a, b) => b.priority - a.priority);
+  },
+});
+
+/**
+ * Prioritised “fix next” list across open issues for a site (ADR-0008 Sitebulb insight).
+ */
+export const fixNext = query({
+  args: { siteId: v.id("sites"), limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) return [];
+    const site = await ctx.db.get(args.siteId);
+    if (!site) return [];
+    const location = await ctx.db.get(site.locationId);
+    if (!location) return [];
+    const client = await ctx.db.get(location.clientId);
+    if (!client || client.agencyId !== agency._id) return [];
+
+    const issues = await ctx.db
+      .query("openIssues")
+      .withIndex("by_site", (q) => q.eq("siteId", args.siteId))
+      .collect();
+
+    const open = issues.filter(
+      (i) => i.status === "open" || i.status === "triaged" || i.status === "in_progress",
+    );
+
+    // Prefer high-impact types (heuristic weights; matches agent severity catalog)
+    const TYPE_WEIGHT: Record<string, number> = {
+      broken_link: 40,
+      noindex: 35,
+      missing_h1: 20,
+      multiple_h1: 15,
+      missing_title: 25,
+      duplicate_title: 22,
+      missing_alt: 12,
+      thin_content: 14,
+      missing_meta_description: 10,
+      canonical_off_origin: 28,
+      mixed_content: 30,
+      missing_structured_data: 8,
+      missing_hreflang: 6,
+      large_image_no_dimensions: 9,
+      render_blocking_script: 11,
+      missing_lazy_loading: 5,
+    };
+
+    const byType = new Map<string, { type: string; count: number; sampleUrl: string }>();
+    for (const i of open) {
+      const cur = byType.get(i.type) ?? { type: i.type, count: 0, sampleUrl: i.url };
+      cur.count += 1;
+      byType.set(i.type, cur);
+    }
+
+    return [...byType.values()]
+      .map((c) => ({
+        type: c.type,
+        count: c.count,
+        sampleUrl: c.sampleUrl,
+        score: (TYPE_WEIGHT[c.type] ?? 5) * Math.log2(c.count + 1),
+        why: `Fix ${c.count}× ${c.type.replace(/_/g, " ")} next for biggest SEO/a11y lift`,
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, args.limit ?? 8);
+  },
+});
+
 export const setStatus = mutation({
   args: {
     findingId: v.id("auditFindings"),
