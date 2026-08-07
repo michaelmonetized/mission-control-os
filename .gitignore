@@ -11,3 +11,4 @@ target
 .convex
 apps/web/src/routeTree.gen.ts.bak
 .vercel
+apps/ios/.build/
