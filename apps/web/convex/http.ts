@@ -249,4 +249,71 @@ http.route({
   }),
 });
 
+/**
+ * Stripe webhooks (ADR-0001 / 0031).
+ * Configure endpoint: https://<deployment>.convex.site/stripe/webhook
+ * Env: STRIPE_WEBHOOK_SECRET
+ */
+http.route({
+  path: "/stripe/webhook",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    const whSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+    if (!whSecret) {
+      return Response.json(
+        { ok: false, error: "STRIPE_WEBHOOK_SECRET not configured" },
+        { status: 503 },
+      );
+    }
+    const rawBody = await req.text();
+    const { verifyStripeSignature, normalizeStripeEvent } = await import(
+      "./lib/stripeWebhook"
+    );
+    const verified = await verifyStripeSignature(
+      rawBody,
+      req.headers.get("stripe-signature"),
+      whSecret,
+    );
+    if (!verified.ok) {
+      return Response.json({ ok: false, error: verified.error }, { status: 400 });
+    }
+
+    let event: { type: string; data?: { object?: Record<string, unknown> } };
+    try {
+      event = JSON.parse(rawBody);
+    } catch {
+      return Response.json({ ok: false, error: "invalid json" }, { status: 400 });
+    }
+
+    const n = normalizeStripeEvent(event);
+    // Only persist when we have enough to upsert; ack other events as ok no-op
+    if (
+      n.agencyId &&
+      n.stripeCustomerId &&
+      n.stripeSubscriptionId &&
+      n.plan &&
+      n.status &&
+      n.currentPeriodEnd != null
+    ) {
+      const res = await ctx.runMutation(internal.billing.applyStripeEvent, {
+        type: n.type,
+        agencyId: n.agencyId,
+        stripeCustomerId: n.stripeCustomerId,
+        stripeSubscriptionId: n.stripeSubscriptionId,
+        plan: n.plan,
+        status: n.status,
+        currentPeriodEnd: n.currentPeriodEnd,
+      });
+      return Response.json({ ok: true, applied: res });
+    }
+
+    return Response.json({
+      ok: true,
+      applied: false,
+      type: n.type,
+      note: "event acknowledged; incomplete billing fields (wait for subscription.*)",
+    });
+  }),
+});
+
 export default http;

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth, useOrganization, useUser } from "@clerk/react";
 import { useAction, useMutation, useQuery } from "convex/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
 import { Badge } from "@/components/mc/badge";
@@ -23,11 +23,25 @@ function SettingsPage() {
   const billing = useQuery(api.billing.getMine, {});
   const mockActivate = useMutation(api.billing.mockActivate);
   const cancelBilling = useMutation(api.billing.cancelMine);
+  const createCheckout = useAction(api.billing.createCheckoutSession);
+  const createPortal = useAction(api.billing.createPortalSession);
   const fireWebhook = useAction(api.webhooks.fire);
   const [hookUrl, setHookUrl] = useState("https://httpbin.org/post");
   const [hookNote, setHookNote] = useState<string | null>(null);
   const [hookBusy, setHookBusy] = useState(false);
   const [billNote, setBillNote] = useState<string | null>(null);
+  const [billBusy, setBillBusy] = useState(false);
+
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const b = q.get("billing");
+    if (b === "success") {
+      setBillNote(
+        `Checkout complete${q.get("plan") ? ` · ${q.get("plan")}` : ""} — webhook will sync plan`,
+      );
+    }
+    if (b === "cancel") setBillNote("Checkout canceled");
+  }, []);
 
   async function testWebhook() {
     setHookBusy(true);
@@ -120,41 +134,87 @@ function SettingsPage() {
           <div className="grid sm:grid-cols-3 gap-2">
             {(["starter", "pro", "enterprise"] as const).map((plan) => {
               const meta = billing?.catalog?.[plan];
+              const isAdmin = orgRole === "org:admin" || orgRole === "admin";
               return (
                 <div key={plan} className="mc-glass rounded-md p-3 space-y-2">
                   <div className="font-medium capitalize">{meta?.label ?? plan}</div>
                   <div className="text-xs text-[var(--color-mocha-subtext0)]">
                     ${meta?.priceMonthly ?? "—"}/mo · {meta?.seats ?? "—"} seats
                   </div>
-                  <Button
-                    variant={billing?.plan === plan ? "default" : "secondary"}
-                    disabled={orgRole !== "org:admin" && orgRole !== "admin"}
-                    onClick={() =>
-                      void mockActivate({ plan }).then((r) =>
-                        setBillNote(`Activated ${r.plan}${r.mock ? " (mock)" : ""}`),
-                      )
-                    }
-                  >
-                    {billing?.plan === plan ? "Active" : "Activate"}
-                  </Button>
+                  <div className="flex flex-col gap-1">
+                    <Button
+                      variant={billing?.plan === plan ? "default" : "secondary"}
+                      disabled={!isAdmin || billBusy}
+                      onClick={() => {
+                        setBillBusy(true);
+                        setBillNote(null);
+                        void createCheckout({ plan })
+                          .then((r) => {
+                            if (r.ok && r.url) {
+                              window.location.href = r.url;
+                              return;
+                            }
+                            setBillNote(r.error ?? "Checkout failed");
+                          })
+                          .catch((e) =>
+                            setBillNote(e instanceof Error ? e.message : "Checkout failed"),
+                          )
+                          .finally(() => setBillBusy(false));
+                      }}
+                    >
+                      {billing?.plan === plan ? "Current · upgrade/repay" : "Checkout"}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      disabled={!isAdmin || billBusy}
+                      onClick={() =>
+                        void mockActivate({ plan }).then((r) =>
+                          setBillNote(`Mock activated ${r.plan}`),
+                        )
+                      }
+                    >
+                      Mock (dev)
+                    </Button>
+                  </div>
                 </div>
               );
             })}
           </div>
           <p className="text-xs text-[var(--color-mocha-subtext0)]">
-            Mock activate for dev. Production: Stripe Checkout + webhook →{" "}
-            <code className="text-[var(--color-brand-sky)]">billing.upsertFromStripe</code>.
+            Stripe Checkout when{" "}
+            <code className="text-[var(--color-brand-sky)]">STRIPE_SECRET_KEY</code> + price env
+            set on Convex. Webhook:{" "}
+            <code className="text-[var(--color-brand-sky)]">/stripe/webhook</code>.
           </p>
-          {billing?.plan ? (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                void cancelBilling().then(() => setBillNote("Subscription canceled"))
-              }
-            >
-              Cancel subscription
-            </Button>
-          ) : null}
+          <div className="flex flex-wrap gap-2">
+            {billing?.hasCustomer ? (
+              <Button
+                variant="secondary"
+                disabled={billBusy}
+                onClick={() => {
+                  setBillBusy(true);
+                  void createPortal({})
+                    .then((r) => {
+                      if (r.ok && r.url) window.location.href = r.url;
+                      else setBillNote(r.error ?? "Portal failed");
+                    })
+                    .finally(() => setBillBusy(false));
+                }}
+              >
+                Billing portal
+              </Button>
+            ) : null}
+            {billing?.plan ? (
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  void cancelBilling().then(() => setBillNote("Subscription marked canceled (local)"))
+                }
+              >
+                Mark canceled
+              </Button>
+            ) : null}
+          </div>
           {billNote ? (
             <p className="text-xs text-[var(--color-brand-sky)]">{billNote}</p>
           ) : null}
