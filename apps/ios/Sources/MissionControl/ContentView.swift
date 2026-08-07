@@ -20,7 +20,7 @@ public struct ContentView: View {
     ("Portal", "Client graphs + grants"),
   ]
 
-  public init(session: MCAuthSession = MCAuthSession()) {
+  public init(session: MCAuthSession) {
     self.session = session
   }
 
@@ -101,6 +101,4 @@ private struct ModulePlaceholder: View {
   }
 }
 
-#Preview {
-  AuthGateView(session: MCAuthSession())
-}
+// Previews live in the Xcode app target (CommandLineTools SPM build lacks PreviewsMacros).

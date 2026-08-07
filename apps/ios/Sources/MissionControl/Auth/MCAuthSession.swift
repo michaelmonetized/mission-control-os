@@ -39,7 +39,6 @@ public struct MCAuthUser: Equatable, Sendable {
 }
 
 /// Protocol for ClerkKit (or mock) session bridge (ADR-0005/0010 mobile).
-@MainActor
 public protocol MCAuthProviding: AnyObject {
   var user: MCAuthUser? { get }
   var isLoading: Bool { get }
@@ -50,7 +49,7 @@ public protocol MCAuthProviding: AnyObject {
 }
 
 /// Observable session store — inject real ClerkAuthBridge in app target.
-@MainActor
+/// Not class-isolated so SPM library inits work outside Xcode Previews.
 public final class MCAuthSession: ObservableObject {
   @Published public private(set) var user: MCAuthUser?
   @Published public private(set) var isLoading: Bool = false
@@ -82,6 +81,7 @@ public final class MCAuthSession: ObservableObject {
     isLoading = provider.isLoading
   }
 
+  @MainActor
   public func mockSignIn(as surface: MCAuthSurface) async {
     isLoading = true
     await provider.mockSignIn(as: surface)
@@ -89,6 +89,7 @@ public final class MCAuthSession: ObservableObject {
     isLoading = false
   }
 
+  @MainActor
   public func signOut() async {
     isLoading = true
     await provider.signOut()
@@ -98,7 +99,6 @@ public final class MCAuthSession: ObservableObject {
 }
 
 /// In-process mock until ClerkKit SPM is linked in the Xcode app target.
-@MainActor
 public final class MockClerkAuthBridge: MCAuthProviding {
   public private(set) var user: MCAuthUser?
   public private(set) var isLoading: Bool = false

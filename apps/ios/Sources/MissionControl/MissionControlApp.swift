@@ -17,7 +17,8 @@ import SwiftUI
 public struct MissionControlRoot: View {
   @ObservedObject var session: MCAuthSession
 
-  public init(session: MCAuthSession = MCAuthSession()) {
+  /// Pass a session from the `@main` App (create it on the main actor).
+  public init(session: MCAuthSession) {
     self.session = session
   }
 

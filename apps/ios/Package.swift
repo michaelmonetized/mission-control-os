@@ -20,7 +20,8 @@ let package = Package(
       //   .product(name: "ClerkKit", package: "clerk-ios"),
       //   .product(name: "ClerkKitUI", package: "clerk-ios"),
       // ],
-      path: "Sources/MissionControl"
+      path: "Sources/MissionControl",
+      exclude: ["Auth/ClerkAuthBridge.md"]
     ),
   ]
 )
