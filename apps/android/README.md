@@ -2,33 +2,39 @@
 
 Kotlin + Jetpack Compose surface (ADR-0005 / 0006 / 0010).
 
-## Stack (planned)
+## Stack
 
 | Layer | Choice |
 |-------|--------|
 | UI | Jetpack Compose |
-| Auth | Clerk Android |
+| Auth | **AuthGate** + `AuthViewModel` / `ClerkAuthBridge` — clerk-android when Gradle linked |
 | Data | Convex / Control Plane HTTP |
 | Agent | Not on device; Local Agent is desktop/laptop daemon |
 
-## Layout
+## Auth shell (shipped)
 
 ```
 app/src/main/java/com/missioncontrol/app/
-  MainActivity.kt
-  ui/CockpitScreen.kt
-  ui/theme/Theme.kt
+  MainActivity.kt          — AuthGate entry
+  auth/
+    AuthModels.kt          — McAuthUser, AuthSurface, ClerkAuthBridge
+    MockClerkAuthBridge.kt
+    AuthViewModel.kt
+    AuthGate.kt            — sign-in / agency / portal
 ```
 
-## Status
+Surfaces:
 
-Scaffold with full module list (matches web cockpit). Next: Clerk Android + Convex.
+1. **Signed out** — SignInShell (Clerk AuthView slot + mock)
+2. **Agency staff** — org present → CockpitScreen modules
+3. **Client portal** — no org → PortalScreen (ADR-0026)
 
-### Clerk wire checklist
+## Clerk wire checklist
 
-1. Gradle: Clerk Android SDK + Compose AuthView / UserButton
-2. `Clerk.initialize(publishableKey)` in Application
-3. Org context for Agency staff; Client portal users outside org (ADR-0026)
-4. Convex JWT template `convex` + HTTP Control Plane fallback
+1. Gradle: [Clerk Android](https://clerk.com/docs/references/android/overview) + Compose AuthView
+2. Implement `ClerkAuthBridge` with real session APIs
+3. `Clerk.initialize(publishableKey)` in `Application`
+4. Org context for Agency staff; Client portal users outside org
+5. Convex JWT template `convex`
 
-Open in Android Studio and wire Gradle when ready.
+Open in Android Studio when ready.

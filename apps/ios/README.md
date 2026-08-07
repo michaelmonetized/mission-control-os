@@ -2,40 +2,41 @@
 
 SwiftUI surface (ADR-0005 / 0006 / 0010). Equal priority with Web, Desktop, TUI, Android.
 
-## Stack (planned)
+## Stack
 
 | Layer | Choice |
 |-------|--------|
 | UI | SwiftUI |
-| Auth | Clerk iOS (`ClerkKit` / ClerkKitUI) — Agency org for staff; Client portal without org membership (ADR-0015/0026) |
+| Auth | **AuthGateView** + `MCAuthSession` / `MCAuthProviding` — ClerkKit when SPM linked |
 | Data | Convex Swift client or Control Plane HTTP + Sync Fabric |
 | Agent | Does **not** crawl; observes Control Plane only |
 
-## Layout
+## Auth shell (shipped)
 
 ```
-MissionControl/
-  Sources/MissionControl/
-    MissionControlApp.swift
-    ContentView.swift
-    Auth/
-    Cockpit/
-  Package.swift
+Sources/MissionControl/
+  Auth/
+    MCAuthSession.swift      — session + MockClerkAuthBridge
+    AuthGateView.swift       — sign-in / agency cockpit / client portal
+    ClerkAuthBridge.md       — real ClerkKit wiring notes
+  MissionControlApp.swift    — MissionControlRoot → AuthGateView
+  ContentView.swift          — agency module list
 ```
 
-## Status
+Surfaces:
 
-Scaffold with full module list (matches web cockpit). Next: ClerkKit AuthView + org session + Convex.
+1. **Signed out** — SignInShellView (Clerk AuthView slot + mock Agency / Portal)
+2. **Agency staff** — org id present → cockpit modules (ADR-0015)
+3. **Client portal** — no org membership → PortalShellView (ADR-0026)
 
-### Clerk wire checklist
+## Clerk wire checklist
 
-1. Add `ClerkKit` / `ClerkKitUI` SPM deps
-2. `Clerk.configure(publishableKey:)` in app entry
-3. `AuthView` for sign-in; OrganizationSwitcher for Agency
-4. Client portal users: **no** Agency org membership (ADR-0026) — separate portal surface
-5. Convex: JWT template `convex` (same as web) + Swift client or HTTP Control Plane
+1. Add `ClerkKit` / `ClerkKitUI` SPM (`https://github.com/clerk/clerk-ios`)
+2. Implement `ClerkAuthBridge: MCAuthProviding` (see `Auth/ClerkAuthBridge.md`)
+3. `Clerk.configure(publishableKey:)` via `MCAuthSession`
+4. Replace SignInShellView body with `AuthView()`
+5. Convex JWT template `convex` (same as web)
 
 ```bash
-# When Package is buildable:
 cd apps/ios && swift build
 ```

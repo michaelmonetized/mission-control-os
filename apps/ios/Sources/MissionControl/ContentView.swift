@@ -1,8 +1,10 @@
 import SwiftUI
 
 /// Sparse cockpit shell — mirrors web modules (ADR-0006 equal surfaces).
-/// Next: ClerkKit AuthView + Convex client (see apps/ios/README.md).
+/// Hosted behind AuthGateView after Agency staff sign-in (ADR-0015).
 public struct ContentView: View {
+  @ObservedObject var session: MCAuthSession
+
   private let modules: [(name: String, hint: String)] = [
     ("Cockpit", "Dashboard + activity"),
     ("Clients", "Hierarchy Agency→Site"),
@@ -14,32 +16,61 @@ public struct ContentView: View {
     ("Email", "Resend ESP domains"),
     ("Automations", "Inline then Trigger"),
     ("Activity", "Agency event trail"),
+    ("Billing", "Stripe subscription"),
     ("Portal", "Client graphs + grants"),
   ]
 
-  public init() {}
+  public init(session: MCAuthSession = MCAuthSession()) {
+    self.session = session
+  }
 
   public var body: some View {
     NavigationStack {
-      List(modules, id: \.name) { mod in
-        NavigationLink {
-          ModulePlaceholder(name: mod.name, hint: mod.hint)
-        } label: {
-          VStack(alignment: .leading, spacing: 2) {
-            Text(mod.name)
-            Text(mod.hint)
-              .font(.caption)
-              .foregroundStyle(.secondary)
+      List {
+        if let user = session.user {
+          Section {
+            VStack(alignment: .leading, spacing: 2) {
+              Text(user.displayName ?? user.email ?? user.userId)
+                .font(.headline)
+              Text(user.organizationId.map { "Org \($0.prefix(12))…" } ?? "No org")
+                .font(.caption.monospaced())
+                .foregroundStyle(.secondary)
+              if user.isAgencyAdmin {
+                Text("Admin")
+                  .font(.caption2)
+                  .foregroundStyle(Color(red: 0.537, green: 0.863, blue: 0.922))
+              }
+            }
+          }
+        }
+        Section("Modules") {
+          ForEach(modules, id: \.name) { mod in
+            NavigationLink {
+              ModulePlaceholder(name: mod.name, hint: mod.hint)
+            } label: {
+              VStack(alignment: .leading, spacing: 2) {
+                Text(mod.name)
+                Text(mod.hint)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+              }
+            }
           }
         }
       }
       .navigationTitle("Mission Control")
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
-          // Clerk UserButton / AuthView — ClerkKit when wired
-          Image(systemName: "person.crop.circle")
-            .foregroundStyle(Color(red: 0.537, green: 0.863, blue: 0.922)) // Sky
-            .accessibilityLabel("Account")
+          // ClerkKitUI UserButton when linked
+          Menu {
+            Button("Sign out", role: .destructive) {
+              Task { await session.signOut() }
+            }
+          } label: {
+            Image(systemName: "person.crop.circle")
+              .foregroundStyle(Color(red: 0.537, green: 0.863, blue: 0.922))
+              .accessibilityLabel("Account")
+          }
         }
       }
     }
@@ -71,5 +102,5 @@ private struct ModulePlaceholder: View {
 }
 
 #Preview {
-  ContentView()
+  AuthGateView(session: MCAuthSession())
 }
