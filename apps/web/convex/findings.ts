@@ -164,6 +164,12 @@ export const fixNext = query({
       large_image_no_dimensions: 9,
       render_blocking_script: 11,
       missing_lazy_loading: 5,
+      cwv_lcp_poor: 45,
+      cwv_cls_poor: 42,
+      cwv_ttfb_slow: 18,
+      cwv_fcp_poor: 20,
+      cwv_lcp_needs_improvement: 25,
+      cwv_cls_needs_improvement: 22,
     };
 
     const byType = new Map<string, { type: string; count: number; sampleUrl: string }>();

@@ -12,9 +12,23 @@ use std::time::{SystemTime, UNIX_EPOCH};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CrawlOptions {
     pub origin: String,
-    pub mode: String, // "rendered" | "http_only"
+    /// "rendered" | "http_only" | "cwv" (rendered + Playwright Core Web Vitals pass)
+    pub mode: String,
     pub ignore_robots: bool,
     pub max_pages: usize,
+    /// Force CWV pass even when mode is rendered (default true for mode=cwv)
+    #[serde(default)]
+    pub cwv: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct CwvMetrics {
+    pub url: String,
+    pub lcp_ms: f64,
+    pub cls: f64,
+    pub fcp_ms: f64,
+    pub ttfb_ms: f64,
+    pub load_ms: f64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -107,12 +121,16 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
         fetch_robots_disallow(&origin).unwrap_or_default()
     };
 
-    let use_rendered = opts.mode != "http_only" && playwright_available();
-    let mode_used = if use_rendered {
+    let want_cwv = opts.cwv || opts.mode == "cwv";
+    let use_rendered =
+        (opts.mode != "http_only" || want_cwv) && playwright_available();
+    let mode_used = if want_cwv && use_rendered {
+        "cwv".to_string()
+    } else if use_rendered {
         "rendered".to_string()
     } else {
-        if opts.mode == "rendered" {
-            tracing::warn!("Playwright not found — falling back to http_only");
+        if opts.mode == "rendered" || opts.mode == "cwv" || want_cwv {
+            tracing::warn!("Playwright not found — falling back to http_only (no CWV)");
         }
         "http_only".to_string()
     };
@@ -495,6 +513,44 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
         }
     }
 
+    // Playwright Core Web Vitals pass (ADR-0008 full CWV depth)
+    if want_cwv && use_rendered {
+        let mut cwv_urls: Vec<String> = vec![origin.clone()];
+        // Sample up to 4 additional shallow pages
+        let mut shallow: Vec<(usize, String)> = depths
+            .iter()
+            .filter(|(u, _)| *u != &origin)
+            .map(|(u, d)| (*d, u.clone()))
+            .collect();
+        shallow.sort_by_key(|(d, _)| *d);
+        for (_, u) in shallow.into_iter().take(4) {
+            cwv_urls.push(u);
+        }
+        for u in cwv_urls {
+            match measure_cwv_with_playwright(&u, &artifacts) {
+                Ok(m) => {
+                    apply_cwv_findings(&mut findings, &m);
+                    let _ = fs::write(
+                        data_dir
+                            .join("artifacts")
+                            .join(format!("cwv_{}.json", pages)),
+                        serde_json::to_string_pretty(&m).unwrap_or_default(),
+                    );
+                }
+                Err(e) => {
+                    tracing::warn!(url = %u, error = %e, "CWV measurement failed");
+                    push_finding(
+                        &mut findings,
+                        "cwv_measurement_failed",
+                        "low",
+                        &u,
+                        e,
+                    );
+                }
+            }
+        }
+    }
+
     // Build site structure graph (ADR-0008)
     let mut nodes: Vec<StructureNode> = depths
         .iter()
@@ -652,6 +708,173 @@ fn render_with_playwright(url: &str, artifacts: &Path) -> Result<String, String>
         return Err("playwright render failed".into());
     }
     fs::read_to_string(out).map_err(|e| e.to_string())
+}
+
+/// Core Web Vitals via Playwright PerformanceObserver (ADR-0008).
+/// Thresholds: LCP good&lt;2500 / poor&gt;4000; CLS good&lt;0.1 / poor&gt;0.25; TTFB/FCP informational.
+fn measure_cwv_with_playwright(url: &str, artifacts: &Path) -> Result<CwvMetrics, String> {
+    let out = artifacts.join("cwv_metrics.json");
+    let script = format!(
+        r#"const {{ chromium }} = require('playwright');
+const fs = require('fs');
+(async () => {{
+  const browser = await chromium.launch({{ headless: true }});
+  const page = await browser.newPage();
+  await page.goto({url}, {{ waitUntil: 'networkidle', timeout: 60000 }});
+  // Allow late LCP / layout shifts
+  await page.waitForTimeout(2000);
+  const metrics = await page.evaluate(() => new Promise((resolve) => {{
+    let lcp = 0;
+    let cls = 0;
+    try {{
+      const poLcp = new PerformanceObserver((list) => {{
+        for (const e of list.getEntries()) {{
+          if (e.entryType === 'largest-contentful-paint') lcp = e.startTime;
+        }}
+      }});
+      poLcp.observe({{ type: 'largest-contentful-paint', buffered: true }});
+      const poCls = new PerformanceObserver((list) => {{
+        for (const e of list.getEntries()) {{
+          if (e.entryType === 'layout-shift' && !e.hadRecentInput) cls += e.value;
+        }}
+      }});
+      poCls.observe({{ type: 'layout-shift', buffered: true }});
+    }} catch (_) {{}}
+    setTimeout(() => {{
+      const nav = performance.getEntriesByType('navigation')[0];
+      const paint = performance.getEntriesByType('paint') || [];
+      const fcp = (paint.find(p => p.name === 'first-contentful-paint') || {{}}).startTime || 0;
+      // LCP from buffered entries if observer missed
+      if (!lcp) {{
+        try {{
+          const lcps = performance.getEntriesByType('largest-contentful-paint');
+          if (lcps.length) lcp = lcps[lcps.length - 1].startTime;
+        }} catch (_) {{}}
+      }}
+      resolve({{
+        lcp: lcp || 0,
+        cls: cls || 0,
+        fcp: fcp || 0,
+        ttfb: nav ? (nav.responseStart - nav.requestStart) : 0,
+        load: nav ? nav.loadEventEnd : 0,
+      }});
+    }}, 1500);
+  }}));
+  fs.writeFileSync({out}, JSON.stringify(metrics));
+  console.log(JSON.stringify(metrics));
+  await browser.close();
+}})().catch(e => {{ console.error(String(e)); process.exit(1); }});"#,
+        url = serde_json::to_string(url).map_err(|e| e.to_string())?,
+        out = serde_json::to_string(out.to_str().unwrap_or("cwv.json")).map_err(|e| e.to_string())?
+    );
+    let output = Command::new("node")
+        .arg("-e")
+        .arg(&script)
+        .output()
+        .map_err(|e| e.to_string())?;
+    if !output.status.success() {
+        let err = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("playwright CWV failed: {err}"));
+    }
+    let raw = if out.exists() {
+        fs::read_to_string(&out).map_err(|e| e.to_string())?
+    } else {
+        String::from_utf8_lossy(&output.stdout).to_string()
+    };
+    // last JSON line
+    let line = raw
+        .lines()
+        .rev()
+        .find(|l| l.trim().starts_with('{'))
+        .unwrap_or(raw.trim());
+    let v: serde_json::Value =
+        serde_json::from_str(line).map_err(|e| format!("cwv parse: {e} · {line}"))?;
+    Ok(CwvMetrics {
+        url: url.to_string(),
+        lcp_ms: v.get("lcp").and_then(|x| x.as_f64()).unwrap_or(0.0),
+        cls: v.get("cls").and_then(|x| x.as_f64()).unwrap_or(0.0),
+        fcp_ms: v.get("fcp").and_then(|x| x.as_f64()).unwrap_or(0.0),
+        ttfb_ms: v.get("ttfb").and_then(|x| x.as_f64()).unwrap_or(0.0),
+        load_ms: v.get("load").and_then(|x| x.as_f64()).unwrap_or(0.0),
+    })
+}
+
+fn apply_cwv_findings(findings: &mut Vec<Finding>, m: &CwvMetrics) {
+    // LCP thresholds (ms)
+    if m.lcp_ms > 4000.0 {
+        push_finding(
+            findings,
+            "cwv_lcp_poor",
+            "high",
+            &m.url,
+            format!("LCP {:.0}ms > 4000ms (poor)", m.lcp_ms),
+        );
+    } else if m.lcp_ms > 2500.0 {
+        push_finding(
+            findings,
+            "cwv_lcp_needs_improvement",
+            "medium",
+            &m.url,
+            format!("LCP {:.0}ms needs improvement (2500–4000)", m.lcp_ms),
+        );
+    }
+    // CLS
+    if m.cls > 0.25 {
+        push_finding(
+            findings,
+            "cwv_cls_poor",
+            "high",
+            &m.url,
+            format!("CLS {:.3} > 0.25 (poor)", m.cls),
+        );
+    } else if m.cls > 0.1 {
+        push_finding(
+            findings,
+            "cwv_cls_needs_improvement",
+            "medium",
+            &m.url,
+            format!("CLS {:.3} needs improvement (0.1–0.25)", m.cls),
+        );
+    }
+    // TTFB informational
+    if m.ttfb_ms > 800.0 {
+        push_finding(
+            findings,
+            "cwv_ttfb_slow",
+            "medium",
+            &m.url,
+            format!("TTFB {:.0}ms > 800ms", m.ttfb_ms),
+        );
+    }
+    // FCP
+    if m.fcp_ms > 3000.0 {
+        push_finding(
+            findings,
+            "cwv_fcp_poor",
+            "medium",
+            &m.url,
+            format!("FCP {:.0}ms > 3000ms", m.fcp_ms),
+        );
+    } else if m.fcp_ms > 1800.0 {
+        push_finding(
+            findings,
+            "cwv_fcp_needs_improvement",
+            "low",
+            &m.url,
+            format!("FCP {:.0}ms needs improvement", m.fcp_ms),
+        );
+    }
+    // Always emit a summary finding at info/low for dashboard visibility
+    push_finding(
+        findings,
+        "cwv_snapshot",
+        "low",
+        &m.url,
+        format!(
+            "CWV LCP={:.0}ms CLS={:.3} FCP={:.0}ms TTFB={:.0}ms load={:.0}ms",
+            m.lcp_ms, m.cls, m.fcp_ms, m.ttfb_ms, m.load_ms
+        ),
+    );
 }
 
 fn fetch_robots_disallow(origin: &str) -> Result<HashSet<String>, String> {

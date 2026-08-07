@@ -39,12 +39,16 @@ enum Commands {
     Crawl {
         #[arg(long)]
         origin: String,
+        /// rendered | http_only | cwv (rendered + Playwright Core Web Vitals)
         #[arg(long, default_value = "rendered")]
         mode: String,
         #[arg(long, default_value_t = false)]
         ignore_robots: bool,
         #[arg(long, default_value_t = 25)]
         max_pages: usize,
+        /// Run Playwright CWV pass (also implied by --mode cwv)
+        #[arg(long, default_value_t = false)]
+        cwv: bool,
     },
     /// Poll Convex agent HTTP for one job, crawl, stream findings, complete
     Poll {
@@ -106,6 +110,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             mode,
             ignore_robots,
             max_pages,
+            cwv,
         } => {
             let d = data_dir();
             fs::create_dir_all(d.join("artifacts"))?;
@@ -114,6 +119,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 mode,
                 ignore_robots,
                 max_pages,
+                cwv,
             };
             let result = tokio::task::spawn_blocking(move || crawl::run_crawl(&d, &opts)).await??;
             println!("{}", serde_json::to_string_pretty(&result)?);
@@ -171,11 +177,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .await?;
 
             let d = data_dir();
+            let cwv = mode == "cwv";
             let opts = crawl::CrawlOptions {
                 origin,
                 mode,
                 ignore_robots,
                 max_pages,
+                cwv,
             };
             let result =
                 tokio::task::spawn_blocking(move || crawl::run_crawl(&d, &opts)).await??;

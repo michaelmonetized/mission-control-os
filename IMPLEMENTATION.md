@@ -35,7 +35,7 @@ docs/adr · docs/dsd
 | **0005** Multi-surface CP | Web/Desktop/TUI/Mobile | Web live; Desktop/TUI; iOS/Android module scaffolds + Clerk checklists |
 | **0006** All surfaces equal | Same capabilities | Shared protocol + Convex; TUI modules include Pipeline/Activity |
 | **0007** Full audit loop | Every surface | Web + Agent; TUI navigation; portal graphs |
-| **0008** Crawl depth | SF+Sitebulb-class | Extractors + clusters/fix-next + run comparison + schedules when agent online + CWV heuristics |
+| **0008** Crawl depth | SF+Sitebulb-class | Extractors + clusters/fix-next + structure graph + schedules + HTML CWV heuristics + Playwright CWV pass (`--mode cwv`) |
 | **0009** Lakebed | **Superseded** by 0010 | N/A |
 | **0010** Stack | TanStack + Clerk + Convex + Rust | Live |
 | **0011** Desktop Electron+Effect | Cross-platform | Bootstrap + status + restart + unpair Effect graphs |
@@ -100,14 +100,13 @@ cargo run -p mc-tui
 | Item | Gap |
 |------|-----|
 | ADR-0006 mobile | Scaffold only — ClerkKit / Clerk Android + Convex live queries TBD |
-| ADR-0008 full Lighthouse CWV | Heuristics (CLS/images, render-blocking, lazy) live; full Lighthouse/Playwright CWV TBD |
-| ADR-0008 site structure viz | Link graph not yet visualised (metrics + clusters cover prioritisation) |
+| ADR-0006 mobile live | Auth shells + mock; real ClerkKit / clerk-android SPM/Gradle link TBD |
+| ADR-0008 INP | LCP/CLS/FCP/TTFB via Playwright; Interaction to Next Paint not instrumented |
 | ADR-0034 HTTP CRM proxy | Vite dual-write contacts/companies/opps/conversations; Convex remains SoT |
 | ADR-0046 Trigger.dev cloud | Claim/complete HTTP + local worker live; `@trigger.dev/sdk` cloud deploy needs `TRIGGER_SECRET_KEY` |
-| ADR-0022 Playwright | Default when `require('playwright')` works; else HTTP |
 | DSD-0008 iCloud vector | Reconstructed SVG until iCloud import |
 | Clerk production instance | Dev keys on Vercel previews |
-| Stripe Checkout | Schema + mock activate + webhook upsert; Checkout session + Stripe.js TBD |
+| Stripe live keys | Checkout + webhook code live; needs Convex env + Stripe Dashboard prices |
 | ADR-0017 multi-repo split | Deferred intentionally |
 
 ## Cost control

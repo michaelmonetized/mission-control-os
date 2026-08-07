@@ -124,7 +124,7 @@ function AuditPage() {
     try {
       const run = await queueRun({
         siteId: effectiveSite as Id<"sites">,
-        mode: "rendered",
+        mode: "cwv",
         ignoreRobots,
       });
       setRunId(run.crawlRunId);

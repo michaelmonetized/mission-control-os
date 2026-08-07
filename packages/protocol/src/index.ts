@@ -48,7 +48,9 @@ export interface UpdateClientBody {
 export interface CrawlRunBody {
   siteId: SiteId;
   ignoreRobots?: boolean;
-  mode?: "rendered" | "http_only";
+  mode?: "rendered" | "http_only" | "cwv";
+  /** Playwright Core Web Vitals pass (ADR-0008) */
+  cwv?: boolean;
 }
 
 export interface MetricsSnapshot {
@@ -193,10 +195,20 @@ export const FINDING_TYPES = [
   "missing_favicon",
   "missing_structured_data",
   "missing_hreflang",
-  /** CWV-adjacent (ADR-0008) — not full Lighthouse */
+  /** CWV-adjacent HTML heuristics (ADR-0008) */
   "large_image_no_dimensions",
   "render_blocking_script",
   "missing_lazy_loading",
+  /** Full Playwright CWV pass (ADR-0008) */
+  "cwv_lcp_poor",
+  "cwv_lcp_needs_improvement",
+  "cwv_cls_poor",
+  "cwv_cls_needs_improvement",
+  "cwv_ttfb_slow",
+  "cwv_fcp_poor",
+  "cwv_fcp_needs_improvement",
+  "cwv_snapshot",
+  "cwv_measurement_failed",
 ] as const;
 
 export type FindingTypeApi = (typeof FINDING_TYPES)[number];
