@@ -1,0 +1,679 @@
+[
+  {
+    "isFramework" : true,
+    "moduleName" : "Accessibility",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Accessibility-3M3TXODUVD06K.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "AppKit",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/AppKit-KK3XF01BV3RI.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "ColorSync",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/ColorSync-1SZECEKKCWKPO.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "Combine",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Combine-1ZPFR0BYHHZSR.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "CoreAudio",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreAudio-21YHJLVXHSWF1.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreData",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreData-UOQ87HZZXWG0.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "CoreFoundation",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreFoundation-29IFUOCROUFX.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreGraphics",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreGraphics-IYW3BJB3JRYE.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "CoreImage",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreImage-2A53C0KJKNB8M.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreMedia",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreMedia-2W6ZDLT2TGULV.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreText",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreText-2M147W98PJP02.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreTransferable",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreTransferable-G8MJV315XJEY.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "CoreVideo",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreVideo-3E9YBMK3DXYGO.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Darwin",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Darwin-3O58QK8LAVY4S.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "DataDetection",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/DataDetection-24JP1OALXYAU5.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "DeveloperToolsSupport",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/DeveloperToolsSupport-8756XX8XG7XU.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Dispatch",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Dispatch-1BOA2X4R6AW20.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "Foundation",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Foundation-1BQMB4Z0EEGB9.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "IOKit",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/IOKit-HT177UBQLTDX.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "ImageIO",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/ImageIO-1JH9UGNR6ETEU.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Metal",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Metal-1272V6FUAXYM4.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "OSLog",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/OSLog-2ESIN2XW5SKB2.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "ObjectiveC",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/ObjectiveC-D7W0BLHQCZZ5.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Observation",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Observation-JMOTUKHMFBX8.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "QuartzCore",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/QuartzCore-10RWQLIRQ3YKX.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Spatial",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Spatial-3MS5HBTNIS13R.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Swift",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Swift-1NIR5AAA3DEJC.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "SwiftOnoneSupport",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/SwiftOnoneSupport-2YOKSWJ4KSKPH.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "SwiftUI",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/SwiftUI-EH5PY2316HTQ.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "SwiftUICore",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/SwiftUICore-3J2RCBZ2MTPV0.swiftmodule"
+  },
+  {
+    "isFramework" : true,
+    "moduleName" : "Symbols",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Symbols-3F6USBTTOKC3Y.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "Synchronization",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Synchronization-FMDMDN5CDISC.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "System",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/System-3L2QTFG8WVGV7.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "UniformTypeIdentifiers",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/UniformTypeIdentifiers-22HLK9YI32RF2.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "XPC",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/XPC-3OEIXM8CXI6QK.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_Builtin_float",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_float-2TNEY44FST5GI.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_Concurrency",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Concurrency-364A48XI2AQUM.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation1",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_DarwinFoundation1-3K7MH3GWRV8TF.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation2",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_DarwinFoundation2-1D37X0RRFDZTN.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation3",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_DarwinFoundation3-UXPJMC7LVPM7.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "_StringProcessing",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_StringProcessing-2UWHNQVPI9768.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "os",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/os-1CZAL2QI07JI1.swiftmodule"
+  },
+  {
+    "isFramework" : false,
+    "moduleName" : "simd",
+    "modulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/simd-1Y103MUJV52HF.swiftmodule"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/Accessibility.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Accessibility-5TJBJDTLQELFDDBPQSZ8PKKUJ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Accessibility"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/AppKit.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/AppKit-ARSCRRLCV24OFWSA42JDGJHGN.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "AppKit"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/ApplicationServices.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/ApplicationServices-2EJKGZX4QX7JVY8L1N5GBYHTF.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ApplicationServices"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CFNetwork.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CFNetwork-2SIL49D5ALN5TTNB8315BJ42B.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CFNetwork"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/cups.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CUPS-55UW3YB8DSAN0XCE9GONUAO5Y.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CUPS"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/ColorSync.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/ColorSync-EK6L4614Q36SLL5XC1HYBZ76K.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ColorSync"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreAudio.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreAudio-6Q007ZLRXD3SCUO1RPKEJW626.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreAudio"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreAudioTypes.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreAudioTypes-BHJVR2QD769K9PZE1XHLNCEYC.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreAudioTypes"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreData.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreData-1X8NZ4T78MVGYC5SSYN0137N.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreData"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreFoundation.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreFoundation-AND09IX2BAYF8IEJ7G44ETVK2.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreFoundation"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreGraphics.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreGraphics-BPJMCTELGD0KBOZ2AW9UY2C2O.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreGraphics"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreImage.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreImage-2QB6FB21OEOXMX5GUJF2VDZYV.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreImage"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreMedia.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreMedia-5TKVL4WSXUIKKU771303MIEVG.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreMedia"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreServices.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreServices-ANH9S1YY9Q51KTUMKWZJBQABL.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreServices"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreText.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreText-88B21FLZOBZ6OKIAHND9P7XN6.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreText"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreTransferable.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreTransferable-DK61KE379G9KGFFT1E27YVZSJ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreTransferable"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/CoreVideo.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/CoreVideo-6GGWH1BBGXVRLN2WKKXJ6KE17.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CoreVideo"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/Darwin.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Darwin-5MQ055FVD0ITCMBEKALA6EI2L.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Darwin"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/DataDetection.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/DataDetection-2KSGRGSL79XKA3G9LNXGVGRPT.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "DataDetection"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/DeveloperToolsSupport.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/DeveloperToolsSupport-A14TEZ67TKUGF71DBSOV422SO.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "DeveloperToolsSupport"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/DiskArbitration.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/DiskArbitration-1O9ITYKCKTJ9VZMV1PT9Z3Z9L.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "DiskArbitration"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/dispatch.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Dispatch-9G92DCRF698A6MFLQX3RW3XGS.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Dispatch"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/Foundation.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Foundation-CWFN48T2GJ5555RNKEE47FYRU.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Foundation"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/IOKit.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/IOKit-6XM7VTPXKNWDUEXN081JEIY2Z.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "IOKit"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/IOSurface.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/IOSurface-DHNT102WW7WC5CK9SDZWUBULV.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "IOSurface"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/ImageIO.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/ImageIO-2CWF2O8EYFX4L2MUY67JUAM78.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ImageIO"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/DarwinBasic.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/MachO-71H4Y2GSZV8B7K7M10X832RCU.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "MachO"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/Metal.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Metal-2SE14W1Z5ZMKUOAW5OFFIZZQF.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Metal"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/OSLog.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/OSLog-E41X9WY719HCVPQ3DKJUC07LN.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "OSLog"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/ObjectiveC.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/ObjectiveC-6A756R5BYEUC0ZWVITGE0NSDD.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ObjectiveC"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/OpenGL.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/OpenGL-4FKB1B4MBHHV2PY2O2CRKC1D2.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "OpenGL"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/QuartzCore.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/QuartzCore-7AK7KSR1TDUPZD2PTGJK3N94J.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "QuartzCore"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/Security.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Security-8BS4LGPB7GWVWQBTND5K77NMK.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Security"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/Spatial\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Spatial-AAD163OLVQUVLV7T4ARG6BAZS.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Spatial"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/lib\/swift\/shims\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/SwiftShims-31JHQZ0LX9279V88VOZP6QZKE.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "SwiftShims"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/SwiftUI.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/SwiftUI-2KQYPU0852AJG1C3L02F4KDYU.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "SwiftUI"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/SwiftUICore.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/SwiftUICore-C6AMUF5JG4FUP5RIL3HXHPOBV.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "SwiftUICore"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/Symbols.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/Symbols-5XMUCLO3OTIFB4M9NVVSJIY8Z.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "Symbols"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/System\/Library\/Frameworks\/UniformTypeIdentifiers.framework\/Modules\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/UniformTypeIdentifiers-9QDVAAISMA1FGU3G6X3HFSOHT.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "UniformTypeIdentifiers"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/xpc.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/XPC-LIPW5Y6EFCRERML37OYTASWB.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "XPC"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/DarwinFoundation1.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_AvailabilityInternal-42YJVWZ8B78W4AWZ1AB7DJ7C1.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_AvailabilityInternal"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_float-CQZ9B0USOJ7O2MT1Q3KNH7TVC.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_float"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_intrinsics-DPVNLUSD54WVAY4T0QJ67EA5N.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_intrinsics"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_inttypes-EP179BT7FS5MPLA6KXYJZM6MK.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_inttypes"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_limits-163ICGZY8JDGLM1OWZD60YPV0.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_limits"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_stdarg-5V2SL4V0QHZJX5CRPMARW25ZA.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_stdarg"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_stdatomic-BJCMK9XKN2Z1GTIB8S452AC54.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_stdatomic"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_stdbool-BBFK5SCNPNRH54AF0O2DAJ0IF.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_stdbool"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_stddef-1B78TU91SY4CDYFAXCZ7HBJ2E.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_stddef"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_stdint-8ZSJDNRHDYYCNJJZTKIDA168S.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_stdint"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_Builtin_tgmath-BIGTYSWKG5LFEMZCFC7468OSQ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_Builtin_tgmath"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/DarwinFoundation1.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_DarwinFoundation1-3QQZ4XOGSR0SSBBN3D5LG0K0P.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation1"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/DarwinFoundation2.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_DarwinFoundation2-3D1LFWADDCZ7NJFUL4O1YBMTK.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation2"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/DarwinFoundation3.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_DarwinFoundation3-4MXLGADCN6ZSA0YBPRR9Y4PYG.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_DarwinFoundation3"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/lib\/swift\/shims\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/_SwiftConcurrencyShims-4WNMYAVZ8RJY70WG1BBP33J6I.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "_SwiftConcurrencyShims"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/launch.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/launch-31I3RNEPQB1UNWEG995176P4F.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "launch"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/libDER\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/libDER-1PUCGPX8MVGNMNYOG9F23U249.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "libDER"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/libkern.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/libkern-KABEMT7OHEGFIKHRLYU3M1B.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "libkern"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/os.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/os-7VNTR9042T3K8GY2UK5L990OS.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "os"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/os.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/os_object-8MRMUFLNYFYO4ZOKK13PDDLOH.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "os_object"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/os.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/os_workgroup-7MG314DVP84GSF19OK84KHLKR.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "os_workgroup"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/ptrauth-AGBZ76FRDB0BH3X2OYLGCVJQ6.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ptrauth"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/usr\/lib\/clang\/21\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/ptrcheck-4M7BXJIMGC5EBM3YBH1XWABMZ.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "ptrcheck"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/simd\/module.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/simd-8L4RG1IEORXS4234UR0M4TLBT.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "simd"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/c_standard_library.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/string_h-ARJN14FW5P3FF4DM2LDGCB8KP.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "string_h"
+  },
+  {
+    "clangModuleMapPath" : "\/Library\/Developer\/CommandLineTools\/SDKs\/MacOSX27.0.sdk\/usr\/include\/DarwinFoundation2.modulemap",
+    "clangModulePath" : "\/Users\/michael\/Projects\/mission-control-os\/apps\/ios\/.build\/out\/SDKExplicitPrecompiledModules\/sys_types-CEPFNI0UHF6E7ZSJ8LD2E76WT.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "sys_types"
+  }
+]

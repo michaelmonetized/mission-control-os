@@ -1,0 +1,49 @@
+{
+  "" : {
+    "diagnostics" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControl-primary.dia",
+    "emit-module-dependencies" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControl-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControl-primary-emit-module.dia",
+    "pch" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControl-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControl-primary.swiftdeps"
+  },
+  "/Users/michael/Projects/mission-control-os/apps/ios/Sources/MissionControl/Auth/AuthGateView.swift" : {
+    "const-values" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/AuthGateView.swiftconstvalues",
+    "dependencies" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/AuthGateView.d",
+    "diagnostics" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/AuthGateView.dia",
+    "index-unit-output-path" : "/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/AuthGateView.o",
+    "llvm-bc" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/AuthGateView.bc",
+    "object" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/AuthGateView.o",
+    "swift-dependencies" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/AuthGateView.swiftdeps",
+    "swiftmodule" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/AuthGateView~partial.swiftmodule"
+  },
+  "/Users/michael/Projects/mission-control-os/apps/ios/Sources/MissionControl/Auth/MCAuthSession.swift" : {
+    "const-values" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MCAuthSession.swiftconstvalues",
+    "dependencies" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MCAuthSession.d",
+    "diagnostics" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MCAuthSession.dia",
+    "index-unit-output-path" : "/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MCAuthSession.o",
+    "llvm-bc" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MCAuthSession.bc",
+    "object" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MCAuthSession.o",
+    "swift-dependencies" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MCAuthSession.swiftdeps",
+    "swiftmodule" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MCAuthSession~partial.swiftmodule"
+  },
+  "/Users/michael/Projects/mission-control-os/apps/ios/Sources/MissionControl/ContentView.swift" : {
+    "const-values" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
+  "/Users/michael/Projects/mission-control-os/apps/ios/Sources/MissionControl/MissionControlApp.swift" : {
+    "const-values" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControlApp.swiftconstvalues",
+    "dependencies" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControlApp.d",
+    "diagnostics" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControlApp.dia",
+    "index-unit-output-path" : "/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControlApp.o",
+    "llvm-bc" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControlApp.bc",
+    "object" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControlApp.o",
+    "swift-dependencies" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControlApp.swiftdeps",
+    "swiftmodule" : "/Users/michael/Projects/mission-control-os/apps/ios/.build/out/Intermediates.noindex/MissionControl.build/Debug/MissionControl-t.build/Objects-normal/arm64/MissionControlApp~partial.swiftmodule"
+  }
+}

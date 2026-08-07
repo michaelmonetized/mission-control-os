@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Sparkline } from "@/components/mc/sparkline";
 import { Progress } from "@/components/mc/progress";
 import { downloadCsv } from "@/lib/export-csv";
+import { SiteStructureGraph } from "@/components/mc/site-structure-graph";
 
 export const Route = createFileRoute("/app/audit")({
   component: AuditPage,
@@ -78,6 +79,10 @@ function AuditPage() {
     api.crawl.compareSnapshots,
     effectiveSite ? { siteId: effectiveSite as Id<"sites"> } : "skip",
   );
+  const siteStructure = useQuery(
+    api.crawl.structureFromFindings,
+    latestRun ? { crawlRunId: latestRun as Id<"crawlRuns"> } : "skip",
+  );
   const agentOnline = useQuery(api.schedules.agentOnline, {});
   const schedules = useQuery(api.schedules.list, {});
   const upsertSchedule = useMutation(api.schedules.upsert);
@@ -138,6 +143,8 @@ function AuditPage() {
         url: `${sites?.find((s) => s.id === effectiveSite)?.origin ?? ""}/missing`,
         message: "404 sample",
       });
+      const origin = sites?.find((s) => s.id === effectiveSite)?.origin ?? "https://example.com";
+      const base = origin.replace(/\/$/, "");
       await completeRun({
         crawlRunId: run.crawlRunId,
         metrics: {
@@ -146,9 +153,44 @@ function AuditPage() {
           duplicatePercent: 0,
           pagesRetrieved: 3,
         },
+        structure: {
+          origin: base,
+          maxDepth: 2,
+          nodeCount: 4,
+          edgeCount: 3,
+          nodes: [
+            { id: base, url: base, path: "/", depth: 0, title: "Home" },
+            {
+              id: `${base}/about`,
+              url: `${base}/about`,
+              path: "/about",
+              depth: 1,
+              title: "About",
+            },
+            {
+              id: `${base}/blog`,
+              url: `${base}/blog`,
+              path: "/blog",
+              depth: 1,
+              title: "Blog",
+            },
+            {
+              id: `${base}/blog/post`,
+              url: `${base}/blog/post`,
+              path: "/blog/post",
+              depth: 2,
+              title: "Post",
+            },
+          ],
+          edges: [
+            { from: base, to: `${base}/about` },
+            { from: base, to: `${base}/blog` },
+            { from: `${base}/blog`, to: `${base}/blog/post` },
+          ],
+        },
       });
       setNote(
-        `Queued + sample stream for ${run.crawlRunId}. Run \`mc-agent crawl --origin …\` locally for real crawl.`,
+        `Queued + sample stream + structure for ${run.crawlRunId}. Run \`mc-agent crawl --origin …\` for real graph.`,
       );
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Failed");
@@ -375,6 +417,26 @@ function AuditPage() {
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {siteStructure && siteStructure.nodes.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Site structure</CardTitle>
+            <CardDescription>
+              Internal link graph by crawl depth (ADR-0008 Sitebulb-class viz)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SiteStructureGraph
+              nodes={siteStructure.nodes}
+              edges={siteStructure.edges}
+              origin={siteStructure.origin}
+              maxDepth={siteStructure.maxDepth}
+              source={siteStructure.source}
+            />
           </CardContent>
         </Card>
       ) : null}

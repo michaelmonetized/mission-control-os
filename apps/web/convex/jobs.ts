@@ -189,6 +189,25 @@ export const completeInternal = internalMutation({
       duplicatePercent: v.number(),
       pagesRetrieved: v.number(),
     }),
+    structure: v.optional(
+      v.object({
+        origin: v.string(),
+        maxDepth: v.number(),
+        nodeCount: v.number(),
+        edgeCount: v.number(),
+        nodes: v.array(
+          v.object({
+            id: v.string(),
+            url: v.string(),
+            path: v.string(),
+            depth: v.number(),
+            title: v.optional(v.string()),
+            outDegree: v.optional(v.number()),
+          }),
+        ),
+        edges: v.array(v.object({ from: v.string(), to: v.string() })),
+      }),
+    ),
   },
   handler: async (ctx, args) => {
     const run = await ctx.db.get(args.crawlRunId);
@@ -201,6 +220,19 @@ export const completeInternal = internalMutation({
       completedAt,
       ...args.metrics,
     });
+    if (args.structure) {
+      await ctx.db.insert("siteStructures", {
+        siteId: run.siteId,
+        crawlRunId: args.crawlRunId,
+        origin: args.structure.origin,
+        nodes: args.structure.nodes,
+        edges: args.structure.edges,
+        maxDepth: args.structure.maxDepth,
+        nodeCount: args.structure.nodeCount,
+        edgeCount: args.structure.edgeCount,
+        completedAt,
+      });
+    }
     return { ok: true, completedAt };
   },
 });

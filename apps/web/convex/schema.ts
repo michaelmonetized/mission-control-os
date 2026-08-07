@@ -289,4 +289,37 @@ export default defineSchema({
   })
     .index("by_agency", ["agencyId"])
     .index("by_lastSeen", ["lastSeenAt"]),
+
+  /**
+   * Site structure graph from crawl (ADR-0008 Sitebulb-class site structure viz).
+   * nodes: { id, url, path, depth, title? }
+   * edges: { from, to } same-origin internal links
+   */
+  siteStructures: defineTable({
+    siteId: v.id("sites"),
+    crawlRunId: v.id("crawlRuns"),
+    origin: v.string(),
+    nodes: v.array(
+      v.object({
+        id: v.string(),
+        url: v.string(),
+        path: v.string(),
+        depth: v.number(),
+        title: v.optional(v.string()),
+        outDegree: v.optional(v.number()),
+      }),
+    ),
+    edges: v.array(
+      v.object({
+        from: v.string(),
+        to: v.string(),
+      }),
+    ),
+    maxDepth: v.number(),
+    nodeCount: v.number(),
+    edgeCount: v.number(),
+    completedAt: v.number(),
+  })
+    .index("by_site", ["siteId"])
+    .index("by_run", ["crawlRunId"]),
 });

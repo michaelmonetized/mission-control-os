@@ -28,6 +28,35 @@ pub struct Finding {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StructureNode {
+    pub id: String,
+    pub url: String,
+    pub path: String,
+    pub depth: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub out_degree: Option<usize>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StructureEdge {
+    pub from: String,
+    pub to: String,
+}
+
+/// Site structure graph (ADR-0008 Sitebulb-class visualisation).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SiteStructure {
+    pub origin: String,
+    pub nodes: Vec<StructureNode>,
+    pub edges: Vec<StructureEdge>,
+    pub max_depth: usize,
+    pub node_count: usize,
+    pub edge_count: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CrawlResult {
     pub findings: Vec<Finding>,
     pub pages_retrieved: usize,
@@ -37,6 +66,8 @@ pub struct CrawlResult {
     pub missing_meta: usize,
     pub mode_used: String,
     pub artifacts_dir: PathBuf,
+    #[serde(default)]
+    pub structure: Option<SiteStructure>,
 }
 
 fn fingerprint(kind: &str, url: &str, detail: &str) -> String {
@@ -86,9 +117,9 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
         "http_only".to_string()
     };
 
-    let mut queue: VecDeque<String> = VecDeque::new();
+    let mut queue: VecDeque<(String, usize)> = VecDeque::new();
     let mut seen: HashSet<String> = HashSet::new();
-    queue.push_back(origin.clone());
+    queue.push_back((origin.clone(), 0));
     seen.insert(origin.clone());
 
     let mut findings: Vec<Finding> = Vec::new();
@@ -97,6 +128,12 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
     let mut missing_alt = 0usize;
     let mut missing_meta = 0usize;
     let mut titles: HashMap<String, Vec<String>> = HashMap::new();
+    // Structure graph: depth + internal edges
+    let mut depths: HashMap<String, usize> = HashMap::new();
+    depths.insert(origin.clone(), 0);
+    let mut page_titles: HashMap<String, String> = HashMap::new();
+    let mut out_links: HashMap<String, Vec<String>> = HashMap::new();
+    let mut max_depth = 0usize;
 
     let client = reqwest::blocking::Client::builder()
         .timeout(std::time::Duration::from_secs(20))
@@ -108,7 +145,7 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
     // Soft rate limit between page fetches (open Q #20 defaults)
     let delay_ms = 150u64;
 
-    while let Some(url) = queue.pop_front() {
+    while let Some((url, depth)) = queue.pop_front() {
         if pages >= opts.max_pages {
             break;
         }
@@ -137,6 +174,8 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
         };
 
         pages += 1;
+        max_depth = max_depth.max(depth);
+        depths.insert(url.clone(), depth);
         let page_path = artifacts.join(format!("page_{pages}.html"));
         let _ = fs::write(&page_path, &html);
 
@@ -151,6 +190,7 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
                 "document missing <title>",
             );
         } else {
+            page_titles.insert(url.clone(), title.clone());
             titles.entry(title.clone()).or_default().push(url.clone());
             if title.len() > 60 {
                 push_finding(
@@ -419,16 +459,23 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
             );
         }
 
-        // enqueue same-origin links
+        // enqueue same-origin links + record structure edges
+        let mut outs: Vec<String> = Vec::new();
         for link in extract_hrefs(&html) {
             if link.starts_with("mailto:") || link.starts_with("tel:") || link.starts_with("javascript:") {
                 continue;
             }
             let abs = resolve_url(&url, &link);
-            if abs.starts_with(&origin) && seen.insert(abs.clone()) {
-                queue.push_back(abs);
+            if abs.starts_with(&origin) {
+                // strip fragment for graph identity
+                let abs = abs.split('#').next().unwrap_or(&abs).to_string();
+                outs.push(abs.clone());
+                if seen.insert(abs.clone()) {
+                    queue.push_back((abs, depth + 1));
+                }
             }
         }
+        out_links.insert(url.clone(), outs);
     }
 
     // duplicate titles
@@ -448,6 +495,60 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
         }
     }
 
+    // Build site structure graph (ADR-0008)
+    let mut nodes: Vec<StructureNode> = depths
+        .iter()
+        .map(|(url, d)| {
+            let path = url
+                .strip_prefix(&origin)
+                .unwrap_or(url.as_str())
+                .to_string();
+            let path = if path.is_empty() {
+                "/".to_string()
+            } else {
+                path
+            };
+            let outs = out_links.get(url).map(|v| v.len()).unwrap_or(0);
+            StructureNode {
+                id: url.clone(),
+                url: url.clone(),
+                path,
+                depth: *d,
+                title: page_titles.get(url).cloned(),
+                out_degree: Some(outs),
+            }
+        })
+        .collect();
+    nodes.sort_by(|a, b| a.depth.cmp(&b.depth).then_with(|| a.path.cmp(&b.path)));
+
+    let mut edges: Vec<StructureEdge> = Vec::new();
+    for (from, tos) in &out_links {
+        for to in tos {
+            if depths.contains_key(to) {
+                edges.push(StructureEdge {
+                    from: from.clone(),
+                    to: to.clone(),
+                });
+            }
+        }
+    }
+    // Cap edges for payload size
+    if edges.len() > 500 {
+        edges.truncate(500);
+    }
+    if nodes.len() > 200 {
+        nodes.truncate(200);
+    }
+
+    let structure = SiteStructure {
+        origin: origin.clone(),
+        node_count: nodes.len(),
+        edge_count: edges.len(),
+        max_depth,
+        nodes,
+        edges,
+    };
+
     // ADR-0020: clean artifacts after run (keep a small summary json optional)
     let _ = fs::write(
         data_dir.join("artifacts").join(format!("summary_{run_id}.json")),
@@ -457,8 +558,19 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
             "missing_alt": missing_alt,
             "duplicate_titles": duplicate_titles,
             "mode": mode_used,
+            "structure": {
+                "node_count": structure.node_count,
+                "edge_count": structure.edge_count,
+                "max_depth": structure.max_depth,
+            },
         }))
         .unwrap_or_default(),
+    );
+    let _ = fs::write(
+        data_dir
+            .join("artifacts")
+            .join(format!("structure_{run_id}.json")),
+        serde_json::to_string_pretty(&structure).unwrap_or_default(),
     );
     cleanup_artifacts(&artifacts);
 
@@ -471,6 +583,7 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
         missing_meta,
         mode_used,
         artifacts_dir: artifacts,
+        structure: Some(structure),
     })
 }
 

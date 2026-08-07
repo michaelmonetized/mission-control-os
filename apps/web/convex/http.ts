@@ -230,6 +230,21 @@ http.route({
         duplicatePercent: number;
         pagesRetrieved: number;
       };
+      structure?: {
+        origin: string;
+        maxDepth: number;
+        nodeCount: number;
+        edgeCount: number;
+        nodes: {
+          id: string;
+          url: string;
+          path: string;
+          depth: number;
+          title?: string;
+          outDegree?: number;
+        }[];
+        edges: { from: string; to: string }[];
+      };
     };
     if (!body.crawlRunId || !body.metrics) {
       return Response.json({ ok: false, error: "crawlRunId + metrics required" }, { status: 400 });
@@ -238,6 +253,7 @@ http.route({
       const res = await ctx.runMutation(internal.jobs.completeInternal, {
         crawlRunId: body.crawlRunId as any,
         metrics: body.metrics,
+        structure: body.structure,
       });
       return Response.json({ ok: true, data: res });
     } catch (e) {

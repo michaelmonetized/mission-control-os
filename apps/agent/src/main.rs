@@ -207,18 +207,46 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let broken = result.broken_links;
             let missing_alt = result.missing_alt;
             let dup = result.duplicate_titles;
+            // Map Rust structure (snake) → Convex (camel) for site graph (ADR-0008)
+            let structure_json = result.structure.as_ref().map(|s| {
+                serde_json::json!({
+                    "origin": s.origin,
+                    "maxDepth": s.max_depth,
+                    "nodeCount": s.node_count,
+                    "edgeCount": s.edge_count,
+                    "nodes": s.nodes.iter().map(|n| serde_json::json!({
+                        "id": n.id,
+                        "url": n.url,
+                        "path": n.path,
+                        "depth": n.depth,
+                        "title": n.title,
+                        "outDegree": n.out_degree,
+                    })).collect::<Vec<_>>(),
+                    "edges": s.edges.iter().map(|e| serde_json::json!({
+                        "from": e.from,
+                        "to": e.to,
+                    })).collect::<Vec<_>>(),
+                })
+            });
+            let mut complete_body = serde_json::json!({
+                "crawlRunId": crawl_run_id,
+                "metrics": {
+                    "brokenLinks": broken,
+                    "missingAlt": missing_alt,
+                    "duplicatePercent": if pages > 0 { (dup as f64 / pages as f64) * 100.0 } else { 0.0 },
+                    "pagesRetrieved": pages,
+                }
+            });
+            if let Some(st) = structure_json {
+                complete_body
+                    .as_object_mut()
+                    .unwrap()
+                    .insert("structure".into(), st);
+            }
             let _ = client
                 .post(format!("{site}/agent/complete"))
                 .headers(auth_header(&agent_secret))
-                .json(&serde_json::json!({
-                    "crawlRunId": crawl_run_id,
-                    "metrics": {
-                        "brokenLinks": broken,
-                        "missingAlt": missing_alt,
-                        "duplicatePercent": if pages > 0 { (dup as f64 / pages as f64) * 100.0 } else { 0.0 },
-                        "pagesRetrieved": pages,
-                    }
-                }))
+                .json(&complete_body)
                 .send()
                 .await?;
 

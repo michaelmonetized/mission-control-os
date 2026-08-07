@@ -141,6 +141,24 @@ export const streamFinding = mutation({
   },
 });
 
+const structureValidator = v.object({
+  origin: v.string(),
+  maxDepth: v.number(),
+  nodeCount: v.number(),
+  edgeCount: v.number(),
+  nodes: v.array(
+    v.object({
+      id: v.string(),
+      url: v.string(),
+      path: v.string(),
+      depth: v.number(),
+      title: v.optional(v.string()),
+      outDegree: v.optional(v.number()),
+    }),
+  ),
+  edges: v.array(v.object({ from: v.string(), to: v.string() })),
+});
+
 export const completeRun = mutation({
   args: {
     crawlRunId: v.id("crawlRuns"),
@@ -150,6 +168,7 @@ export const completeRun = mutation({
       duplicatePercent: v.number(),
       pagesRetrieved: v.number(),
     }),
+    structure: v.optional(structureValidator),
   },
   handler: async (ctx, args) => {
     const { clerkOrgId } = await requireAgencyOrg(ctx);
@@ -168,7 +187,129 @@ export const completeRun = mutation({
       completedAt,
       ...args.metrics,
     });
+    if (args.structure) {
+      await ctx.db.insert("siteStructures", {
+        siteId: scoped.run.siteId,
+        crawlRunId: args.crawlRunId,
+        origin: args.structure.origin,
+        nodes: args.structure.nodes,
+        edges: args.structure.edges,
+        maxDepth: args.structure.maxDepth,
+        nodeCount: args.structure.nodeCount,
+        edgeCount: args.structure.edgeCount,
+        completedAt,
+      });
+    }
     return { ok: true, completedAt };
+  },
+});
+
+/** Site structure graph for a crawl run (ADR-0008). */
+export const structureForRun = query({
+  args: { crawlRunId: v.id("crawlRuns") },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) return null;
+    const scoped = await assertRunInAgency(ctx, args.crawlRunId, agency._id);
+    if (!scoped) return null;
+    const row = await ctx.db
+      .query("siteStructures")
+      .withIndex("by_run", (q) => q.eq("crawlRunId", args.crawlRunId))
+      .unique();
+    if (!row) return null;
+    return {
+      origin: row.origin,
+      maxDepth: row.maxDepth,
+      nodeCount: row.nodeCount,
+      edgeCount: row.edgeCount,
+      nodes: row.nodes,
+      edges: row.edges,
+      completedAt: row.completedAt,
+    };
+  },
+});
+
+/**
+ * Demo / fallback: build structure from finding URLs when Agent graph not streamed.
+ */
+export const structureFromFindings = query({
+  args: { crawlRunId: v.id("crawlRuns") },
+  handler: async (ctx, args) => {
+    const { clerkOrgId } = await requireAgencyOrg(ctx);
+    const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
+    if (!agency) return null;
+    const scoped = await assertRunInAgency(ctx, args.crawlRunId, agency._id);
+    if (!scoped) return null;
+
+    // Prefer real structure
+    const real = await ctx.db
+      .query("siteStructures")
+      .withIndex("by_run", (q) => q.eq("crawlRunId", args.crawlRunId))
+      .unique();
+    if (real) {
+      return {
+        source: "agent" as const,
+        origin: real.origin,
+        maxDepth: real.maxDepth,
+        nodeCount: real.nodeCount,
+        edgeCount: real.edgeCount,
+        nodes: real.nodes,
+        edges: real.edges,
+      };
+    }
+
+    const findings = await ctx.db
+      .query("auditFindings")
+      .withIndex("by_run", (q) => q.eq("crawlRunId", args.crawlRunId))
+      .collect();
+    const site = scoped.site;
+    const origin = site.origin.replace(/\/$/, "");
+    const urlSet = new Set<string>([origin]);
+    for (const f of findings) {
+      try {
+        const u = new URL(f.url, origin);
+        if (u.origin === new URL(origin).origin) {
+          const path = u.pathname.replace(/\/$/, "") || "";
+          urlSet.add(`${u.origin}${path || ""}` || origin);
+        }
+      } catch {
+        /* skip */
+      }
+    }
+    const nodes = [...urlSet].slice(0, 80).map((url, i) => {
+      let path = "/";
+      try {
+        path = new URL(url).pathname || "/";
+      } catch {
+        path = url.replace(origin, "") || "/";
+      }
+      const depth = path === "/" ? 0 : path.split("/").filter(Boolean).length;
+      return {
+        id: url,
+        url,
+        path,
+        depth,
+        title: undefined as string | undefined,
+        outDegree: undefined as number | undefined,
+      };
+    });
+    nodes.sort((a, b) => a.depth - b.depth || a.path.localeCompare(b.path));
+    // Synthetic star edges from origin for viz
+    const root = nodes.find((n) => n.depth === 0)?.id ?? origin;
+    const edges = nodes
+      .filter((n) => n.id !== root)
+      .slice(0, 100)
+      .map((n) => ({ from: root, to: n.id }));
+    return {
+      source: "findings_fallback" as const,
+      origin,
+      maxDepth: nodes.reduce((m, n) => Math.max(m, n.depth), 0),
+      nodeCount: nodes.length,
+      edgeCount: edges.length,
+      nodes,
+      edges,
+    };
   },
 });
 

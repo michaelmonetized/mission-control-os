@@ -1,0 +1,7 @@
+Target dependency graph (3 targets)
+Target 'AllExcludingTests' in project 'Aggregate'
+➜ Explicit dependency on target 'MissionControl-product' in project 'MissionControl'
+➜ Explicit dependency on target 'MissionControl' in project 'MissionControl'
+Target 'MissionControl-product' in project 'MissionControl'
+➜ Explicit dependency on target 'MissionControl' in project 'MissionControl'
+Target 'MissionControl' in project 'MissionControl' (no dependencies)
