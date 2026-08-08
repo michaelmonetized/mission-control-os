@@ -128,7 +128,7 @@ function Landing() {
           <span className="text-[#89dceb]">Own the loop.</span>
         </h2>
         <p className="relative z-10 mx-auto mt-5 max-w-[32rem] text-[#a6adc8]">
-          Screaming Frog depth. Sitebulb prioritisation. Client-ready portal. One flat plan —
+          Technical audit depth, prioritised fixes, and a client-ready portal. One flat plan —
           Starter, Pro, or Enterprise.
         </p>
         <div className="relative z-10 mt-10 flex flex-wrap items-center justify-center gap-3">

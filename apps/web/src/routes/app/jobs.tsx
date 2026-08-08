@@ -23,7 +23,7 @@ function JobsPage() {
       <div>
         <h1 className="text-2xl font-semibold">Agent jobs</h1>
         <p className="text-sm text-[var(--color-mocha-subtext0)]">
-          Queued crawl runs for Local Agent daemon · claim marks running
+          Queued crawl runs for the local agent. Claim marks a job as running.
         </p>
       </div>
       {note ? (
@@ -35,8 +35,7 @@ function JobsPage() {
         <CardHeader>
           <CardTitle className="text-base">Queued crawls</CardTitle>
           <CardDescription>
-            {queued === undefined ? "…" : `${queued.length} waiting`} · prefer{" "}
-            <code className="text-[10px]">mc-agent</code> poll over manual claim
+            {queued === undefined ? "…" : `${queued.length} waiting`} · agent usually claims automatically
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">

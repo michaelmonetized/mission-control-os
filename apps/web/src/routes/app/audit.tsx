@@ -204,7 +204,7 @@ function AuditPage() {
           <h1 className="text-2xl font-semibold">Audit</h1>
           <p className="text-[var(--color-mocha-subtext0)] max-w-[42rem]">
             Local Agent only · rendered default · robots respect · artifacts cleaned · findings status
-            in Convex (ADR-0004/0019–0024) · Sitebulb-class clusters & fix-next (ADR-0008).
+            stored in your workspace · issue clusters and fix-next prioritization.
           </p>
         </div>
         <div
@@ -327,7 +327,7 @@ function AuditPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Fix next</CardTitle>
-            <CardDescription>Prioritised open issues (ADR-0008 Sitebulb insight)</CardDescription>
+            <CardDescription>Prioritized open issues</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             {(fixNext ?? []).length === 0 ? (
@@ -376,7 +376,7 @@ function AuditPage() {
           <CardHeader>
             <CardTitle className="text-base">Run comparison</CardTitle>
             <CardDescription>
-              Latest vs previous snapshot (ADR-0008 / 0024)
+              Latest vs previous snapshot
               {comparison.improving === true
                 ? " · improving"
                 : comparison.improving === false
@@ -424,7 +424,7 @@ function AuditPage() {
           <CardHeader>
             <CardTitle className="text-base">Site structure</CardTitle>
             <CardDescription>
-              Internal link graph by crawl depth (ADR-0008 Sitebulb-class viz)
+              Internal link graph by crawl depth
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -443,7 +443,7 @@ function AuditPage() {
         <CardHeader>
           <CardTitle className="text-base">Scheduled crawls</CardTitle>
           <CardDescription>
-            Queue when Agent is online (ADR-0008) · cron every 15m
+            Queue when the agent is online · scheduled every 15m
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -515,7 +515,7 @@ function AuditPage() {
       <Card>
         <CardHeader>
           <CardTitle>Metrics over time</CardTitle>
-          <CardDescription>Durable metrics snapshots per completed run (ADR-0024)</CardDescription>
+          <CardDescription>Metrics snapshots per completed run</CardDescription>
         </CardHeader>
         <CardContent>
           {history.length === 0 ? (
@@ -544,7 +544,7 @@ function AuditPage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <div className="text-xs text-[var(--color-mocha-subtext0)] mb-1">
-                    Broken links (TanStack Charts)
+                    Broken links
                   </div>
                   <MetricsChart
                     data={history.map((h) => ({ x: h.date.slice(5), y: h.brokenLinks }))}
@@ -556,7 +556,7 @@ function AuditPage() {
                 </div>
                 <div>
                   <div className="text-xs text-[var(--color-mocha-subtext0)] mb-1">
-                    Missing alt (TanStack Charts)
+                    Missing alt
                   </div>
                   <MetricsChart
                     data={history.map((h) => ({ x: h.date.slice(5), y: h.missingAlt }))}
@@ -569,8 +569,7 @@ function AuditPage() {
               </div>
               <p className="text-xs mt-3 text-[var(--color-mocha-subtext0)]">
                 <span className="text-[var(--color-brand-sky)]">■</span> broken links{" "}
-                <span className="text-[var(--color-brand-flamingo)]">■</span> missing alt · powered by
-                TanStack Charts
+                <span className="text-[var(--color-brand-flamingo)]">■</span> missing alt
               </p>
               {history.length > 0 ? (
                 <div className="mt-4 space-y-1">
@@ -660,7 +659,7 @@ function AuditPage() {
       <Card>
         <CardHeader>
           <CardTitle>Findings</CardTitle>
-          <CardDescription>Live status field (ADR-0023) · share to portal</CardDescription>
+          <CardDescription>Status · share to portal</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
           {(findings ?? []).length > 0 ? (

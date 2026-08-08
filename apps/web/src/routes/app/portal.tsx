@@ -58,14 +58,13 @@ function PortalSetupPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Client Portal setup</h1>
       <p className="text-[var(--color-mocha-subtext0)]">
-        Client Users authenticate with Clerk but stay <strong>outside</strong> the Agency org
-        (ADR-0026). Access is a Convex grant + allowlist (ADR-0027).
+        Invite clients by email. They get portal access without joining your organization.
       </p>
       <Card>
         <CardHeader>
           <CardTitle>Invite portal user</CardTitle>
           <CardDescription>
-            Sends grant + allowlist row. User claims via /portal after sign-in.
+            Sends an invite. They sign in at /portal after accepting.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">

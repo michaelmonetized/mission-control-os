@@ -195,8 +195,7 @@ function EmailPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Email ESP</h1>
       <p className="text-[var(--color-mocha-subtext0)]">
-        Full ESP on Resend (ADR-0036). Agency + Client Email Domains · DNS onboarding · isolated
-        workspaces. Admin-only provision.
+        Agency and client sending domains. Add DNS records, then verify. Admin-only provision.
       </p>
       {note ? <p className="text-sm text-[var(--color-brand-sky)]">{note}</p> : null}
       {!isAdmin ? (
