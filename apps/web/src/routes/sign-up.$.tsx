@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SignUp } from "@clerk/react";
+import { SignUp } from "@clerk/tanstack-react-start";
 import { LogoLockup } from "@/components/mc/logo";
 import { clerkAppearance } from "@/lib/clerk-appearance";
 
@@ -16,7 +16,7 @@ function SignUpCatchAll() {
         routing="path"
         path="/sign-up"
         signInUrl="/sign-in"
-        forceRedirectUrl="/onboarding"
+        fallbackRedirectUrl="/onboarding"
         appearance={clerkAppearance}
       />
     </div>

@@ -6,7 +6,7 @@ import {
   Scripts,
   createRootRoute,
 } from "@tanstack/react-router";
-import { ClerkProvider, useAuth } from "@clerk/react";
+import { ClerkProvider, useAuth } from "@clerk/tanstack-react-start";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { CommandPaletteHost } from "@/components/layout/command-palette";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
@@ -73,6 +73,8 @@ function AppProviders({ children }: { children: React.ReactNode }) {
       afterSignOutUrl="/"
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
+      // Prefer fallback so session tasks (choose-organization) are not overridden
+      // by a hard forceRedirect — avoids /app ↔ /select-agency ↔ /sign-in loops.
       taskUrls={{
         "choose-organization": "/select-agency",
       }}

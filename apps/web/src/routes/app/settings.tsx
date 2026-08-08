@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useAuth, useOrganization, useUser } from "@clerk/react";
+import { useAuth, useOrganization, useUser } from "@clerk/tanstack-react-start";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { api } from "../../../convex/_generated/api";

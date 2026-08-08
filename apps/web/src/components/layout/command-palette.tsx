@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "convex/react";
-import { useAuth } from "@clerk/react";
+import { useAuth } from "@clerk/tanstack-react-start";
 import { api } from "../../../convex/_generated/api";
 import { cn } from "cnfast";
 

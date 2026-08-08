@@ -4,7 +4,7 @@ import { PortalGate } from "@/lib/auth-guards";
 import { Button } from "@/components/mc/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
 import { LogoLockup } from "@/components/mc/logo";
-import { UserButton } from "@clerk/react";
+import { UserButton } from "@clerk/tanstack-react-start";
 
 export const Route = createFileRoute("/portal/onboarding")({
   component: () => (

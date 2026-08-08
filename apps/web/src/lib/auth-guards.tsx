@@ -1,14 +1,22 @@
-import { useAuth, useOrganization } from "@clerk/react";
+import { useAuth, useOrganization, SignInButton } from "@clerk/tanstack-react-start";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Button } from "@/components/mc/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
-import { CreateOrganization, OrganizationList, SignInButton } from "@clerk/react";
 
 /** Agency cockpit: must be signed in + active Clerk Organization (ADR-0015). */
 export function AgencyGate({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn, orgId, orgRole } = useAuth();
   const { organization } = useOrganization();
+  const navigate = useNavigate();
+
+  // Prefer a single org-selection surface (/select-agency) over embedding
+  // OrganizationList on every gated route — avoids fighting Clerk taskUrls.
+  useEffect(() => {
+    if (isLoaded && isSignedIn && !orgId) {
+      void navigate({ to: "/select-agency" });
+    }
+  }, [isLoaded, isSignedIn, orgId, navigate]);
 
   if (!isLoaded) {
     return (
@@ -30,7 +38,7 @@ export function AgencyGate({ children }: { children: React.ReactNode }) {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <SignInButton mode="modal" forceRedirectUrl="/app">
+            <SignInButton mode="modal" fallbackRedirectUrl="/app">
               <Button className="w-full">Sign in</Button>
             </SignInButton>
             <Link to="/sign-up" className="text-sm text-center text-[var(--color-brand-sky)]">
@@ -47,23 +55,8 @@ export function AgencyGate({ children }: { children: React.ReactNode }) {
 
   if (!orgId) {
     return (
-      <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-12 gap-8">
-        <div className="text-center max-w-[32rem]">
-          <h1 className="text-2xl font-semibold mb-2">Select or create your Agency</h1>
-          <p className="text-sm text-[var(--color-mocha-subtext0)]">
-            Each Agency is a Clerk Organization (ADR-0015). Solo operators still create one org.
-          </p>
-        </div>
-        <div className="w-full max-w-[32rem] mc-glass p-6 rounded-[var(--radius-lg)]">
-          <OrganizationList
-            hidePersonal
-            afterCreateOrganizationUrl="/onboarding"
-            afterSelectOrganizationUrl="/app"
-          />
-        </div>
-        <div className="w-full max-w-[32rem]">
-          <CreateOrganization afterCreateOrganizationUrl="/onboarding" />
-        </div>
+      <div className="min-h-dvh flex items-center justify-center text-[var(--color-mocha-subtext0)]">
+        Selecting Agency…
       </div>
     );
   }
@@ -78,13 +71,6 @@ export function AgencyGate({ children }: { children: React.ReactNode }) {
 /** Client portal: signed in, but must NOT require Agency org membership. */
 export function PortalGate({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      // stay on page; show sign-in UI
-    }
-  }, [isLoaded, isSignedIn, navigate]);
 
   if (!isLoaded) {
     return (
@@ -105,7 +91,7 @@ export function PortalGate({ children }: { children: React.ReactNode }) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SignInButton mode="modal" forceRedirectUrl="/portal">
+            <SignInButton mode="modal" fallbackRedirectUrl="/portal">
               <Button className="w-full">Sign in</Button>
             </SignInButton>
           </CardContent>

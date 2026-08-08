@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { useOrganization } from "@clerk/react";
+import { useOrganization } from "@clerk/tanstack-react-start";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { AgencyGate } from "@/lib/auth-guards";

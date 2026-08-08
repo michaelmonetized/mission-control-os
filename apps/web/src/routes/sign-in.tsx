@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SignIn } from "@clerk/react";
+import { SignIn } from "@clerk/tanstack-react-start";
 import { LogoLockup } from "@/components/mc/logo";
 import { clerkAppearance } from "@/lib/clerk-appearance";
 
@@ -15,7 +15,8 @@ function SignInPage() {
         routing="path"
         path="/sign-in"
         signUpUrl="/sign-up"
-        forceRedirectUrl="/app"
+        // fallback (not force): session tasks like choose-organization can run
+        fallbackRedirectUrl="/app"
         appearance={clerkAppearance}
       />
     </div>

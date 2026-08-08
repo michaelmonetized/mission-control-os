@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "convex/react";
-import { UserButton } from "@clerk/react";
+import { UserButton } from "@clerk/tanstack-react-start";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { PortalGate } from "@/lib/auth-guards";

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { OrganizationSwitcher, UserButton, useAuth } from "@clerk/react";
+import { OrganizationSwitcher, UserButton, useAuth } from "@clerk/tanstack-react-start";
 import { LogoLockup } from "@/components/mc/logo";
 import { cn } from "cnfast";
 import { useIsAgencyAdmin } from "@/lib/auth-guards";

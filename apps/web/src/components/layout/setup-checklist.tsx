@@ -1,7 +1,7 @@
 import { useQuery } from "convex/react";
 import { Link } from "@tanstack/react-router";
 import { api } from "../../../convex/_generated/api";
-import { useAuth } from "@clerk/react";
+import { useAuth } from "@clerk/tanstack-react-start";
 
 /**
  * Persistent setup checklist (ADR-0040) until critical OS paths are ready.

@@ -1,6 +1,6 @@
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { useAuth } from "@clerk/react";
+import { useAuth } from "@clerk/tanstack-react-start";
 
 /** Shows queued crawl jobs awaiting Local Agent (ADR-0004). */
 export function AgentStatusBadge() {

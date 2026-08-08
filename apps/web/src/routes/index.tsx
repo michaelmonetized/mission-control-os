@@ -1,5 +1,5 @@
 import { createFileRoute, Link, ClientOnly } from "@tanstack/react-router";
-import { Show, SignInButton, UserButton } from "@clerk/react";
+import { Show, SignInButton, UserButton } from "@clerk/tanstack-react-start";
 import { LogoLockup } from "@/components/mc/logo";
 import { Button } from "@/components/mc/button";
 import { ArrowRight } from "lucide-react";
@@ -35,7 +35,7 @@ function Landing() {
           </Link>
           <div className="flex items-center gap-3">
             <Show when="signed-out">
-              <SignInButton mode="modal" forceRedirectUrl="/app">
+              <SignInButton mode="modal" fallbackRedirectUrl="/app">
                 <Button size="sm" variant="ghost" className="text-xs text-[#a6adc8]">
                   Sign in
                 </Button>
@@ -89,7 +89,7 @@ function Landing() {
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <Show when="signed-out">
-              <SignInButton mode="modal" forceRedirectUrl="/app">
+              <SignInButton mode="modal" fallbackRedirectUrl="/app">
                 <Button className="gap-2 font-semibold">
                   Enter free <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -133,7 +133,7 @@ function Landing() {
         </p>
         <div className="relative z-10 mt-10 flex flex-wrap items-center justify-center gap-3">
           <Show when="signed-out">
-            <SignInButton mode="modal" forceRedirectUrl="/app">
+            <SignInButton mode="modal" fallbackRedirectUrl="/app">
               <Button className="gap-2 font-semibold">
                 Start free <ArrowRight className="h-4 w-4" />
               </Button>

@@ -5,7 +5,7 @@ import { AgencyGate } from "@/lib/auth-guards";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/react";
+import { useAuth } from "@clerk/tanstack-react-start";
 
 export const Route = createFileRoute("/app")({
   component: AgencyAppLayout,
