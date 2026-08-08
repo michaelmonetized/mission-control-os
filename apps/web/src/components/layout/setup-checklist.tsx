@@ -52,8 +52,8 @@ export function SetupChecklist() {
     },
     {
       id: "onboarding",
-      label: "Onboarding spine",
-      done: step >= 7,
+      label: "Agency setup",
+      done: step >= 5,
       to: "/onboarding",
     },
   ];
