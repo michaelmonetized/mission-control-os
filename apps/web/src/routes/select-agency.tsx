@@ -1,21 +1,21 @@
 import type { ReactNode } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
-  CreateOrganization,
-  OrganizationList,
-  TaskChooseOrganization,
   useAuth,
+  useClerk,
+  useOrganizationList,
   useSession,
+  useUser,
 } from "@clerk/tanstack-react-start";
 import { LogoLockup } from "@/components/mc/logo";
 import { Button } from "@/components/mc/button";
-import { clerkAppearance } from "@/lib/clerk-appearance";
+import { Input } from "@/components/mc/input";
 
 export const Route = createFileRoute("/select-agency")({
   component: SelectAgencyPage,
 });
 
-/** Shared shell: logo + Clerk card, no double chrome around Clerk UI. */
 function AgencyShell({
   children,
   subtitle,
@@ -34,26 +34,100 @@ function AgencyShell({
             </p>
           ) : null}
         </div>
-        <div className="flex w-full justify-center [&_.cl-rootBox]:mx-auto [&_.cl-card]:mx-auto [&_.cl-cardBox]:mx-auto">
-          {children}
-        </div>
+        <div className="w-full">{children}</div>
       </div>
     </div>
   );
 }
 
 /**
- * Clerk `taskUrls.choose-organization` lands here after OAuth when an org is
- * required. During that pending session task, `isSignedIn` is often still false —
- * do NOT gate on isSignedIn. Render TaskChooseOrganization so the task can complete.
+ * Prefer hard navigation after org activation — Clerk TaskChooseOrganization
+ * hangs forever on Continue when SPA routerPush/setActive never settles under Start.
  */
+function goToApp() {
+  window.location.assign("/app");
+}
+
 function SelectAgencyPage() {
-  // Pending org task sessions are "signed out" by default — flip that so
-  // post-OAuth choose-organization is not treated as signed-out dead-end UI.
   const { isLoaded, isSignedIn, orgId } = useAuth({ treatPendingAsSignedOut: false });
   const { session, isLoaded: sessionLoaded } = useSession();
+  const { user } = useUser();
+  const clerk = useClerk();
+  const navigate = useNavigate();
+
+  const { isLoaded: orgsLoaded, userMemberships, setActive } = useOrganizationList({
+    userMemberships: { infinite: true },
+  });
 
   const pendingOrgTask = session?.currentTask?.key === "choose-organization";
+  const needsAgency = pendingOrgTask || (isSignedIn && !orgId);
+
+  const defaultName =
+    user?.fullName
+      ? `${user.fullName.split(" ")[0]}'s Agency`
+      : user?.primaryEmailAddress?.emailAddress?.split("@")[0]
+        ? `${user.primaryEmailAddress.emailAddress.split("@")[0]}'s Agency`
+        : "My Agency";
+
+  const [name, setName] = useState(defaultName);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setName(defaultName);
+  }, [defaultName]);
+
+  // Org already active → leave this page (hard nav clears stuck task UI).
+  useEffect(() => {
+    if (!isLoaded || !sessionLoaded) return;
+    if (orgId && !pendingOrgTask) {
+      goToApp();
+    }
+  }, [isLoaded, sessionLoaded, orgId, pendingOrgTask]);
+
+  async function activateOrg(organizationId: string) {
+    setBusy(true);
+    setError(null);
+    try {
+      // Hard navigate inside setActive's navigate hook — TaskChooseOrganization
+      // + SPA routerPush never settles under TanStack Start (Continue spins forever).
+      const params = {
+        organization: organizationId,
+        navigate: async () => {
+          goToApp();
+        },
+      };
+      if (setActive) {
+        await setActive(params);
+      } else {
+        await clerk.setActive(params);
+      }
+      // Fallback if navigate hook is skipped by Clerk version
+      goToApp();
+    } catch (e) {
+      console.error("setActive org", e);
+      setError(e instanceof Error ? e.message : "Could not activate agency");
+      setBusy(false);
+    }
+  }
+
+  async function createAndContinue() {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      setError("Agency name is required");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const org = await clerk.createOrganization({ name: trimmed });
+      await activateOrg(org.id);
+    } catch (e) {
+      console.error("createOrganization", e);
+      setError(e instanceof Error ? e.message : "Could not create agency");
+      setBusy(false);
+    }
+  }
 
   if (!isLoaded || !sessionLoaded) {
     return (
@@ -63,20 +137,7 @@ function SelectAgencyPage() {
     );
   }
 
-  // Active session task (post OAuth / force-org): official task UI.
-  if (pendingOrgTask) {
-    return (
-      <AgencyShell subtitle="Create or select an agency workspace to continue.">
-        <TaskChooseOrganization
-          redirectUrlComplete="/app"
-          appearance={clerkAppearance}
-        />
-      </AgencyShell>
-    );
-  }
-
-  // Truly signed out (no pending task) — path SignIn, not a modal.
-  if (!isSignedIn) {
+  if (!isSignedIn && !pendingOrgTask) {
     return (
       <AgencyShell subtitle="Sign in to select or create your agency. Client portal users skip this step.">
         <div className="flex w-full flex-col items-stretch gap-3">
@@ -94,31 +155,105 @@ function SelectAgencyPage() {
     );
   }
 
-  // Signed in, no pending task, already has org → soft hint to cockpit.
-  if (orgId) {
+  if (orgId && !pendingOrgTask) {
     return (
-      <AgencyShell subtitle="Agency already selected.">
-        <Link to="/app">
-          <Button>Open Cockpit</Button>
-        </Link>
+      <AgencyShell subtitle="Opening cockpit…">
+        <Button className="w-full" onClick={() => goToApp()} disabled={busy}>
+          Open Cockpit
+        </Button>
       </AgencyShell>
     );
   }
 
-  // Signed in without org (app needs one, no pending Clerk task).
+  if (!needsAgency) {
+    return (
+      <AgencyShell>
+        <Button className="w-full" onClick={() => void navigate({ to: "/app" })}>
+          Continue
+        </Button>
+      </AgencyShell>
+    );
+  }
+
+  const memberships = userMemberships?.data ?? [];
+
   return (
     <AgencyShell subtitle="Create or select an agency workspace to continue.">
-      <div className="flex w-full flex-col items-center gap-6">
-        <OrganizationList
-          hidePersonal
-          afterCreateOrganizationUrl="/onboarding"
-          afterSelectOrganizationUrl="/app"
-          appearance={clerkAppearance}
-        />
-        <CreateOrganization
-          afterCreateOrganizationUrl="/onboarding"
-          appearance={clerkAppearance}
-        />
+      <div className="mc-glass w-full space-y-5 rounded-[var(--radius-lg)] border border-[var(--color-mocha-surface1)] p-6">
+        <div className="text-center">
+          <h1 className="text-lg font-semibold text-[var(--color-mocha-text)]">
+            Setup your agency
+          </h1>
+          <p className="mt-1 text-sm text-[var(--color-mocha-subtext0)]">
+            Enter a name for your workspace
+          </p>
+        </div>
+
+        {orgsLoaded && memberships.length > 0 ? (
+          <div className="space-y-2">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-mocha-subtext0)]">
+              Your agencies
+            </p>
+            <ul className="space-y-2">
+              {memberships.map((m) => (
+                <li key={m.id}>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void activateOrg(m.organization.id)}
+                    className="w-full rounded-[var(--radius-sm)] border border-[var(--color-mocha-surface1)] bg-[var(--color-mocha-surface0)] px-3 py-2.5 text-left text-sm hover:border-[var(--color-brand-sky)] disabled:opacity-50"
+                  >
+                    {m.organization.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="relative py-2 text-center text-xs text-[var(--color-mocha-subtext0)]">
+              <span className="bg-[var(--color-mocha-surface0)] px-2">or create new</span>
+            </div>
+          </div>
+        ) : null}
+
+        <label className="block space-y-2 text-sm">
+          <span className="text-[var(--color-mocha-subtext0)]">Name</span>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={busy}
+            autoComplete="organization"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") void createAndContinue();
+            }}
+          />
+        </label>
+
+        {error ? (
+          <p className="text-sm text-[var(--color-mocha-red)]" role="alert">
+            {error}
+          </p>
+        ) : null}
+
+        <Button
+          className="w-full"
+          disabled={busy || !name.trim()}
+          onClick={() => void createAndContinue()}
+        >
+          {busy ? "Working…" : "Continue"}
+        </Button>
+
+        {user ? (
+          <p className="text-center text-xs text-[var(--color-mocha-subtext0)]">
+            Signed in as {user.primaryEmailAddress?.emailAddress}
+            {" · "}
+            <button
+              type="button"
+              className="text-[var(--color-brand-sky)] underline"
+              onClick={() => void clerk.signOut({ redirectUrl: "/" })}
+            >
+              Sign out
+            </button>
+          </p>
+        ) : null}
       </div>
     </AgencyShell>
   );
