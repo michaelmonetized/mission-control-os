@@ -290,6 +290,12 @@ export default defineSchema({
     .index("by_agency", ["agencyId"])
     .index("by_lastSeen", ["lastSeenAt"]),
 
+  /** Stripe webhook idempotency (B3). */
+  stripeWebhookEvents: defineTable({
+    eventId: v.string(),
+    processedAt: v.number(),
+  }).index("by_event", ["eventId"]),
+
   /**
    * Site structure graph from crawl (ADR-0008 Sitebulb-class site structure viz).
    * nodes: { id, url, path, depth, title? }

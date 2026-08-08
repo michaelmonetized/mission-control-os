@@ -273,31 +273,30 @@ Work top-down. Verify still valid on tip before coding.
 
 ### P0 / Critical
 
-- [ ] **R01** Scope crawl run mutations to caller agency — `convex/crawl.ts` · #21
-- [ ] **R02** Agency scope `streamFinding` / `completeRun` / `findingsForRun` — #21
-- [ ] **R03** UTF-8 head slice panic — `crawl.rs` · #42 · **fixed this PR**
-- [ ] **R04** Validate workspace-scoped tasks before update — `tasks.ts` · #22
-- [ ] **R05** Validate source task before promote — #22
-- [ ] **R44a** DEBUG-only mock mobile auth — #44 synth
-- [ ] **R46a** Tenant-bind agent complete/findings HTTP — #46 synth
+- [x] **R01–R02** Agency-scope crawl mutations — already on tip via `assertRunInAgency`
+- [x] **R03** UTF-8 head slice panic — fixed
+- [x] **R04–R05** Workspace-scope task update/promote — already on tip
+- [x] **R44a** DEBUG-only mock mobile auth — iOS `#if DEBUG` · Android BuildConfig.DEBUG
+- [x] **R46a** Tenant-bind agent HTTP via `agencyId` / `X-MC-Agency-Id` on claim/stream/complete
 
 ### P1 / Major (selected)
 
-- [ ] **R10** Single source of truth for Clerk org claims — #21  
-- [ ] **R11** Clerk issuer by deployment — #21  
-- [ ] **R12** Portal grants index / no full scan — #21  
-- [ ] **B1–B5** Stripe hardening suite — #42/#43  
-- [ ] **P1–P2** Prod API + deploy workflow — #40  
-- [ ] **TW1** Trigger poll timeout / overlap — #36/#42  
-- [ ] **DE1** Desktop Effect catchAll + timeouts — #42  
-- [ ] **SC1** Schedules `by_next` — #42  
-- [ ] **ST1** Structure max length + edge filter — #45 synth  
-- [ ] **CW1** CWV metrics ≠ finding spam — #46 synth  
-- [ ] **CSV1** Formula injection neutralize — #36  
+- [x] **R10** `requireAgency` helper + `orgClaims` single path  
+- [x] **R11** Clerk issuer from `CLERK_JWT_ISSUER_DOMAIN`  
+- [ ] **R12** Portal grants index / no full scan — still open (schema index add next)  
+- [x] **B1–B5** mockActivate blocked; portal admin; multi-v1 sig; event idempotency; cancelViaStripe  
+- [x] **P1–P2** Prod dual-write 501; deploy concurrency + pinned bun/vercel  
+- [x] **TW1** Trigger poll timeout / no overlap / interval validation  
+- [x] **DE1** Desktop Effect fetch timeouts + honest stopOk + catchAll  
+- [x] **SC1** Schedules `by_next` index for tickDue  
+- [x] **ST1** Structure max 200/500 + edge filter after truncate  
+- [x] **CW1** CWV snapshot noise removed (thresholds only)  
+- [x] **CSV1** Formula injection neutralize  
 
 ### P2 / Minor
 
-- [ ] Onboarding step bounds, accessible names, table dividers, Stripe multi-v1, billing promise rejections, favicon quotes, portal loading states — see git history of `REVIEW-TASKS.md` for full R-series.
+- [x] Onboarding step bounds (already), progress aria-label, portal loading, clerk appearance shared, social category union, multi-v1 Stripe, handoff note persist, handoff status reject  
+- [ ] Table dividers / remaining a11y nits — optional polish
 
 ---
 

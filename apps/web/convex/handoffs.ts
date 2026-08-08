@@ -169,7 +169,11 @@ export const completeInternal = internalMutation({
   handler: async (ctx, args) => {
     const row = await ctx.db.get(args.handoffId);
     if (!row) throw new Error("handoff not found");
-    await ctx.db.patch(args.handoffId, { status: args.status });
+    const payload =
+      args.note != null
+        ? { ...(typeof row.payload === "object" && row.payload ? row.payload : {}), note: args.note }
+        : row.payload;
+    await ctx.db.patch(args.handoffId, { status: args.status, payload });
     return { ok: true, id: args.handoffId, note: args.note };
   },
 });

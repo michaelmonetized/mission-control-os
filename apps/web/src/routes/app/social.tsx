@@ -17,7 +17,7 @@ function SocialPage() {
   const [weeks, setWeeks] = useState(4);
   const [body, setBody] = useState("");
   const [channel, setChannel] = useState("instagram");
-  const [category, setCategory] = useState("promo");
+  const [category, setCategory] = useState<"promo" | "edu" | "ugc" | "other">("promo");
   const recycle = useMutation(api.social.recyclePost);
   const [when, setWhen] = useState(() => {
     const d = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
@@ -136,7 +136,9 @@ function SocialPage() {
             <select
               className="rounded-[var(--radius-sm)] border border-[var(--color-mocha-surface1)] bg-[var(--color-mocha-surface0)] px-3 py-2 text-sm"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) =>
+                setCategory(e.target.value as "promo" | "edu" | "ugc" | "other")
+              }
             >
               <option value="promo">promo</option>
               <option value="edu">edu</option>

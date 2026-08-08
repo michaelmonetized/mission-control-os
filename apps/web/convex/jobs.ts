@@ -90,14 +90,32 @@ export const claimCrawl = mutation({
 });
 
 /** Internal: all queued crawls across agencies (agent HTTP with shared secret). */
+async function agencyIdForSite(
+  ctx: { db: any },
+  siteId: Id<"sites">,
+): Promise<Id<"agencies"> | null> {
+  const site = await ctx.db.get(siteId);
+  if (!site) return null;
+  const loc = await ctx.db.get(site.locationId);
+  if (!loc) return null;
+  const client = await ctx.db.get(loc.clientId);
+  if (!client) return null;
+  return client.agencyId as Id<"agencies">;
+}
+
 export const listQueuedInternal = internalQuery({
-  args: { limit: v.optional(v.number()) },
+  args: {
+    limit: v.optional(v.number()),
+    /** When set, only return jobs for this agency (tenant-bound agent). */
+    agencyId: v.optional(v.id("agencies")),
+  },
   handler: async (ctx, args) => {
     const runs = await ctx.db.query("crawlRuns").collect();
     const queued = runs.filter((r) => r.status === "queued");
     const out: {
       crawlRunId: Id<"crawlRuns">;
       siteId: Id<"sites">;
+      agencyId: Id<"agencies"> | null;
       origin: string;
       mode: string;
       ignoreRobots: boolean;
@@ -106,9 +124,12 @@ export const listQueuedInternal = internalQuery({
     for (const run of queued) {
       const site = await ctx.db.get(run.siteId);
       if (!site) continue;
+      const agencyId = await agencyIdForSite(ctx, site._id);
+      if (args.agencyId && agencyId !== args.agencyId) continue;
       out.push({
         crawlRunId: run._id,
         siteId: site._id,
+        agencyId,
         origin: site.origin,
         mode: run.mode,
         ignoreRobots: run.ignoreRobots,
@@ -121,18 +142,26 @@ export const listQueuedInternal = internalQuery({
 });
 
 export const claimInternal = internalMutation({
-  args: { crawlRunId: v.id("crawlRuns") },
+  args: {
+    crawlRunId: v.id("crawlRuns"),
+    agencyId: v.optional(v.id("agencies")),
+  },
   handler: async (ctx, args) => {
     const run = await ctx.db.get(args.crawlRunId);
     if (!run || run.status !== "queued") throw new Error("not claimable");
     const site = await ctx.db.get(run.siteId);
     if (!site) throw new Error("site missing");
+    const owner = await agencyIdForSite(ctx, site._id);
+    if (args.agencyId && owner !== args.agencyId) {
+      throw new Error("crawl run not in agency");
+    }
     await ctx.db.patch(args.crawlRunId, { status: "running" });
     return {
       crawlRunId: args.crawlRunId,
       origin: site.origin,
       mode: run.mode,
       ignoreRobots: run.ignoreRobots,
+      agencyId: owner,
     };
   },
 });
@@ -144,10 +173,15 @@ export const streamFindingInternal = internalMutation({
     severity: v.string(),
     url: v.string(),
     message: v.optional(v.string()),
+    agencyId: v.optional(v.id("agencies")),
   },
   handler: async (ctx, args) => {
     const run = await ctx.db.get(args.crawlRunId);
     if (!run) throw new Error("crawl run not found");
+    if (args.agencyId) {
+      const owner = await agencyIdForSite(ctx, run.siteId);
+      if (owner !== args.agencyId) throw new Error("crawl run not in agency");
+    }
     const findingId = await ctx.db.insert("auditFindings", {
       crawlRunId: args.crawlRunId,
       type: args.type,
@@ -208,10 +242,19 @@ export const completeInternal = internalMutation({
         edges: v.array(v.object({ from: v.string(), to: v.string() })),
       }),
     ),
+    agencyId: v.optional(v.id("agencies")),
   },
   handler: async (ctx, args) => {
     const run = await ctx.db.get(args.crawlRunId);
     if (!run) throw new Error("crawl run not found");
+    if (args.agencyId) {
+      const owner = await agencyIdForSite(ctx, run.siteId);
+      if (owner !== args.agencyId) throw new Error("crawl run not in agency");
+    }
+    if (args.structure) {
+      if (args.structure.nodes.length > 200) throw new Error("structure.nodes exceeds 200");
+      if (args.structure.edges.length > 500) throw new Error("structure.edges exceeds 500");
+    }
     const completedAt = Date.now();
     await ctx.db.patch(args.crawlRunId, { status: "completed", completedAt });
     await ctx.db.insert("metricsSnapshots", {

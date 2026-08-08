@@ -80,6 +80,8 @@ public struct SignInShellView: View {
       .background(Color(red: 0.192, green: 0.196, blue: 0.267))
       .clipShape(RoundedRectangle(cornerRadius: 12))
 
+      #if DEBUG
+      // Never ship mock identity in release (PRE-GTM R44a)
       VStack(spacing: 10) {
         Button {
           Task { await session.mockSignIn(as: .agencyStaff) }
@@ -98,6 +100,11 @@ public struct SignInShellView: View {
         }
         .buttonStyle(.bordered)
       }
+      #else
+      Text("Configure ClerkKit AuthView for production sign-in.")
+        .font(.caption)
+        .foregroundStyle(.secondary)
+      #endif
     }
     .padding(24)
     .frame(maxWidth: .infinity, maxHeight: .infinity)

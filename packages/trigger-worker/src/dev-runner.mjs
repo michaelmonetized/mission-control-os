@@ -5,12 +5,12 @@
  * Env:
  *   CONVEX_URL / VITE_CONVEX_URL — Convex site URL (https://….convex.site)
  *   MC_AGENT_SECRET — shared secret (same as agent HTTP)
- *   MC_TRIGGER_POLL_MS — poll interval (default 15000)
+ *   MC_TRIGGER_POLL_MS — poll interval (default 15000, min 5000, max 300000)
+ *   MC_TRIGGER_FETCH_MS — per-request timeout (default 20000)
  *   TRIGGER_SECRET_KEY — when set, logs prod-deploy hint for @trigger.dev/sdk
- *
- * Production: replace with @trigger.dev/sdk task `mc-automation-resume`.
  */
 import { z } from "zod";
+import { pathToFileURL } from "node:url";
 
 const Payload = z.object({
   automationId: z.string(),
@@ -20,15 +20,40 @@ const Payload = z.object({
   delayMs: z.number().optional(),
 });
 
-const intervalMs = Number(process.env.MC_TRIGGER_POLL_MS ?? 15_000);
+function parseIntervalMs() {
+  const raw = Number(process.env.MC_TRIGGER_POLL_MS ?? 15_000);
+  if (!Number.isFinite(raw) || raw < 5_000 || raw > 300_000) {
+    console.warn("[trigger-worker] MC_TRIGGER_POLL_MS invalid — using 15000");
+    return 15_000;
+  }
+  return Math.floor(raw);
+}
+
+const intervalMs = parseIntervalMs();
+const fetchTimeoutMs = Math.min(
+  120_000,
+  Math.max(3_000, Number(process.env.MC_TRIGGER_FETCH_MS ?? 20_000) || 20_000),
+);
 const convexUrl = (process.env.CONVEX_URL ?? process.env.VITE_CONVEX_URL ?? "").replace(/\/$/, "");
 const agentSecret = process.env.MC_AGENT_SECRET ?? "";
+
+let polling = false;
 
 function authHeaders() {
   return {
     "Content-Type": "application/json",
     ...(agentSecret ? { Authorization: `Bearer ${agentSecret}` } : {}),
   };
+}
+
+async function fetchWithTimeout(url, init = {}) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), fetchTimeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: ctrl.signal });
+  } finally {
+    clearTimeout(t);
+  }
 }
 
 /**
@@ -49,17 +74,21 @@ async function resume(payload) {
  * Claim + complete handoffs from Convex HTTP surface.
  */
 async function pollHandoffs() {
-  if (!convexUrl) {
-    console.log("[trigger-worker] no CONVEX_URL — mock tick only");
+  if (polling) {
+    console.log("[trigger-worker] skip tick — previous poll still running");
     return;
   }
+  polling = true;
   try {
-    const listRes = await fetch(`${convexUrl}/trigger/handoffs`, {
+    if (!convexUrl) {
+      console.log("[trigger-worker] no CONVEX_URL — mock tick only");
+      return;
+    }
+    const listRes = await fetchWithTimeout(`${convexUrl}/trigger/handoffs`, {
       headers: authHeaders(),
     });
     if (!listRes.ok) {
-      // Fallback liveness when routes not deployed yet
-      const health = await fetch(`${convexUrl}/agent/health`, {
+      const health = await fetchWithTimeout(`${convexUrl}/agent/health`, {
         headers: authHeaders(),
       });
       console.log(
@@ -75,7 +104,7 @@ async function pollHandoffs() {
     }
 
     for (const item of items.slice(0, 5)) {
-      const claimRes = await fetch(`${convexUrl}/trigger/handoffs/claim`, {
+      const claimRes = await fetchWithTimeout(`${convexUrl}/trigger/handoffs/claim`, {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({ handoffId: item.id }),
@@ -99,7 +128,7 @@ async function pollHandoffs() {
           idempotencyKey: String(data.idempotencyKey ?? item.id),
           delayMs,
         });
-        const done = await fetch(`${convexUrl}/trigger/handoffs/complete`, {
+        const done = await fetchWithTimeout(`${convexUrl}/trigger/handoffs/complete`, {
           method: "POST",
           headers: authHeaders(),
           body: JSON.stringify({
@@ -108,11 +137,9 @@ async function pollHandoffs() {
             note: "trigger-worker resume",
           }),
         });
-        console.log(
-          `[trigger-worker] completed ${item.id} → ${done.status}`,
-        );
+        console.log(`[trigger-worker] completed ${item.id} → ${done.status}`);
       } catch (e) {
-        await fetch(`${convexUrl}/trigger/handoffs/complete`, {
+        await fetchWithTimeout(`${convexUrl}/trigger/handoffs/complete`, {
           method: "POST",
           headers: authHeaders(),
           body: JSON.stringify({
@@ -120,17 +147,19 @@ async function pollHandoffs() {
             status: "failed",
             note: e instanceof Error ? e.message : String(e),
           }),
-        });
+        }).catch(() => null);
         console.log(`[trigger-worker] failed ${item.id}: ${e}`);
       }
     }
   } catch (e) {
     console.log(`[trigger-worker] poll error: ${e instanceof Error ? e.message : String(e)}`);
+  } finally {
+    polling = false;
   }
 }
 
 function start() {
-  console.log(`[trigger-worker] started (poll ${intervalMs}ms)`);
+  console.log(`[trigger-worker] started (poll ${intervalMs}ms, fetch timeout ${fetchTimeoutMs}ms)`);
   console.log(
     process.env.TRIGGER_SECRET_KEY
       ? "[trigger-worker] TRIGGER_SECRET_KEY present — use Trigger cloud deploy for prod"
@@ -145,14 +174,13 @@ function start() {
     void pollHandoffs();
   }, intervalMs);
 
-  // Immediate first poll
   void pollHandoffs();
 }
 
 const isMain =
   typeof process !== "undefined" &&
   process.argv[1] &&
-  (process.argv[1].endsWith("dev-runner.mjs") || process.argv[1].includes("trigger-worker"));
+  pathToFileURL(process.argv[1]).href === import.meta.url;
 
 if (isMain) {
   start();

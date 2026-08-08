@@ -212,7 +212,13 @@ export const createPortalSession = action({
       (rec.org_id as string | undefined) ??
       (rec.orgId as string | undefined) ??
       ((rec.o as { id?: string } | undefined)?.id);
+    const orgRole =
+      (rec.org_role as string | undefined) ??
+      (rec.orgRole as string | undefined) ??
+      ((rec.o as { rol?: string } | undefined)?.rol);
+    const isAdmin = orgRole === "org:admin" || orgRole === "admin";
     if (!orgId) throw new Error("No active Agency organization");
+    if (!isAdmin) throw new Error("Admin only");
 
     const secret = stripeSecret();
     if (!secret) {
@@ -286,6 +292,7 @@ export const getSubByAgencyInternal = internalQuery({
 export const applyStripeEvent = internalMutation({
   args: {
     type: v.string(),
+    eventId: v.optional(v.string()),
     agencyId: v.optional(v.string()),
     stripeCustomerId: v.optional(v.string()),
     stripeSubscriptionId: v.optional(v.string()),
@@ -303,6 +310,15 @@ export const applyStripeEvent = internalMutation({
     currentPeriodEnd: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    // Idempotency / out-of-order guard (B3)
+    if (args.eventId) {
+      const seen = await ctx.db
+        .query("stripeWebhookEvents")
+        .withIndex("by_event", (q) => q.eq("eventId", args.eventId!))
+        .unique();
+      if (seen) return { ok: true as const, reason: "duplicate" as const };
+    }
+
     if (
       !args.agencyId ||
       !args.stripeCustomerId ||
@@ -364,6 +380,13 @@ export const applyStripeEvent = internalMutation({
       createdAt: Date.now(),
     });
 
+    if (args.eventId) {
+      await ctx.db.insert("stripeWebhookEvents", {
+        eventId: args.eventId,
+        processedAt: Date.now(),
+      });
+    }
+
     return { ok: true as const };
   },
 });
@@ -377,6 +400,10 @@ export const mockActivate = mutation({
     plan: v.union(v.literal("starter"), v.literal("pro"), v.literal("enterprise")),
   },
   handler: async (ctx, args) => {
+    // Block mock when real Stripe is configured (B1)
+    if (process.env.STRIPE_SECRET_KEY?.trim()) {
+      throw new Error("mockActivate disabled when STRIPE_SECRET_KEY is set — use Checkout");
+    }
     const { clerkOrgId, isAdmin } = await requireAgencyOrg(ctx);
     if (!isAdmin) throw new Error("Admin only");
     const agency = await getAgencyByClerkOrg(ctx, clerkOrgId);
@@ -409,6 +436,9 @@ export const mockActivate = mutation({
   },
 });
 
+/**
+ * Mark canceled locally. Prefer cancelViaStripe action when live keys present.
+ */
 export const cancelMine = mutation({
   args: {},
   handler: async (ctx) => {
@@ -421,7 +451,84 @@ export const cancelMine = mutation({
       .withIndex("by_agency", (q) => q.eq("agencyId", agency._id))
       .unique();
     if (!existing) return { ok: false, reason: "no_subscription" as const };
+    if (
+      process.env.STRIPE_SECRET_KEY?.trim() &&
+      existing.stripeSubscriptionId &&
+      !existing.stripeSubscriptionId.startsWith("sub_mock_")
+    ) {
+      throw new Error("Use cancelViaStripe when Stripe is configured");
+    }
     await ctx.db.patch(existing._id, { status: "canceled" });
+    return { ok: true };
+  },
+});
+
+export const markCanceledInternal = internalMutation({
+  args: { agencyId: v.id("agencies") },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_agency", (q) => q.eq("agencyId", args.agencyId))
+      .unique();
+    if (!existing) return { ok: false as const };
+    await ctx.db.patch(existing._id, { status: "canceled" });
+    return { ok: true as const };
+  },
+});
+
+/** Cancel at Stripe then patch local row (B5). */
+export const cancelViaStripe = action({
+  args: {},
+  handler: async (
+    ctx,
+  ): Promise<{ ok: true } | { ok: false; error: string }> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthenticated");
+    const rec = identity as Record<string, unknown>;
+    const orgId =
+      (rec.org_id as string | undefined) ??
+      (rec.orgId as string | undefined) ??
+      ((rec.o as { id?: string } | undefined)?.id);
+    const orgRole =
+      (rec.org_role as string | undefined) ??
+      (rec.orgRole as string | undefined) ??
+      ((rec.o as { rol?: string } | undefined)?.rol);
+    if (!orgId) throw new Error("No active Agency organization");
+    if (orgRole !== "org:admin" && orgRole !== "admin") throw new Error("Admin only");
+
+    const secret = stripeSecret();
+    if (!secret) {
+      return { ok: false, error: "STRIPE_SECRET_KEY not configured" };
+    }
+    const agency: { _id: Id<"agencies">; name: string; clerkOrgId: string } | null =
+      await ctx.runQuery(internal.billing.getAgencyByClerkOrgInternal, {
+        clerkOrgId: orgId,
+      });
+    if (!agency) throw new Error("Agency not found");
+    const existing = await ctx.runQuery(internal.billing.getSubByAgencyInternal, {
+      agencyId: agency._id,
+    });
+    if (!existing?.stripeSubscriptionId || existing.stripeSubscriptionId.startsWith("sub_mock_")) {
+      return { ok: false, error: "No live Stripe subscription" };
+    }
+
+    const res = await fetch(
+      `https://api.stripe.com/v1/subscriptions/${existing.stripeSubscriptionId}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${secret}` },
+      },
+    );
+    if (!res.ok) {
+      const err = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
+      return {
+        ok: false,
+        error: err.error?.message ?? `Stripe cancel HTTP ${res.status}`,
+      };
+    }
+    await ctx.runMutation(internal.billing.markCanceledInternal, {
+      agencyId: agency._id,
+    });
     return { ok: true };
   },
 });

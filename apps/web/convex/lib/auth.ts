@@ -52,3 +52,16 @@ export async function getAgencyByClerkOrg(ctx: AuthCtx, clerkOrgId: string) {
     .withIndex("by_clerkOrg", (q) => q.eq("clerkOrgId", clerkOrgId))
     .unique();
 }
+
+/**
+ * Single helper for agency staff mutations/queries (ADR-0015).
+ * requireAgencyOrg + load agency row; throws if missing.
+ */
+export async function requireAgency(ctx: AuthCtx) {
+  const claims = await requireAgencyOrg(ctx);
+  const agency = await getAgencyByClerkOrg(ctx, claims.clerkOrgId);
+  if (!agency) {
+    throw new Error("Agency not found — complete onboarding first");
+  }
+  return { ...claims, agency };
+}

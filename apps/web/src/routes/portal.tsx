@@ -167,10 +167,12 @@ function ClientPortalHome() {
                 <CardDescription>Workspace scoped to your grant</CardDescription>
               </CardHeader>
               <CardContent className="space-y-1 text-sm">
-                {(portalContacts ?? []).length === 0 ? (
+                {portalContacts === undefined ? (
+                  <p className="text-[var(--color-mocha-subtext0)]">Loading contacts…</p>
+                ) : portalContacts.length === 0 ? (
                   <p className="text-[var(--color-mocha-subtext0)]">No contacts yet.</p>
                 ) : (
-                  (portalContacts ?? []).map((c) => (
+                  portalContacts.map((c) => (
                     <div key={c.id} className="mc-glass px-3 py-2 rounded-md">
                       {c.name}
                       {c.email ? (

@@ -96,21 +96,41 @@ fun SignInShell(
     }
 
     Spacer(Modifier.height(16.dp))
-    Button(
-      onClick = { viewModel.mockSignIn(AuthSurface.AgencyStaff) },
-      modifier = Modifier.fillMaxWidth(),
-    ) {
-      Text("Continue as Agency staff (mock)")
-    }
-    Spacer(Modifier.height(8.dp))
-    OutlinedButton(
-      onClick = { viewModel.mockSignIn(AuthSurface.ClientPortal) },
-      modifier = Modifier.fillMaxWidth(),
-    ) {
-      Text("Continue as Client portal (mock)")
+    // Mock identity only in debug builds (PRE-GTM R44a)
+    if (isDebugBuild()) {
+      Button(
+        onClick = { viewModel.mockSignIn(AuthSurface.AgencyStaff) },
+        modifier = Modifier.fillMaxWidth(),
+      ) {
+        Text("Continue as Agency staff (mock)")
+      }
+      Spacer(Modifier.height(8.dp))
+      OutlinedButton(
+        onClick = { viewModel.mockSignIn(AuthSurface.ClientPortal) },
+        modifier = Modifier.fillMaxWidth(),
+      ) {
+        Text("Continue as Client portal (mock)")
+      }
+    } else {
+      Text(
+        "Wire Clerk AuthView for production sign-in.",
+        color = MochaText.copy(alpha = 0.65f),
+        style = MaterialTheme.typography.bodySmall,
+      )
     }
   }
 }
+
+/** True unless release minify / non-debug package. Scaffold without BuildConfig. */
+private fun isDebugBuild(): Boolean =
+  try {
+    Class.forName("com.missioncontrol.app.BuildConfig")
+      .getField("DEBUG")
+      .getBoolean(null)
+  } catch (_: Throwable) {
+    // No BuildConfig in pure scaffold — treat as debug for local Compose previews only
+    true
+  }
 
 @Composable
 fun PortalScreen(

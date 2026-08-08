@@ -1,15 +1,18 @@
 /**
  * Clerk JWT validation for Convex (Agency org claims on session token).
  *
- * Domain = Clerk Frontend API host for Mission Control OS (dev).
- * When a production Clerk instance is added, append another provider entry
- * (or replace this domain). Convex requires auth.config domains to be static
- * or fully declared as deployment env vars before deploy.
+ * Set CLERK_JWT_ISSUER_DOMAIN on each Convex deployment
+ * (e.g. https://your-instance.clerk.accounts.dev or https://clerk.example.com).
+ * Falls back to the known dev Frontend API host for local work.
  */
+const clerkDomain =
+  process.env.CLERK_JWT_ISSUER_DOMAIN?.replace(/\/$/, "") ||
+  "https://famous-salmon-94.clerk.accounts.dev";
+
 export default {
   providers: [
     {
-      domain: "https://famous-salmon-94.clerk.accounts.dev",
+      domain: clerkDomain,
       applicationID: "convex",
     },
   ],

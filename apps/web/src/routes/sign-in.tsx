@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SignIn } from "@clerk/react";
 import { LogoLockup } from "@/components/mc/logo";
+import { clerkAppearance } from "@/lib/clerk-appearance";
 
 export const Route = createFileRoute("/sign-in")({
   component: SignInPage,
@@ -15,13 +16,7 @@ function SignInPage() {
         path="/sign-in"
         signUpUrl="/sign-up"
         forceRedirectUrl="/app"
-        appearance={{
-          variables: {
-            colorPrimary: "#89dceb",
-            colorBackground: "#1e1e2e",
-            borderRadius: "0.75rem",
-          },
-        }}
+        appearance={clerkAppearance}
       />
     </div>
   );

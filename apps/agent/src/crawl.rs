@@ -866,17 +866,7 @@ fn apply_cwv_findings(findings: &mut Vec<Finding>, m: &CwvMetrics) {
             format!("FCP {:.0}ms needs improvement", m.fcp_ms),
         );
     }
-    // Always emit a summary finding at info/low for dashboard visibility
-    push_finding(
-        findings,
-        "cwv_snapshot",
-        "low",
-        &m.url,
-        format!(
-            "CWV LCP={:.0}ms CLS={:.3} FCP={:.0}ms TTFB={:.0}ms load={:.0}ms",
-            m.lcp_ms, m.cls, m.fcp_ms, m.ttfb_ms, m.load_ms
-        ),
-    );
+    // Metrics are written to artifacts/cwv_*.json — only threshold breaches become findings
 }
 
 fn fetch_robots_disallow(origin: &str) -> Result<HashSet<String>, String> {

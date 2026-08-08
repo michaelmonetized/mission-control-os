@@ -6,15 +6,18 @@ export function Progress({
   value = 0,
   className,
   indicatorClassName,
+  "aria-label": ariaLabel = "Progress",
 }: {
   value?: number;
   className?: string;
   indicatorClassName?: string;
+  "aria-label"?: string;
 }) {
   const pct = Math.max(0, Math.min(100, value));
   return (
     <div
       role="progressbar"
+      aria-label={ariaLabel}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={pct}

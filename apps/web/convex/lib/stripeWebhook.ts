@@ -44,15 +44,15 @@ export async function verifyStripeSignature(
   toleranceSec = 300,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (!signatureHeader) return { ok: false, error: "missing Stripe-Signature" };
-  const parts = Object.fromEntries(
-    signatureHeader.split(",").map((p) => {
-      const [k, ...rest] = p.trim().split("=");
-      return [k, rest.join("=")];
-    }),
-  ) as Record<string, string>;
-  const t = parts.t;
-  const v1 = parts.v1;
-  if (!t || !v1) return { ok: false, error: "malformed Stripe-Signature" };
+  let t: string | undefined;
+  const v1List: string[] = [];
+  for (const part of signatureHeader.split(",")) {
+    const [k, ...rest] = part.trim().split("=");
+    const val = rest.join("=");
+    if (k === "t") t = val;
+    if (k === "v1" && val) v1List.push(val);
+  }
+  if (!t || v1List.length === 0) return { ok: false, error: "malformed Stripe-Signature" };
 
   const ts = Number(t);
   if (!Number.isFinite(ts)) return { ok: false, error: "bad timestamp" };
@@ -60,7 +60,7 @@ export async function verifyStripeSignature(
   if (skew > toleranceSec) return { ok: false, error: "timestamp outside tolerance" };
 
   const expected = await hmacSha256Hex(webhookSecret, `${t}.${rawBody}`);
-  if (!timingSafeEqual(expected, v1)) {
+  if (!v1List.some((v1) => timingSafeEqual(expected, v1))) {
     return { ok: false, error: "signature mismatch" };
   }
   return { ok: true };

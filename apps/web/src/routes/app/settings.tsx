@@ -23,6 +23,7 @@ function SettingsPage() {
   const billing = useQuery(api.billing.getMine, {});
   const mockActivate = useMutation(api.billing.mockActivate);
   const cancelBilling = useMutation(api.billing.cancelMine);
+  const cancelViaStripe = useAction(api.billing.cancelViaStripe);
   const createCheckout = useAction(api.billing.createCheckoutSession);
   const createPortal = useAction(api.billing.createPortalSession);
   const fireWebhook = useAction(api.webhooks.fire);
@@ -207,11 +208,35 @@ function SettingsPage() {
             {billing?.plan ? (
               <Button
                 variant="ghost"
-                onClick={() =>
-                  void cancelBilling().then(() => setBillNote("Subscription marked canceled (local)"))
-                }
+                disabled={billBusy}
+                onClick={() => {
+                  setBillBusy(true);
+                  const run = billing.hasCustomer
+                    ? cancelViaStripe({})
+                    : cancelBilling();
+                  void run
+                    .then((r) => {
+                      if (r && "ok" in r && r.ok === false) {
+                        setBillNote(
+                          "error" in r && r.error
+                            ? String(r.error)
+                            : "Cancel failed",
+                        );
+                        return;
+                      }
+                      setBillNote(
+                        billing.hasCustomer
+                          ? "Canceled at Stripe"
+                          : "Subscription marked canceled (local)",
+                      );
+                    })
+                    .catch((e) =>
+                      setBillNote(e instanceof Error ? e.message : "Cancel failed"),
+                    )
+                    .finally(() => setBillBusy(false));
+                }}
               >
-                Mark canceled
+                {billing.hasCustomer ? "Cancel at Stripe" : "Mark canceled"}
               </Button>
             ) : null}
           </div>

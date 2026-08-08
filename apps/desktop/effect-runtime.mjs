@@ -24,9 +24,19 @@ const execFileAsync = promisify(execFile);
  * }} deps
  */
 export function registerEffectOrchestration(deps) {
+  async function fetchWithTimeout(url, init = {}, ms = 8000) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ms);
+    try {
+      return await fetch(url, { ...init, signal: ctrl.signal });
+    } finally {
+      clearTimeout(t);
+    }
+  }
+
   const healthFn = async () => {
     try {
-      const res = await fetch(
+      const res = await fetchWithTimeout(
         `${deps.controlPlane.replace(/\/$/, "")}/api/agent/heartbeat`,
         {
           method: "POST",
@@ -43,7 +53,7 @@ export function registerEffectOrchestration(deps) {
   const heartbeatFn = async () => {
     try {
       const secret = deps.readSecret();
-      const res = await fetch(
+      const res = await fetchWithTimeout(
         `${deps.controlPlane.replace(/\/$/, "")}/api/agent/heartbeat`,
         {
           method: "POST",
@@ -62,18 +72,20 @@ export function registerEffectOrchestration(deps) {
   };
 
   const stopFn = async () => {
-    // Best-effort: launchctl unload / systemctl --user stop when install scripts present
+    // Best-effort: launchctl unload — only ok when unload succeeds or plist missing
     try {
       if (process.platform === "darwin") {
         const plist = path.join(
           app.getPath("home"),
           "Library/LaunchAgents/com.missioncontrol.agent.plist",
         );
-        if (fs.existsSync(plist)) {
-          await execFileAsync("launchctl", ["unload", plist]).catch(() => null);
+        if (!fs.existsSync(plist)) {
+          return { ok: true, detail: "no plist" };
         }
+        await execFileAsync("launchctl", ["unload", plist]);
+        return { ok: true, detail: "unloaded" };
       }
-      return { ok: true };
+      return { ok: false, error: "stop not implemented for this platform" };
     } catch (e) {
       return { ok: false, error: String(e) };
     }

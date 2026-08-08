@@ -141,23 +141,36 @@ export const streamFinding = mutation({
   },
 });
 
+const structureNode = v.object({
+  id: v.string(),
+  url: v.string(),
+  path: v.string(),
+  depth: v.number(),
+  title: v.optional(v.string()),
+  outDegree: v.optional(v.number()),
+});
+
 const structureValidator = v.object({
   origin: v.string(),
   maxDepth: v.number(),
   nodeCount: v.number(),
   edgeCount: v.number(),
-  nodes: v.array(
-    v.object({
-      id: v.string(),
-      url: v.string(),
-      path: v.string(),
-      depth: v.number(),
-      title: v.optional(v.string()),
-      outDegree: v.optional(v.number()),
-    }),
-  ),
+  nodes: v.array(structureNode),
   edges: v.array(v.object({ from: v.string(), to: v.string() })),
 });
+
+/** Cap structure payload size (agent also caps 200/500). */
+function assertStructureBounds(structure: {
+  nodes: unknown[];
+  edges: unknown[];
+}) {
+  if (structure.nodes.length > 200) {
+    throw new Error("structure.nodes exceeds 200");
+  }
+  if (structure.edges.length > 500) {
+    throw new Error("structure.edges exceeds 500");
+  }
+}
 
 export const completeRun = mutation({
   args: {
@@ -188,6 +201,7 @@ export const completeRun = mutation({
       ...args.metrics,
     });
     if (args.structure) {
+      assertStructureBounds(args.structure);
       await ctx.db.insert("siteStructures", {
         siteId: scoped.run.siteId,
         crawlRunId: args.crawlRunId,

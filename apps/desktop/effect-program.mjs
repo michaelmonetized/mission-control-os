@@ -68,13 +68,13 @@ export async function runAgentStatusEffect(services) {
     const healthOk = yield* Effect.tryPromise({
       try: () => services.health(),
       catch: () => false,
-    });
+    }).pipe(Effect.catchAll(() => Effect.succeed(false)));
     let heartbeatOk = null;
     if (typeof services.heartbeat === "function") {
       const hb = yield* Effect.tryPromise({
         try: () => services.heartbeat(),
         catch: () => ({ ok: false }),
-      });
+      }).pipe(Effect.catchAll(() => Effect.succeed({ ok: false })));
       heartbeatOk = Boolean(hb?.ok);
     }
     return {

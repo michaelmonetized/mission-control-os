@@ -578,6 +578,7 @@ function AuditPage() {
                     <span>{history[history.length - 1]?.pages ?? 0}</span>
                   </div>
                   <Progress
+                    aria-label="Latest pages retrieved"
                     value={Math.min(
                       100,
                       ((history[history.length - 1]?.pages ?? 0) / 50) * 100,

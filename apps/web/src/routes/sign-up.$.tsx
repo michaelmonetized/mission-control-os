@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SignUp } from "@clerk/react";
 import { LogoLockup } from "@/components/mc/logo";
+import { clerkAppearance } from "@/lib/clerk-appearance";
 
 /** Catch-all for Clerk path routing (/sign-up/* multi-step + OAuth callbacks). */
 export const Route = createFileRoute("/sign-up/$")({
@@ -16,13 +17,7 @@ function SignUpCatchAll() {
         path="/sign-up"
         signInUrl="/sign-in"
         forceRedirectUrl="/onboarding"
-        appearance={{
-          variables: {
-            colorPrimary: "#89dceb",
-            colorBackground: "#1e1e2e",
-            borderRadius: "0.75rem",
-          },
-        }}
+        appearance={clerkAppearance}
       />
     </div>
   );

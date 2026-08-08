@@ -23,6 +23,15 @@ function checkAgentSecret(req: Request) {
   return token === secret;
 }
 
+/** Prefer header; body agencyId used for tenant-bound agent ops. */
+function agencyIdFrom(req: Request, body?: { agencyId?: string }) {
+  return (
+    req.headers.get("X-MC-Agency-Id") ??
+    body?.agencyId ??
+    undefined
+  );
+}
+
 http.route({
   path: "/agent/health",
   method: "GET",
@@ -109,6 +118,12 @@ http.route({
     if (!body.handoffId) {
       return Response.json({ ok: false, error: "handoffId required" }, { status: 400 });
     }
+    if (body.status != null && body.status !== "done" && body.status !== "failed") {
+      return Response.json(
+        { ok: false, error: "status must be done|failed" },
+        { status: 400 },
+      );
+    }
     try {
       const res = await ctx.runMutation(internal.handoffs.completeInternal, {
         handoffId: body.handoffId as any,
@@ -130,8 +145,10 @@ http.route({
   method: "GET",
   handler: httpAction(async (ctx, req) => {
     if (!checkAgentSecret(req)) return unauthorized();
+    const agencyId = agencyIdFrom(req);
     const jobs = await ctx.runQuery(internal.jobs.listQueuedInternal, {
       limit: 10,
+      agencyId: agencyId as any,
     });
     return Response.json({ ok: true, data: { items: jobs } });
   }),
@@ -142,13 +159,17 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, req) => {
     if (!checkAgentSecret(req)) return unauthorized();
-    const body = (await req.json().catch(() => ({}))) as { crawlRunId?: string };
+    const body = (await req.json().catch(() => ({}))) as {
+      crawlRunId?: string;
+      agencyId?: string;
+    };
     if (!body.crawlRunId) {
       return Response.json({ ok: false, error: "crawlRunId required" }, { status: 400 });
     }
     try {
       const job = await ctx.runMutation(internal.jobs.claimInternal, {
         crawlRunId: body.crawlRunId as any,
+        agencyId: agencyIdFrom(req, body) as any,
       });
       return Response.json({ ok: true, data: job });
     } catch (e) {
@@ -167,6 +188,7 @@ http.route({
     if (!checkAgentSecret(req)) return unauthorized();
     const body = (await req.json().catch(() => ({}))) as {
       crawlRunId?: string;
+      agencyId?: string;
       type?: string;
       severity?: string;
       url?: string;
@@ -178,6 +200,7 @@ http.route({
         message?: string;
       }[];
     };
+    const agencyId = agencyIdFrom(req, body) as any;
     if (body.crawlRunId && Array.isArray(body.findings)) {
       const ids: unknown[] = [];
       for (const f of body.findings) {
@@ -188,6 +211,7 @@ http.route({
             severity: f.severity ?? "medium",
             url: f.url,
             message: f.message,
+            agencyId,
           });
           ids.push(res.findingId);
         } catch {
@@ -206,6 +230,7 @@ http.route({
         severity: body.severity ?? "medium",
         url: body.url,
         message: body.message,
+        agencyId,
       });
       return Response.json({ ok: true, data: res });
     } catch (e) {
@@ -224,6 +249,7 @@ http.route({
     if (!checkAgentSecret(req)) return unauthorized();
     const body = (await req.json().catch(() => ({}))) as {
       crawlRunId?: string;
+      agencyId?: string;
       metrics?: {
         brokenLinks: number;
         missingAlt: number;
@@ -254,6 +280,7 @@ http.route({
         crawlRunId: body.crawlRunId as any,
         metrics: body.metrics,
         structure: body.structure,
+        agencyId: agencyIdFrom(req, body) as any,
       });
       return Response.json({ ok: true, data: res });
     } catch (e) {
@@ -294,7 +321,11 @@ http.route({
       return Response.json({ ok: false, error: verified.error }, { status: 400 });
     }
 
-    let event: { type: string; data?: { object?: Record<string, unknown> } };
+    let event: {
+      id?: string;
+      type: string;
+      data?: { object?: Record<string, unknown> };
+    };
     try {
       event = JSON.parse(rawBody);
     } catch {
@@ -313,6 +344,7 @@ http.route({
     ) {
       const res = await ctx.runMutation(internal.billing.applyStripeEvent, {
         type: n.type,
+        eventId: event.id,
         agencyId: n.agencyId,
         stripeCustomerId: n.stripeCustomerId,
         stripeSubscriptionId: n.stripeSubscriptionId,

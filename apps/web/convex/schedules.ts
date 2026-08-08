@@ -132,8 +132,12 @@ export const tickDue = internalMutation({
   handler: async (ctx) => {
     const now = Date.now();
     const ONLINE_MS = 10 * 60_000;
-    const all = await ctx.db.query("crawlSchedules").collect();
-    const due = all.filter((s) => s.enabled && s.nextRunAt <= now);
+    // Prefer by_next index: due rows are those with nextRunAt <= now
+    const candidates = await ctx.db
+      .query("crawlSchedules")
+      .withIndex("by_next", (q) => q.lte("nextRunAt", now))
+      .take(50);
+    const due = candidates.filter((s) => s.enabled);
     let queued = 0;
 
     for (const sched of due) {

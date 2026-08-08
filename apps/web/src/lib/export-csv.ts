@@ -13,7 +13,9 @@ export function downloadCsv(filename: string, rows: Record<string, unknown>[]) {
     }, new Set<string>()),
   );
   const escape = (v: unknown) => {
-    const s = v == null ? "" : String(v);
+    let s = v == null ? "" : String(v);
+    // Neutralize spreadsheet formula injection (CSV open in Excel/Sheets)
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
     if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
     return s;
   };

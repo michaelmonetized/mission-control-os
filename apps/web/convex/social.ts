@@ -70,7 +70,14 @@ export const schedulePost = mutation({
     scheduledAt: v.number(),
     mediaUrls: v.optional(v.array(v.string())),
     link: v.optional(v.string()),
-    category: v.optional(v.string()),
+    category: v.optional(
+      v.union(
+        v.literal("promo"),
+        v.literal("edu"),
+        v.literal("ugc"),
+        v.literal("other"),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
     const { clerkOrgId } = await requireAgencyOrg(ctx);
