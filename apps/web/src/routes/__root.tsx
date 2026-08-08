@@ -67,18 +67,20 @@ function AppProviders({ children }: { children: React.ReactNode }) {
     );
   }
 
+  // Never pass publishableKey="" — that overrides SSR/middleware init state and
+  // leaves Clerk dead (isSignedIn false, SignInButton no-ops).
+  const clerkProps = {
+    afterSignOutUrl: "/",
+    signInUrl: "/sign-in",
+    signUpUrl: "/sign-up",
+    taskUrls: {
+      "choose-organization": "/select-agency",
+    },
+    ...(publishableKey ? { publishableKey } : {}),
+  } as const;
+
   return (
-    <ClerkProvider
-      publishableKey={publishableKey ?? ""}
-      afterSignOutUrl="/"
-      signInUrl="/sign-in"
-      signUpUrl="/sign-up"
-      // Prefer fallback so session tasks (choose-organization) are not overridden
-      // by a hard forceRedirect — avoids /app ↔ /select-agency ↔ /sign-in loops.
-      taskUrls={{
-        "choose-organization": "/select-agency",
-      }}
-    >
+    <ClerkProvider {...clerkProps}>
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
         {children}
       </ConvexProviderWithClerk>

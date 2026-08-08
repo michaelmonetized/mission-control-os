@@ -1,4 +1,4 @@
-import { useAuth, useOrganization, SignInButton } from "@clerk/tanstack-react-start";
+import { useAuth, useOrganization, useSession } from "@clerk/tanstack-react-start";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Button } from "@/components/mc/button";
@@ -6,22 +6,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 /** Agency cockpit: must be signed in + active Clerk Organization (ADR-0015). */
 export function AgencyGate({ children }: { children: React.ReactNode }) {
-  const { isLoaded, isSignedIn, orgId, orgRole } = useAuth();
+  const { isLoaded, isSignedIn, orgId, orgRole } = useAuth({
+    treatPendingAsSignedOut: false,
+  });
+  const { session, isLoaded: sessionLoaded } = useSession();
   const { organization } = useOrganization();
   const navigate = useNavigate();
 
-  // Prefer a single org-selection surface (/select-agency) over embedding
-  // OrganizationList on every gated route — avoids fighting Clerk taskUrls.
+  const pendingOrgTask = session?.currentTask?.key === "choose-organization";
+
+  // Org selection (task or missing org) → single surface /select-agency.
   useEffect(() => {
-    if (isLoaded && isSignedIn && !orgId) {
+    if (!isLoaded || !sessionLoaded) return;
+    if (pendingOrgTask || (isSignedIn && !orgId)) {
       void navigate({ to: "/select-agency" });
     }
-  }, [isLoaded, isSignedIn, orgId, navigate]);
+  }, [isLoaded, sessionLoaded, pendingOrgTask, isSignedIn, orgId, navigate]);
 
-  if (!isLoaded) {
+  if (!isLoaded || !sessionLoaded) {
     return (
       <div className="min-h-dvh flex items-center justify-center text-[var(--color-mocha-subtext0)]">
         Loading auth…
+      </div>
+    );
+  }
+
+  if (pendingOrgTask || (isSignedIn && !orgId)) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center text-[var(--color-mocha-subtext0)]">
+        Selecting Agency…
       </div>
     );
   }
@@ -38,9 +51,9 @@ export function AgencyGate({ children }: { children: React.ReactNode }) {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <SignInButton mode="modal" fallbackRedirectUrl="/app">
+            <Link to="/sign-in" className="w-full">
               <Button className="w-full">Sign in</Button>
-            </SignInButton>
+            </Link>
             <Link to="/sign-up" className="text-sm text-center text-[var(--color-brand-sky)]">
               Create account
             </Link>
@@ -49,14 +62,6 @@ export function AgencyGate({ children }: { children: React.ReactNode }) {
             </Link>
           </CardContent>
         </Card>
-      </div>
-    );
-  }
-
-  if (!orgId) {
-    return (
-      <div className="min-h-dvh flex items-center justify-center text-[var(--color-mocha-subtext0)]">
-        Selecting Agency…
       </div>
     );
   }
@@ -91,9 +96,9 @@ export function PortalGate({ children }: { children: React.ReactNode }) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SignInButton mode="modal" fallbackRedirectUrl="/portal">
+            <Link to="/sign-in" className="w-full">
               <Button className="w-full">Sign in</Button>
-            </SignInButton>
+            </Link>
           </CardContent>
         </Card>
       </div>
