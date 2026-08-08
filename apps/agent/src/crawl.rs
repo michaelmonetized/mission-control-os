@@ -588,12 +588,14 @@ pub fn run_crawl(data_dir: &Path, opts: &CrawlOptions) -> Result<CrawlResult, St
             }
         }
     }
-    // Cap edges for payload size
-    if edges.len() > 500 {
-        edges.truncate(500);
-    }
+    // Cap payload: keep shallow nodes, then drop orphan edges
     if nodes.len() > 200 {
         nodes.truncate(200);
+    }
+    let keep: HashSet<String> = nodes.iter().map(|n| n.id.clone()).collect();
+    edges.retain(|e| keep.contains(&e.from) && keep.contains(&e.to));
+    if edges.len() > 500 {
+        edges.truncate(500);
     }
 
     let structure = SiteStructure {
@@ -973,8 +975,16 @@ fn extract_imgs_no_dimensions(html: &str) -> Vec<String> {
 /// Classic scripts in `<head>` without async/defer (render-blocking heuristic).
 fn count_render_blocking_scripts_in_head(html: &str) -> usize {
     let lower = html.to_ascii_lowercase();
-    let head_end = lower.find("</head>").unwrap_or(lower.len().min(50_000));
-    let head = &lower[..head_end];
+    // Cap head scan on a char boundary (UTF-8 safe) — avoid panic on multi-byte slice
+    let cap = lower
+        .char_indices()
+        .take_while(|(i, _)| *i < 50_000)
+        .map(|(i, c)| i + c.len_utf8())
+        .last()
+        .unwrap_or(0)
+        .min(lower.len());
+    let head_end = lower.find("</head>").unwrap_or(cap);
+    let head = &lower[..head_end.min(lower.len())];
     let mut count = 0usize;
     let mut idx = 0;
     while let Some(rel) = head[idx..].find("<script") {
