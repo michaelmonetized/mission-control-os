@@ -6,7 +6,7 @@ import { useIsAgencyAdmin } from "@/lib/auth-guards";
 import { AgentStatusBadge } from "@/components/layout/agent-status";
 
 const nav = [
-  { to: "/app", label: "Cockpit" },
+  { to: "/app", label: "Cockpit", exact: true },
   { to: "/app/clients", label: "Clients" },
   { to: "/app/crm", label: "CRM" },
   { to: "/app/pipeline", label: "Pipeline" },
@@ -34,40 +34,43 @@ export function CockpitShell({
   const isAdmin = useIsAgencyAdmin();
 
   return (
-    <div className="min-h-dvh flex flex-col">
-      <header
-        className="mc-glass sticky top-0 z-40 mx-4 mt-4 px-5 py-3 flex items-center justify-between gap-6"
-        style={{ borderRadius: "var(--radius-lg)" }}
-      >
-        <Link to="/" className="shrink-0">
-          <LogoLockup sky />
+    <div className="min-h-dvh flex bg-[var(--color-mocha-base)]">
+      <aside className="sticky top-0 flex h-dvh w-[13.5rem] shrink-0 flex-col border-r border-[var(--color-mocha-surface0)] bg-[var(--color-mocha-mantle)] px-2 py-3">
+        <Link to="/" className="mb-4 px-2">
+          <LogoLockup sky className="origin-left scale-[0.85]" />
         </Link>
-        <nav className="flex flex-wrap gap-1 text-sm">
+        <nav className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto">
           {nav.map((item) => (
             <Link
               key={item.to}
               to={item.to}
+              activeOptions={"exact" in item && item.exact ? { exact: true } : undefined}
               className={cn(
-                "px-3 py-1.5 rounded-[var(--radius-xs)] text-[var(--color-mocha-subtext0)] hover:text-[var(--color-brand-sky)] transition-colors",
+                "rounded-[var(--radius-xs)] px-2.5 py-1.5 text-sm text-[var(--color-mocha-subtext0)] transition-colors hover:bg-[var(--color-mocha-surface0)] hover:text-[var(--color-brand-sky)]",
               )}
               activeProps={{
                 className:
-                  "px-3 py-1.5 rounded-[var(--radius-xs)] text-[var(--color-brand-sky)] mc-neon-border bg-[color-mix(in_oklab,var(--color-brand-sky)_10%,transparent)]",
+                  "rounded-[var(--radius-xs)] px-2.5 py-1.5 text-sm text-[var(--color-brand-sky)] bg-[color-mix(in_oklab,var(--color-brand-sky)_12%,transparent)]",
               }}
             >
               {item.label}
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-3 shrink-0">
+        <p className="mt-2 px-2 text-[10px] text-[var(--color-mocha-overlay0)]">
+          <kbd className="font-mono text-[var(--color-brand-sky)]">;</kbd> palette ·{" "}
+          <kbd className="font-mono text-[var(--color-brand-sky)]">?</kbd> keys
+        </p>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-40 flex items-center justify-end gap-2 border-b border-[var(--color-mocha-surface0)] bg-[var(--color-mocha-base)]/90 px-3 py-2 backdrop-blur-md">
           {isSignedIn ? (
             <>
-              <span className="text-[10px] uppercase tracking-wide text-[var(--color-mocha-subtext0)] hidden lg:inline">
+              <span className="hidden text-[10px] uppercase tracking-wide text-[var(--color-mocha-subtext0)] sm:inline">
                 {isAdmin ? "Admin" : orgRole === "org:member" ? "Member" : "Staff"}
               </span>
-              <span className="hidden md:inline">
-                <AgentStatusBadge />
-              </span>
+              <AgentStatusBadge />
               <OrganizationSwitcher
                 hidePersonal
                 afterCreateOrganizationUrl="/onboarding"
@@ -76,30 +79,23 @@ export function CockpitShell({
                   elements: {
                     rootBox: "flex items-center",
                     organizationSwitcherTrigger:
-                      "text-[var(--color-mocha-text)] border border-[var(--color-mocha-surface1)] rounded-md px-2 py-1",
+                      "text-[var(--color-mocha-text)] border border-[var(--color-mocha-surface1)] rounded-md px-2 py-1 text-xs",
                   },
                 }}
               />
               <UserButton />
             </>
-          ) : (
-            <div className="text-xs text-[var(--color-mocha-subtext0)] hidden md:block">
-              <kbd className="mc-neu px-2 py-1 rounded-[var(--radius-xs)] text-[var(--color-brand-sky)]">
-                ⌘K
-              </kbd>{" "}
-              palette · vim j/k
-            </div>
-          )}
-        </div>
-      </header>
-      <main className="flex-1 px-4 py-8 max-w-[72rem] w-full mx-auto">
-        {title ? (
-          <h1 className="text-2xl font-semibold mb-6 text-[var(--color-mocha-text)] mc-sparse">
-            {title}
-          </h1>
-        ) : null}
-        {children}
-      </main>
+          ) : null}
+        </header>
+        <main className="flex-1 px-3 py-4 md:px-4 md:py-5">
+          {title ? (
+            <h1 className="mb-4 text-xl font-semibold text-[var(--color-mocha-text)]">
+              {title}
+            </h1>
+          ) : null}
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
