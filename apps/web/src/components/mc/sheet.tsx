@@ -38,7 +38,7 @@ export function SheetContent({
       role="dialog"
       aria-modal
       className={cn(
-        "absolute top-0 bottom-0 w-full max-w-md mc-glass border-[var(--color-mocha-surface1)] p-6 shadow-xl overflow-y-auto",
+        "absolute top-0 bottom-0 w-full max-w-[28rem] mc-glass border-[var(--color-mocha-surface1)] p-6 shadow-xl overflow-y-auto",
         side === "right" ? "right-0 border-l" : "left-0 border-r",
         className,
       )}

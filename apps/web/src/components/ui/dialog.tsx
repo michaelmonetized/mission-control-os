@@ -32,7 +32,7 @@ export function DialogContent({
       <DialogOverlay />
       <DialogPrimitive.Content
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 mc-glass p-6 shadow-lg rounded-[var(--radius-lg)] border border-[var(--color-mocha-surface1)]",
+          "fixed left-1/2 top-1/2 z-50 w-full max-w-[32rem] -translate-x-1/2 -translate-y-1/2 mc-glass p-6 shadow-lg rounded-[var(--radius-lg)] border border-[var(--color-mocha-surface1)]",
           className,
         )}
         {...props}

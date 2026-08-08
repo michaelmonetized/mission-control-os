@@ -92,7 +92,7 @@ export function CockpitShell({
           )}
         </div>
       </header>
-      <main className="flex-1 px-4 py-8 max-w-6xl w-full mx-auto">
+      <main className="flex-1 px-4 py-8 max-w-[72rem] w-full mx-auto">
         {title ? (
           <h1 className="text-2xl font-semibold mb-6 text-[var(--color-mocha-text)] mc-sparse">
             {title}

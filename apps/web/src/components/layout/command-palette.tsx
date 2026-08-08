@@ -157,7 +157,7 @@ export function CommandPaletteHost() {
         aria-label="Close palette"
         onClick={() => setOpen(false)}
       />
-      <div className="relative w-full max-w-lg mc-glass rounded-[var(--radius-lg)] shadow-2xl overflow-hidden border border-[var(--color-mocha-surface1)]">
+      <div className="relative w-full max-w-[32rem] mc-glass rounded-[var(--radius-lg)] shadow-2xl overflow-hidden border border-[var(--color-mocha-surface1)]">
         <div className="px-3 py-2 border-b border-[var(--color-mocha-surface1)] flex items-center gap-2">
           <span className="text-xs text-[var(--color-brand-sky)]">⌘K</span>
           <input

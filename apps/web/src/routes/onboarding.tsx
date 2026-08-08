@@ -96,7 +96,7 @@ function Onboarding() {
 
   return (
     <CockpitShell title="Agency Onboarding">
-      <p className="text-[var(--color-mocha-subtext0)] mb-6 max-w-2xl">
+      <p className="text-[var(--color-mocha-subtext0)] mb-6 max-w-[42rem]">
         Guided full-OS spine (ADR-0040).{" "}
         <strong className="text-[var(--color-brand-sky)]">You are your first Client</strong> — Self
         Client is created automatically when the Agency is ensured in Convex.
@@ -117,7 +117,7 @@ function Onboarding() {
           </li>
         ))}
       </ol>
-      <Card className="max-w-lg">
+      <Card className="max-w-[32rem]">
         <CardHeader>
           <CardTitle>
             Step {step + 1}: {steps[step]}

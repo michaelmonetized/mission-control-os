@@ -33,7 +33,7 @@ function CockpitHome() {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-2">Cockpit</h1>
-      <p className="text-[var(--color-mocha-subtext0)] mb-6 max-w-2xl">
+      <p className="text-[var(--color-mocha-subtext0)] mb-6 max-w-[42rem]">
         Sparse Mission Control shell. ⌘K palette (vim j/k · Superhuman-ish binds). Self Client is live
         after onboarding.
       </p>

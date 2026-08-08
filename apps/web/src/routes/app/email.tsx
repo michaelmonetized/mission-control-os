@@ -101,7 +101,7 @@ function EmailPage() {
               <tr key={i} className="border-t border-[var(--color-mocha-surface1)]">
                 <td className="py-1 pr-2 font-mono">{r.type ?? r.record}</td>
                 <td className="py-1 pr-2 font-mono">{r.name}</td>
-                <td className="py-1 pr-2 font-mono break-all max-w-xs">{r.value}</td>
+                <td className="py-1 pr-2 font-mono break-all max-w-[20rem]">{r.value}</td>
                 <td className="py-1">{r.status ?? "—"}</td>
               </tr>
             ))}

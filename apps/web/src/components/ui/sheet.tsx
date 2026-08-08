@@ -37,7 +37,7 @@ export function SheetContent({
   return (
     <div
       className={cn(
-        "absolute top-0 h-full w-full max-w-md bg-background p-6 shadow-lg",
+        "absolute top-0 h-full w-full max-w-[28rem] bg-background p-6 shadow-lg",
         side === "right" ? "right-0" : "left-0",
         className,
       )}

@@ -204,7 +204,7 @@ function AuditPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Audit</h1>
-          <p className="text-[var(--color-mocha-subtext0)] max-w-2xl">
+          <p className="text-[var(--color-mocha-subtext0)] max-w-[42rem]">
             Local Agent only · rendered default · robots respect · artifacts cleaned · findings status
             in Convex (ADR-0004/0019–0024) · Sitebulb-class clusters & fix-next (ADR-0008).
           </p>

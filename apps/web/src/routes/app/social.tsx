@@ -76,7 +76,7 @@ function SocialPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Social</h1>
-      <p className="text-[var(--color-mocha-subtext0)] max-w-2xl">
+      <p className="text-[var(--color-mocha-subtext0)] max-w-[42rem]">
         Default-approved posts · N-week look-ahead Approval Calendar · disapprove with notes or edit.
         Publish failure → notify Agency+Client and reschedule (ADR-0037/0038).
       </p>

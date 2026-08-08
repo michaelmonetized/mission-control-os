@@ -125,7 +125,7 @@ function CrmPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">CRM</h1>
-      <p className="text-[var(--color-mocha-subtext0)] max-w-2xl">
+      <p className="text-[var(--color-mocha-subtext0)] max-w-[42rem]">
         Dual conversation-centric CRM (ADR-0032/0033): Agency + per-Client workspaces. Channels:
         email, SMS, social DM, web form, live chat.
       </p>

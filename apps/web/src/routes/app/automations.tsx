@@ -98,7 +98,7 @@ function AutomationsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Automations</h1>
-      <p className="text-[var(--color-mocha-subtext0)] max-w-2xl">
+      <p className="text-[var(--color-mocha-subtext0)] max-w-[42rem]">
         Trigger → steps builder (ADR-0043). Inline first; external failure / wait → Trigger.dev handoff
         (ADR-0046). First-class outside CRM too (ADR-0044).
       </p>

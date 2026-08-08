@@ -75,7 +75,7 @@ function ClientPortalHome() {
           <UserButton />
         </div>
       </header>
-      <main className="flex-1 px-4 py-8 max-w-3xl w-full mx-auto space-y-6">
+      <main className="flex-1 px-4 py-8 max-w-[48rem] w-full mx-auto space-y-6">
         <h1 className="text-2xl font-semibold">Your client workspaces</h1>
         <p className="text-sm text-[var(--color-mocha-subtext0)]">
           Outside Agency Clerk Org (ADR-0026). Graphs + Agency-shared findings (ADR-0028).

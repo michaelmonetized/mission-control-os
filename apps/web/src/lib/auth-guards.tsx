@@ -21,7 +21,7 @@ export function AgencyGate({ children }: { children: React.ReactNode }) {
   if (!isSignedIn) {
     return (
       <div className="min-h-dvh flex items-center justify-center px-4">
-        <Card className="max-w-md w-full">
+        <Card className="max-w-[28rem] w-full">
           <CardHeader>
             <CardTitle>Sign in to Mission Control</CardTitle>
             <CardDescription>
@@ -48,20 +48,20 @@ export function AgencyGate({ children }: { children: React.ReactNode }) {
   if (!orgId) {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-12 gap-8">
-        <div className="text-center max-w-lg">
+        <div className="text-center max-w-[32rem]">
           <h1 className="text-2xl font-semibold mb-2">Select or create your Agency</h1>
           <p className="text-sm text-[var(--color-mocha-subtext0)]">
             Each Agency is a Clerk Organization (ADR-0015). Solo operators still create one org.
           </p>
         </div>
-        <div className="w-full max-w-lg mc-glass p-6 rounded-[var(--radius-lg)]">
+        <div className="w-full max-w-[32rem] mc-glass p-6 rounded-[var(--radius-lg)]">
           <OrganizationList
             hidePersonal
             afterCreateOrganizationUrl="/onboarding"
             afterSelectOrganizationUrl="/app"
           />
         </div>
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-[32rem]">
           <CreateOrganization afterCreateOrganizationUrl="/onboarding" />
         </div>
       </div>
@@ -97,7 +97,7 @@ export function PortalGate({ children }: { children: React.ReactNode }) {
   if (!isSignedIn) {
     return (
       <div className="min-h-dvh flex items-center justify-center px-4">
-        <Card className="max-w-md w-full">
+        <Card className="max-w-[28rem] w-full">
           <CardHeader>
             <CardTitle>Client Portal</CardTitle>
             <CardDescription>
