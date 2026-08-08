@@ -7,9 +7,13 @@
   "scripts": {
     "dev": "bun run --filter @mc/web dev",
     "dev:web": "bun run --filter @mc/web dev",
+    "dev:convex": "bun run --filter @mc/web convex:dev",
+    "dev:trigger": "bun run --filter @mc/trigger-worker dev",
     "build": "bun run --filter @mc/web build",
     "typecheck": "bun run --filter '*' typecheck",
     "agent": "cargo run --manifest-path apps/agent/Cargo.toml",
-    "desktop": "bun run --filter @mc/desktop dev"
+    "agent:build": "cargo build --release --manifest-path apps/agent/Cargo.toml",
+    "desktop": "bun run --filter @mc/desktop dev",
+    "desktop:dist": "bun run --filter @mc/desktop dist"
   }
 }

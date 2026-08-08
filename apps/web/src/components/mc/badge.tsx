@@ -1,7 +1,13 @@
-import { Badge as Ui } from "@/components/ui/badge";
-import { cn } from "cnfast";
 import * as React from "react";
+import { Badge as BaseBadge, type BadgeProps as BaseBadgeProps } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
-export function Badge({ className, ...props }: React.ComponentProps<"div">) {
-  return <Ui className={cn("mc-glass rounded-[var(--radius-sm)]", className)} {...props} />;
+/** Mission Control branded Badge wrapper (DSD-0007) */
+export function Badge({ className, ...props }: BaseBadgeProps) {
+  return (
+    <BaseBadge
+      className={cn("tracking-wide font-medium shadow-xs", className)}
+      {...props}
+    />
+  );
 }

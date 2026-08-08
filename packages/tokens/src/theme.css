@@ -132,3 +132,27 @@
 .mc-sparse {
   letter-spacing: 0.01em;
 }
+
+/* Elevation + motion tokens (DSD open Q #3) */
+:root {
+  --mc-elev-0: none;
+  --mc-elev-1: 0 1px 2px color-mix(in oklab, #000 35%, transparent);
+  --mc-elev-2: 0 4px 16px color-mix(in oklab, #000 40%, transparent),
+    0 0 24px color-mix(in oklab, var(--color-brand-sky) 12%, transparent);
+  --mc-elev-3: 0 8px 32px color-mix(in oklab, #000 45%, transparent),
+    0 0 40px color-mix(in oklab, var(--color-brand-sky) 18%, transparent);
+  --mc-duration-fast: 120ms;
+  --mc-duration-med: 220ms;
+  --mc-duration-slow: 360ms;
+  --mc-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --mc-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+.mc-elev-1 { box-shadow: var(--mc-elev-1); }
+.mc-elev-2 { box-shadow: var(--mc-elev-2); }
+.mc-elev-3 { box-shadow: var(--mc-elev-3); }
+.mc-transition {
+  transition:
+    box-shadow var(--mc-duration-med) var(--mc-ease-out),
+    transform var(--mc-duration-med) var(--mc-ease-out),
+    border-color var(--mc-duration-fast) var(--mc-ease-out);
+}

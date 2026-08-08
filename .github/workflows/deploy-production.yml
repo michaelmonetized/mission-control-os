@@ -1,0 +1,50 @@
+name: Production Deploy (Blacksmith Prebuilt)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build & Deploy to Vercel Prod
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.2.0"
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run Workspace Typecheck
+        run: bun run typecheck
+
+      - name: Build Web (TanStack Start / Nitro vercel BOA)
+        run: bun run build
+
+      - name: Promote BOA to monorepo root
+        run: node scripts/vercel-promote-boa.mjs
+
+      - name: Assert Build Output API present
+        run: |
+          test -d .vercel/output
+          test -f .vercel/output/config.json -o -f .vercel/output/nitro.json
+          ls -la .vercel/output
+
+      - name: Deploy Prebuilt to Vercel Production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          # Nitro already emitted BOA; do not re-run `vercel build` (would re-hit monorepo dist traps).
+          npx vercel@39.2.6 pull --yes --environment=production --token=$VERCEL_TOKEN
+          npx vercel@39.2.6 deploy --prebuilt --prod --token=$VERCEL_TOKEN

@@ -1,0 +1,18 @@
+# Mission Control Local Agent — systemd --user unit (ADR-0013)
+# Install via apps/agent/install/install.sh
+[Unit]
+Description=Mission Control Local Agent (user)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=__MC_AGENT_BIN__ daemon --control-plane __MC_CONTROL_PLANE__
+Restart=on-failure
+RestartSec=5
+Environment=MC_CONTROL_PLANE=__MC_CONTROL_PLANE__
+Environment=RUST_LOG=info
+WorkingDirectory=%h/.local/share/mission-control-agent
+
+[Install]
+WantedBy=default.target

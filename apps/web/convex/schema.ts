@@ -87,7 +87,10 @@ export default defineSchema({
     contactId: v.optional(v.id("contacts")),
     workspaceId: v.optional(v.id("crmWorkspaces")),
     assigneeUserId: v.optional(v.string()),
-  }).index("by_client", ["clientId"]),
+  })
+    .index("by_client", ["clientId"])
+    .index("by_project", ["projectId"])
+    .index("by_workspace", ["workspaceId"]),
 
   crawlRuns: defineTable({
     siteId: v.id("sites"),
@@ -115,7 +118,24 @@ export default defineSchema({
     url: v.string(),
     status: v.string(),
     shared: v.boolean(),
-  }).index("by_site", ["siteId"]),
+  })
+    .index("by_site", ["siteId"])
+    .index("by_site_fingerprint", ["siteId", "fingerprint"]),
+
+  /** Queued automation handoffs for Trigger.dev (ADR-0046) */
+  automationHandoffs: defineTable({
+    automationId: v.id("automations"),
+    agencyId: v.id("agencies"),
+    fromStep: v.number(),
+    reason: v.string(),
+    idempotencyKey: v.string(),
+    payload: v.any(),
+    status: v.string(), // queued | processing | done | failed
+    createdAt: v.number(),
+  })
+    .index("by_agency", ["agencyId"])
+    .index("by_status", ["status"])
+    .index("by_idempotency", ["idempotencyKey"]),
 
   metricsSnapshots: defineTable({
     crawlRunId: v.id("crawlRuns"),
@@ -136,6 +156,8 @@ export default defineSchema({
     scheduledAt: v.number(),
     status: v.string(),
     editNotes: v.optional(v.string()),
+    category: v.optional(v.string()),
+    recycleFromId: v.optional(v.id("socialPosts")),
   }).index("by_client", ["clientId"]),
 
   emailDomains: defineTable({
@@ -144,6 +166,9 @@ export default defineSchema({
     domain: v.string(),
     verified: v.boolean(),
     resendDomainId: v.optional(v.string()),
+    /** SPF/DKIM/DMARC records from Resend create/get (ADR-0036) */
+    dnsRecords: v.optional(v.any()),
+    status: v.optional(v.string()),
   }).index("by_agency", ["agencyId"]),
 
   automations: defineTable({
@@ -167,12 +192,17 @@ export default defineSchema({
     clerkUserId: v.optional(v.string()),
     email: v.string(),
     role: v.union(v.literal("admin"), v.literal("member")),
-  }).index("by_client", ["clientId"]),
+  })
+    .index("by_client", ["clientId"])
+    .index("by_email", ["email"])
+    .index("by_clerkUser", ["clerkUserId"]),
 
   portalAllowlist: defineTable({
     clientId: v.id("clients"),
     email: v.string(),
-  }).index("by_client", ["clientId"]),
+  })
+    .index("by_client", ["clientId"])
+    .index("by_email", ["email"]),
 
   connectedAccounts: defineTable({
     agencyId: v.id("agencies"),
@@ -188,4 +218,114 @@ export default defineSchema({
     refreshHash: v.string(),
     deviceLabel: v.optional(v.string()),
   }).index("by_user", ["clerkUserId"]),
+
+  /** Saved audit report snapshots for history/export */
+  auditReports: defineTable({
+    agencyId: v.id("agencies"),
+    clientId: v.id("clients"),
+    siteId: v.id("sites"),
+    crawlRunId: v.id("crawlRuns"),
+    title: v.string(),
+    summary: v.any(),
+    createdAt: v.number(),
+  })
+    .index("by_agency", ["agencyId"])
+    .index("by_client", ["clientId"]),
+
+  activityEvents: defineTable({
+    agencyId: v.id("agencies"),
+    kind: v.string(),
+    message: v.string(),
+    actorUserId: v.optional(v.string()),
+    entityType: v.optional(v.string()),
+    entityId: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_agency", ["agencyId"]),
+
+  /** Agency SaaS subscriptions & billing (ADR-0001 / ADR-0031) */
+  subscriptions: defineTable({
+    agencyId: v.id("agencies"),
+    stripeCustomerId: v.string(),
+    stripeSubscriptionId: v.string(),
+    plan: v.union(v.literal("starter"), v.literal("pro"), v.literal("enterprise")),
+    status: v.union(
+      v.literal("active"),
+      v.literal("past_due"),
+      v.literal("canceled"),
+      v.literal("trialing"),
+    ),
+    currentPeriodEnd: v.number(),
+  })
+    .index("by_agency", ["agencyId"])
+    .index("by_stripeSub", ["stripeSubscriptionId"]),
+
+  /**
+   * Scheduled crawl runs when an Agent is online (ADR-0008 agency ops).
+   * Cron enqueues queueRun when due + recent agent presence.
+   */
+  crawlSchedules: defineTable({
+    agencyId: v.id("agencies"),
+    siteId: v.id("sites"),
+    intervalHours: v.number(),
+    mode: v.string(),
+    ignoreRobots: v.boolean(),
+    enabled: v.boolean(),
+    nextRunAt: v.number(),
+    lastQueuedAt: v.optional(v.number()),
+  })
+    .index("by_agency", ["agencyId"])
+    .index("by_site", ["siteId"])
+    .index("by_next", ["nextRunAt"]),
+
+  /**
+   * Agent online presence from heartbeats (ADR-0012 / 0008 scheduled runs).
+   * Keyed by agency so schedules know a daemon is live.
+   */
+  agentPresence: defineTable({
+    agencyId: v.id("agencies"),
+    deviceLabel: v.optional(v.string()),
+    lastSeenAt: v.number(),
+    source: v.optional(v.string()),
+  })
+    .index("by_agency", ["agencyId"])
+    .index("by_lastSeen", ["lastSeenAt"]),
+
+  /** Stripe webhook idempotency (B3). */
+  stripeWebhookEvents: defineTable({
+    eventId: v.string(),
+    processedAt: v.number(),
+  }).index("by_event", ["eventId"]),
+
+  /**
+   * Site structure graph from crawl (ADR-0008 Sitebulb-class site structure viz).
+   * nodes: { id, url, path, depth, title? }
+   * edges: { from, to } same-origin internal links
+   */
+  siteStructures: defineTable({
+    siteId: v.id("sites"),
+    crawlRunId: v.id("crawlRuns"),
+    origin: v.string(),
+    nodes: v.array(
+      v.object({
+        id: v.string(),
+        url: v.string(),
+        path: v.string(),
+        depth: v.number(),
+        title: v.optional(v.string()),
+        outDegree: v.optional(v.number()),
+      }),
+    ),
+    edges: v.array(
+      v.object({
+        from: v.string(),
+        to: v.string(),
+      }),
+    ),
+    maxDepth: v.number(),
+    nodeCount: v.number(),
+    edgeCount: v.number(),
+    completedAt: v.number(),
+  })
+    .index("by_site", ["siteId"])
+    .index("by_run", ["crawlRunId"]),
 });

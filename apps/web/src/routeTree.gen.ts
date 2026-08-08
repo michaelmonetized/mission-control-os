@@ -12,15 +12,29 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PortalRouteImport } from './routes/portal'
+import { Route as SelectAgencyRouteImport } from './routes/select-agency'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as ApiSplatRouteImport } from './routes/api/$'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppActivityRouteImport } from './routes/app/activity'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
 import { Route as AppAutomationsRouteImport } from './routes/app/automations'
 import { Route as AppClientsRouteImport } from './routes/app/clients'
+import { Route as AppConnectionsRouteImport } from './routes/app/connections'
 import { Route as AppCrmRouteImport } from './routes/app/crm'
 import { Route as AppEmailRouteImport } from './routes/app/email'
+import { Route as AppJobsRouteImport } from './routes/app/jobs'
+import { Route as AppPipelineRouteImport } from './routes/app/pipeline'
 import { Route as AppPortalRouteImport } from './routes/app/portal'
+import { Route as AppReportsRouteImport } from './routes/app/reports'
+import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppSocialRouteImport } from './routes/app/social'
 import { Route as AppTasksRouteImport } from './routes/app/tasks'
+import { Route as PortalOnboardingRouteImport } from './routes/portal/onboarding'
+import { Route as SignInSplatRouteImport } from './routes/sign-in.$'
+import { Route as SignUpSplatRouteImport } from './routes/sign-up.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -37,9 +51,39 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SelectAgencyRoute = SelectAgencyRouteImport.update({
+  id: '/select-agency',
+  path: '/select-agency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSplatRoute = ApiSplatRouteImport.update({
+  id: '/api/$',
+  path: '/api/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppActivityRoute = AppActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAuditRoute = AppAuditRouteImport.update({
@@ -57,6 +101,11 @@ const AppClientsRoute = AppClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => AppRoute,
 } as any)
+const AppConnectionsRoute = AppConnectionsRouteImport.update({
+  id: '/connections',
+  path: '/connections',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCrmRoute = AppCrmRouteImport.update({
   id: '/crm',
   path: '/crm',
@@ -67,9 +116,29 @@ const AppEmailRoute = AppEmailRouteImport.update({
   path: '/email',
   getParentRoute: () => AppRoute,
 } as any)
+const AppJobsRoute = AppJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPipelineRoute = AppPipelineRouteImport.update({
+  id: '/pipeline',
+  path: '/pipeline',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPortalRoute = AppPortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSocialRoute = AppSocialRouteImport.update({
@@ -82,32 +151,75 @@ const AppTasksRoute = AppTasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => AppRoute,
 } as any)
+const PortalOnboardingRoute = PortalOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => PortalRoute,
+} as any)
+const SignInSplatRoute = SignInSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => SignInRoute,
+} as any)
+const SignUpSplatRoute = SignUpSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => SignUpRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/portal': typeof PortalRouteWithChildren
+  '/select-agency': typeof SelectAgencyRoute
+  '/sign-in': typeof SignInRouteWithChildren
+  '/sign-up': typeof SignUpRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
+  '/app/activity': typeof AppActivityRoute
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
+  '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
+  '/app/jobs': typeof AppJobsRoute
+  '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
+  '/portal/onboarding': typeof PortalOnboardingRoute
+  '/sign-in/$': typeof SignInSplatRoute
+  '/sign-up/$': typeof SignUpSplatRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRoute
+  '/portal': typeof PortalRouteWithChildren
+  '/select-agency': typeof SelectAgencyRoute
+  '/sign-in': typeof SignInRouteWithChildren
+  '/sign-up': typeof SignUpRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
+  '/app/activity': typeof AppActivityRoute
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
+  '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
+  '/app/jobs': typeof AppJobsRoute
+  '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
+  '/portal/onboarding': typeof PortalOnboardingRoute
+  '/sign-in/$': typeof SignInSplatRoute
+  '/sign-up/$': typeof SignUpSplatRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -115,14 +227,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/portal': typeof PortalRouteWithChildren
+  '/select-agency': typeof SelectAgencyRoute
+  '/sign-in': typeof SignInRouteWithChildren
+  '/sign-up': typeof SignUpRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
+  '/app/activity': typeof AppActivityRoute
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/clients': typeof AppClientsRoute
+  '/app/connections': typeof AppConnectionsRoute
   '/app/crm': typeof AppCrmRoute
   '/app/email': typeof AppEmailRoute
+  '/app/jobs': typeof AppJobsRoute
+  '/app/pipeline': typeof AppPipelineRoute
   '/app/portal': typeof AppPortalRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/social': typeof AppSocialRoute
   '/app/tasks': typeof AppTasksRoute
+  '/portal/onboarding': typeof PortalOnboardingRoute
+  '/sign-in/$': typeof SignInSplatRoute
+  '/sign-up/$': typeof SignUpSplatRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -131,41 +257,83 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/onboarding'
+    | '/portal'
+    | '/select-agency'
+    | '/sign-in'
+    | '/sign-up'
+    | '/api/$'
+    | '/app/activity'
     | '/app/audit'
     | '/app/automations'
     | '/app/clients'
+    | '/app/connections'
     | '/app/crm'
     | '/app/email'
+    | '/app/jobs'
+    | '/app/pipeline'
     | '/app/portal'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/social'
     | '/app/tasks'
+    | '/portal/onboarding'
+    | '/sign-in/$'
+    | '/sign-up/$'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/onboarding'
+    | '/portal'
+    | '/select-agency'
+    | '/sign-in'
+    | '/sign-up'
+    | '/api/$'
+    | '/app/activity'
     | '/app/audit'
     | '/app/automations'
     | '/app/clients'
+    | '/app/connections'
     | '/app/crm'
     | '/app/email'
+    | '/app/jobs'
+    | '/app/pipeline'
     | '/app/portal'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/social'
     | '/app/tasks'
+    | '/portal/onboarding'
+    | '/sign-in/$'
+    | '/sign-up/$'
     | '/app'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/onboarding'
+    | '/portal'
+    | '/select-agency'
+    | '/sign-in'
+    | '/sign-up'
+    | '/api/$'
+    | '/app/activity'
     | '/app/audit'
     | '/app/automations'
     | '/app/clients'
+    | '/app/connections'
     | '/app/crm'
     | '/app/email'
+    | '/app/jobs'
+    | '/app/pipeline'
     | '/app/portal'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/social'
     | '/app/tasks'
+    | '/portal/onboarding'
+    | '/sign-in/$'
+    | '/sign-up/$'
     | '/app/'
   fileRoutesById: FileRoutesById
 }
@@ -173,6 +341,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
+  PortalRoute: typeof PortalRouteWithChildren
+  SelectAgencyRoute: typeof SelectAgencyRoute
+  SignInRoute: typeof SignInRouteWithChildren
+  SignUpRoute: typeof SignUpRouteWithChildren
+  ApiSplatRoute: typeof ApiSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -198,11 +371,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/select-agency': {
+      id: '/select-agency'
+      path: '/select-agency'
+      fullPath: '/select-agency'
+      preLoaderRoute: typeof SelectAgencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/': {
       id: '/app/'
       path: '/'
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/activity': {
+      id: '/app/activity'
+      path: '/activity'
+      fullPath: '/app/activity'
+      preLoaderRoute: typeof AppActivityRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/audit': {
@@ -226,6 +441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClientsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/connections': {
+      id: '/app/connections'
+      path: '/connections'
+      fullPath: '/app/connections'
+      preLoaderRoute: typeof AppConnectionsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/crm': {
       id: '/app/crm'
       path: '/crm'
@@ -240,11 +462,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEmailRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/jobs': {
+      id: '/app/jobs'
+      path: '/jobs'
+      fullPath: '/app/jobs'
+      preLoaderRoute: typeof AppJobsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pipeline': {
+      id: '/app/pipeline'
+      path: '/pipeline'
+      fullPath: '/app/pipeline'
+      preLoaderRoute: typeof AppPipelineRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/portal': {
       id: '/app/portal'
       path: '/portal'
       fullPath: '/app/portal'
       preLoaderRoute: typeof AppPortalRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/social': {
@@ -261,28 +511,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTasksRouteImport
       parentRoute: typeof AppRoute
     }
+    '/portal/onboarding': {
+      id: '/portal/onboarding'
+      path: '/onboarding'
+      fullPath: '/portal/onboarding'
+      preLoaderRoute: typeof PortalOnboardingRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/sign-in/$': {
+      id: '/sign-in/$'
+      path: '/$'
+      fullPath: '/sign-in/$'
+      preLoaderRoute: typeof SignInSplatRouteImport
+      parentRoute: typeof SignInRoute
+    }
+    '/sign-up/$': {
+      id: '/sign-up/$'
+      path: '/$'
+      fullPath: '/sign-up/$'
+      preLoaderRoute: typeof SignUpSplatRouteImport
+      parentRoute: typeof SignUpRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppActivityRoute: typeof AppActivityRoute
   AppAuditRoute: typeof AppAuditRoute
   AppAutomationsRoute: typeof AppAutomationsRoute
   AppClientsRoute: typeof AppClientsRoute
+  AppConnectionsRoute: typeof AppConnectionsRoute
   AppCrmRoute: typeof AppCrmRoute
   AppEmailRoute: typeof AppEmailRoute
+  AppJobsRoute: typeof AppJobsRoute
+  AppPipelineRoute: typeof AppPipelineRoute
   AppPortalRoute: typeof AppPortalRoute
+  AppReportsRoute: typeof AppReportsRoute
+  AppSettingsRoute: typeof AppSettingsRoute
   AppSocialRoute: typeof AppSocialRoute
   AppTasksRoute: typeof AppTasksRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppActivityRoute: AppActivityRoute,
   AppAuditRoute: AppAuditRoute,
   AppAutomationsRoute: AppAutomationsRoute,
   AppClientsRoute: AppClientsRoute,
+  AppConnectionsRoute: AppConnectionsRoute,
   AppCrmRoute: AppCrmRoute,
   AppEmailRoute: AppEmailRoute,
+  AppJobsRoute: AppJobsRoute,
+  AppPipelineRoute: AppPipelineRoute,
   AppPortalRoute: AppPortalRoute,
+  AppReportsRoute: AppReportsRoute,
+  AppSettingsRoute: AppSettingsRoute,
   AppSocialRoute: AppSocialRoute,
   AppTasksRoute: AppTasksRoute,
   AppIndexRoute: AppIndexRoute,
@@ -290,11 +573,58 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface PortalRouteChildren {
+  PortalOnboardingRoute: typeof PortalOnboardingRoute
+}
+
+const PortalRouteChildren: PortalRouteChildren = {
+  PortalOnboardingRoute: PortalOnboardingRoute,
+}
+
+const PortalRouteWithChildren =
+  PortalRoute._addFileChildren(PortalRouteChildren)
+
+interface SignInRouteChildren {
+  SignInSplatRoute: typeof SignInSplatRoute
+}
+
+const SignInRouteChildren: SignInRouteChildren = {
+  SignInSplatRoute: SignInSplatRoute,
+}
+
+const SignInRouteWithChildren =
+  SignInRoute._addFileChildren(SignInRouteChildren)
+
+interface SignUpRouteChildren {
+  SignUpSplatRoute: typeof SignUpSplatRoute
+}
+
+const SignUpRouteChildren: SignUpRouteChildren = {
+  SignUpSplatRoute: SignUpSplatRoute,
+}
+
+const SignUpRouteWithChildren =
+  SignUpRoute._addFileChildren(SignUpRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
+  PortalRoute: PortalRouteWithChildren,
+  SelectAgencyRoute: SelectAgencyRoute,
+  SignInRoute: SignInRouteWithChildren,
+  SignUpRoute: SignUpRouteWithChildren,
+  ApiSplatRoute: ApiSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

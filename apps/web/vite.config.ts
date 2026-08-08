@@ -1,10 +1,15 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { nitro } from "nitro/vite";
 import path from "node:path";
-import { handleApi } from "./src/server/api";
+import { fileURLToPath } from "node:url";
+import { handleApi } from "./src/server/api.ts";
 
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
+
+/** Dev-only dual-write /api middleware (disabled in production via handleApi). */
 function mcApiPlugin(): Plugin {
   return {
     name: "mc-api",
@@ -28,7 +33,12 @@ function mcApiPlugin(): Plugin {
           res.end(Buffer.from(await response.arrayBuffer()));
         } catch (e) {
           res.statusCode = 500;
-          res.end(JSON.stringify({ ok: false, error: { code: "internal", message: String(e) } }));
+          res.end(
+            JSON.stringify({
+              ok: false,
+              error: { code: "internal", message: String(e) },
+            }),
+          );
         }
       });
     },
@@ -36,21 +46,24 @@ function mcApiPlugin(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [
-    TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
-    react(),
-    tailwindcss(),
-    mcApiPlugin(),
-  ],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@mc/protocol": path.resolve(__dirname, "../../packages/protocol/src/index.ts"),
-      "@mc/tokens": path.resolve(__dirname, "../../packages/tokens/src"),
-    },
-  },
   server: {
     host: "127.0.0.1",
     port: 5173,
   },
+  resolve: {
+    tsconfigPaths: true,
+    alias: {
+      "@": path.resolve(rootDir, "./src"),
+      "@mc/protocol": path.resolve(rootDir, "../../packages/protocol/src/index.ts"),
+    },
+  },
+  plugins: [
+    tailwindcss(),
+    tanstackStart({
+      srcDirectory: "src",
+    }),
+    react(),
+    nitro(),
+    mcApiPlugin(),
+  ],
 });

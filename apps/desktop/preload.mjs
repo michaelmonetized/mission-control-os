@@ -1,7 +1,20 @@
-import { contextBridge } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("mcDesktop", {
-  platform: process.platform,
-  /** Pair Agent: fetch long-lived token via session and write secret store (ADR-0016) */
-  pairAgent: async () => ({ ok: false, note: "implement with Clerk session + /api/agent/token" }),
+  platform: () => ipcRenderer.invoke("mc:platform"),
+  getAgentSecret: () => ipcRenderer.invoke("mc:getAgentSecret"),
+  /** @param {{ bearer?: string, deviceLabel?: string }} opts */
+  pairAgent: (opts) => ipcRenderer.invoke("mc:pairAgent", opts ?? {}),
+  /** @param {{ binPath?: string }} opts */
+  installAgentService: (opts) => ipcRenderer.invoke("mc:installAgentService", opts ?? {}),
+  /** Effect-style bootstrap: pair → install → health (ADR-0011) */
+  orchestrateAgentBootstrap: (opts) =>
+    ipcRenderer.invoke("mc:orchestrateAgentBootstrap", opts ?? {}),
+  /** Daemon presence poll */
+  orchestrateAgentStatus: () => ipcRenderer.invoke("mc:orchestrateAgentStatus"),
+  /** stop → reinstall → health */
+  orchestrateAgentRestart: (opts) =>
+    ipcRenderer.invoke("mc:orchestrateAgentRestart", opts ?? {}),
+  /** Clear pairing secrets */
+  orchestrateAgentUnpair: () => ipcRenderer.invoke("mc:orchestrateAgentUnpair"),
 });

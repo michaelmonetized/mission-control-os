@@ -1,7 +1,19 @@
-import { Checkbox as Ui } from "@/components/ui/checkbox";
-import { cn } from "cnfast";
 import * as React from "react";
+import { Checkbox as BaseCheckbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
-export function Checkbox({ className, ...props }: React.ComponentProps<"div">) {
-  return <Ui className={cn("mc-glass rounded-[var(--radius-sm)]", className)} {...props} />;
+/** Mission Control branded Checkbox wrapper (DSD-0007) */
+export function Checkbox({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof BaseCheckbox>) {
+  return (
+    <BaseCheckbox
+      className={cn(
+        "border-[var(--color-mocha-surface2)] data-[state=checked]:bg-[var(--color-brand-sky)] data-[state=checked]:text-[var(--color-mocha-crust)] transition-colors",
+        className,
+      )}
+      {...props}
+    />
+  );
 }

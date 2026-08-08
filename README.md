@@ -55,6 +55,22 @@ cd apps/desktop && bun install && bun run dev
 
 ## Status
 
-Architecture + DSD grill complete. Implementation scaffold satisfies structure and happy-path UI/API; production crawl engine, live Clerk/Convex/Resend, and mobile apps are next.
+Architecture + DSD grill complete. **Live Clerk (Agency = Org), Convex (dev + prod), and Vercel** are wired for the web cockpit. Production crawl engine, Resend ESP, Trigger.dev, and mobile apps are next.
 
-Copy `.env.example` → `.env` for real credentials.
+### Platform
+
+| | |
+|--|--|
+| Production web | https://mission-control-os-zeta.vercel.app |
+| Convex dashboard | https://dashboard.convex.dev/t/hustle-testing/mission-control-os |
+| Clerk app | Mission Control OS (orgs enabled, JWT template `convex`) |
+
+### Env
+
+```bash
+# Prefer apps/web/.env.local for Vite
+cp .env.example apps/web/.env.local
+clerk link --app <app_id> && clerk env pull --file apps/web/.env.local
+# Then rename publishable key to VITE_CLERK_PUBLISHABLE_KEY if needed
+cd apps/web && bunx convex dev --once   # writes VITE_CONVEX_URL
+```
