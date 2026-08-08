@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/mc/badge";
 import { Button } from "@/components/mc/button";
 import { Input } from "@/components/mc/input";
-import { KEYMAP } from "@/lib/keymap";
 import { Separator } from "@/components/mc/separator";
 
 export const Route = createFileRoute("/app/settings")({
@@ -266,21 +265,10 @@ function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Keyboard</CardTitle>
-          <CardDescription>Command palette (;)</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ul className="grid sm:grid-cols-2 gap-1 text-xs font-mono text-[var(--color-mocha-subtext0)]">
-            {KEYMAP.map((k) => (
-              <li key={k.keys}>
-                <span className="text-[var(--color-brand-sky)]">{k.keys}</span> — {k.action}
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
+      <p className="text-[10px] text-[var(--color-mocha-subtext0)]">
+        Press <kbd className="font-mono text-[var(--color-brand-sky)]">?</kbd> for keyboard shortcuts ·{" "}
+        <kbd className="font-mono text-[var(--color-brand-sky)]">;</kbd> for command palette
+      </p>
     </div>
   );
 }
