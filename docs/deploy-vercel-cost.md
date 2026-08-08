@@ -2,6 +2,10 @@
 
 Aligned with uncap/invite / bestwnc-style shipping.
 
+## Framework
+
+`apps/web` is **TanStack Start** + Nitro (`framework: "tanstack-start"` in root and `apps/web/vercel.json`). Preview builds use Vercel's Start detection; do not set SPA `rewrites` to `index.html`.
+
 ## Free preview minutes only
 
 `vercel.json` disables Git production auto-deploy for `main` / `master`:

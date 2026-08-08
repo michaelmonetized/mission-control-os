@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useAction, useQuery } from "convex/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/mc/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
+import { createMcColumnHelper, DataTable } from "@/components/mc/data-table";
 import { Input } from "@/components/mc/input";
 import { useIsAgencyAdmin } from "@/lib/auth-guards";
 
@@ -20,6 +21,36 @@ type DnsRec = {
   priority?: number;
   status?: string;
 };
+
+const dnsHelper = createMcColumnHelper<DnsRec>();
+const dnsColumns = dnsHelper.columns([
+  dnsHelper.accessor((r) => r.type ?? r.record ?? "", {
+    id: "type",
+    header: "Type",
+    cell: ({ getValue }) => (
+      <span className="font-mono">{String(getValue() ?? "")}</span>
+    ),
+  }),
+  dnsHelper.accessor("name", {
+    header: "Name",
+    cell: ({ getValue }) => (
+      <span className="font-mono">{String(getValue() ?? "")}</span>
+    ),
+  }),
+  dnsHelper.accessor("value", {
+    header: "Value",
+    cell: ({ getValue }) => (
+      <span className="font-mono break-all max-w-[20rem] block">
+        {String(getValue() ?? "")}
+      </span>
+    ),
+  }),
+  dnsHelper.accessor("status", {
+    header: "Status",
+    cell: ({ getValue }) => String(getValue() ?? "—"),
+  }),
+]);
+
 
 function EmailPage() {
   const isAdmin = useIsAgencyAdmin();
@@ -81,33 +112,21 @@ function EmailPage() {
   }
 
   function DnsTable({ records }: { records: unknown }) {
-    const list = (Array.isArray(records) ? records : []) as DnsRec[];
+    const list = useMemo(
+      () => (Array.isArray(records) ? records : []) as DnsRec[],
+      [records],
+    );
     if (!list.length) {
       return <p className="text-xs text-[var(--color-mocha-subtext0)]">No DNS records yet.</p>;
     }
     return (
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs text-left">
-          <thead className="text-[var(--color-mocha-subtext0)]">
-            <tr>
-              <th className="py-1 pr-2">Type</th>
-              <th className="py-1 pr-2">Name</th>
-              <th className="py-1 pr-2">Value</th>
-              <th className="py-1">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((r, i) => (
-              <tr key={i} className="border-t border-[var(--color-mocha-surface1)]">
-                <td className="py-1 pr-2 font-mono">{r.type ?? r.record}</td>
-                <td className="py-1 pr-2 font-mono">{r.name}</td>
-                <td className="py-1 pr-2 font-mono break-all max-w-[20rem]">{r.value}</td>
-                <td className="py-1">{r.status ?? "—"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        columns={dnsColumns}
+        data={list}
+        pageSize={20}
+        emptyMessage="No DNS records yet."
+        className="text-xs"
+      />
     );
   }
 

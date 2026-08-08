@@ -7,7 +7,8 @@ import { PortalGate } from "@/lib/auth-guards";
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from "@/components/mc/card";
 import { Button } from "@/components/mc/button";
 import { LogoLockup } from "@/components/mc/logo";
-import { Sparkline } from "@/components/mc/sparkline";
+import { Sparkline } from "@/components/mc/chart";
+import { createMcColumnHelper, DataTable } from "@/components/mc/data-table";
 import { downloadCsv } from "@/lib/export-csv";
 import { useEffect, useMemo, useState } from "react";
 
@@ -64,7 +65,42 @@ function ClientPortalHome() {
         })),
     [metrics],
   );
-  const maxB = Math.max(...history.map((h) => h.broken), 1);
+  type SharedFindingRow = {
+    id: string;
+    type: string;
+    severity: string;
+    status: string;
+    url: string;
+  };
+
+  const sharedHelper = useMemo(() => createMcColumnHelper<SharedFindingRow>(), []);
+  const sharedColumns = useMemo(
+    () =>
+      sharedHelper.columns([
+        sharedHelper.accessor("type", { header: "Type" }),
+        sharedHelper.accessor("severity", { header: "Severity" }),
+        sharedHelper.accessor("status", { header: "Status" }),
+        sharedHelper.accessor("url", {
+          header: "URL",
+          cell: ({ getValue }) => (
+            <span className="font-mono text-xs break-all">{String(getValue() ?? "")}</span>
+          ),
+        }),
+      ]),
+    [sharedHelper],
+  );
+
+  const sharedRows = useMemo<SharedFindingRow[]>(
+    () =>
+      (shared ?? []).map((f) => ({
+        id: f.id,
+        type: f.type,
+        severity: f.severity,
+        status: f.status,
+        url: f.url,
+      })),
+    [shared],
+  );
 
   return (
     <div className="min-h-dvh flex flex-col">
@@ -135,27 +171,6 @@ function ClientPortalHome() {
                         />
                       </div>
                     </div>
-                    <div className="flex items-end gap-2 h-32">
-                      {history.map((h, i) => (
-                        <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                          <div className="w-full flex gap-0.5 items-end h-24">
-                            <div
-                              className="flex-1 rounded-t bg-[var(--color-brand-sky)]"
-                              style={{ height: `${(h.broken / maxB) * 100}%` }}
-                            />
-                            <div
-                              className="flex-1 rounded-t bg-[var(--color-brand-flamingo)]"
-                              style={{
-                                height: `${(h.alt / Math.max(...history.map((x) => x.alt), 1)) * 100}%`,
-                              }}
-                            />
-                          </div>
-                          <span className="text-[10px] text-[var(--color-mocha-subtext0)]">
-                            {h.date}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
                   </>
                 )}
               </CardContent>
@@ -208,17 +223,15 @@ function ClientPortalHome() {
                   CSV
                 </Button>
               </CardHeader>
-              <CardContent className="space-y-2">
-                {(shared ?? []).length === 0 ? (
-                  <p className="text-sm text-[var(--color-mocha-subtext0)]">None shared yet.</p>
-                ) : (
-                  (shared ?? []).map((f) => (
-                    <div key={f.id} className="mc-glass px-3 py-2 rounded-md text-sm">
-                      <strong>{f.type}</strong> · {f.severity} · {f.status}
-                      <div className="font-mono text-xs break-all">{f.url}</div>
-                    </div>
-                  ))
-                )}
+              <CardContent>
+                <DataTable
+                  columns={sharedColumns}
+                  data={sharedRows}
+                  filterColumn="type"
+                  filterPlaceholder="Filter by type…"
+                  pageSize={8}
+                  emptyMessage="None shared yet."
+                />
               </CardContent>
             </Card>
           </>

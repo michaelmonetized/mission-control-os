@@ -5,7 +5,7 @@ import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/mc/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/mc/card";
-import { Sparkline } from "@/components/mc/sparkline";
+import { MetricsChart, Sparkline } from "@/components/mc/chart";
 import { Progress } from "@/components/mc/progress";
 import { downloadCsv } from "@/lib/export-csv";
 import { SiteStructureGraph } from "@/components/mc/site-structure-graph";
@@ -114,8 +114,6 @@ function AuditPage() {
         pages: m.pagesRetrieved,
       }));
   }, [metrics]);
-
-  const maxB = Math.max(...history.map((h) => h.brokenLinks), 1);
 
   async function startCrawl() {
     if (!effectiveSite) return;
@@ -536,7 +534,6 @@ function AuditPage() {
                     width={200}
                     height={36}
                     stroke="var(--color-brand-flamingo)"
-                    fill="color-mix(in oklab, var(--color-brand-flamingo) 18%, transparent)"
                   />
                 </div>
                 <div className="mc-glass rounded-md p-3">
@@ -544,32 +541,36 @@ function AuditPage() {
                   <Sparkline values={history.map((h) => h.pages)} width={200} height={36} />
                 </div>
               </div>
-              <div className="flex items-end gap-3 h-40">
-                {history.map((h, i) => (
-                  <div key={`${h.date}-${i}`} className="flex-1 flex flex-col items-center gap-1">
-                    <div className="w-full flex gap-0.5 items-end h-28">
-                      <div
-                        className="flex-1 rounded-t bg-[var(--color-brand-sky)] opacity-90"
-                        style={{ height: `${(h.brokenLinks / maxB) * 100}%` }}
-                        title={`Broken: ${h.brokenLinks}`}
-                      />
-                      <div
-                        className="flex-1 rounded-t bg-[var(--color-brand-flamingo)] opacity-90"
-                        style={{
-                          height: `${(h.missingAlt / Math.max(...history.map((x) => x.missingAlt), 1)) * 100}%`,
-                        }}
-                        title={`Missing alt: ${h.missingAlt}`}
-                      />
-                    </div>
-                    <span className="text-[10px] text-[var(--color-mocha-subtext0)]">
-                      {h.date.slice(5)}
-                    </span>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <div className="text-xs text-[var(--color-mocha-subtext0)] mb-1">
+                    Broken links (TanStack Charts)
                   </div>
-                ))}
+                  <MetricsChart
+                    data={history.map((h) => ({ x: h.date.slice(5), y: h.brokenLinks }))}
+                    kind="bar"
+                    height={160}
+                    color="var(--color-brand-sky)"
+                    ariaLabel="Broken links over time"
+                  />
+                </div>
+                <div>
+                  <div className="text-xs text-[var(--color-mocha-subtext0)] mb-1">
+                    Missing alt (TanStack Charts)
+                  </div>
+                  <MetricsChart
+                    data={history.map((h) => ({ x: h.date.slice(5), y: h.missingAlt }))}
+                    kind="area"
+                    height={160}
+                    color="var(--color-brand-flamingo)"
+                    ariaLabel="Missing alt over time"
+                  />
+                </div>
               </div>
               <p className="text-xs mt-3 text-[var(--color-mocha-subtext0)]">
                 <span className="text-[var(--color-brand-sky)]">■</span> broken links{" "}
-                <span className="text-[var(--color-brand-flamingo)]">■</span> missing alt
+                <span className="text-[var(--color-brand-flamingo)]">■</span> missing alt · powered by
+                TanStack Charts
               </p>
               {history.length > 0 ? (
                 <div className="mt-4 space-y-1">
