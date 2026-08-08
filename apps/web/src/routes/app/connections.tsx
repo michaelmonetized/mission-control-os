@@ -27,7 +27,7 @@ function ConnectionsPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Connected Accounts</h1>
       <p className="text-[var(--color-mocha-subtext0)] max-w-[42rem]">
-        Agency- or Client-owned connectivity (ADR-0039). Prefer Client-owned brand channels when they
+        Connect social and ad accounts for the agency or a client. Prefer client-owned brand channels when they
         can complete OAuth; Agency-owned when operating under retainer.
       </p>
       <Card>

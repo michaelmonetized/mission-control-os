@@ -78,7 +78,7 @@ function SocialPage() {
       <h1 className="text-2xl font-semibold">Social</h1>
       <p className="text-[var(--color-mocha-subtext0)] max-w-[42rem]">
         Default-approved posts · N-week look-ahead Approval Calendar · disapprove with notes or edit.
-        Publish failure → notify Agency+Client and reschedule (ADR-0037/0038).
+        Approved posts publish on schedule. Failures notify you and reschedule.
       </p>
 
       <div className="flex flex-wrap gap-3 items-end">

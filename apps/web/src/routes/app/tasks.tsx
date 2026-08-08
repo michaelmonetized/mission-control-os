@@ -80,7 +80,7 @@ function TasksPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Tasks & Projects</h1>
       <p className="text-[var(--color-mocha-subtext0)]">
-        One Task system (ADR-0035). Flags route CRM nurture vs Client PM. Promote moves a nurture task
+        One task system for CRM nurture and client delivery. Promote moves a nurture task
         into a delivery Project.
       </p>
 
@@ -178,7 +178,7 @@ function TasksPage() {
         <CardHeader>
           <CardTitle className="text-base">Promote to Project</CardTitle>
           <CardDescription>
-            Moves task → delivery flag + project membership (ADR-0035)
+            Moves the task into delivery and project membership
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">

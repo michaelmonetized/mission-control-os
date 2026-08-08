@@ -58,7 +58,7 @@ function ClientsPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Clients</h1>
       <p className="text-sm text-[var(--color-mocha-subtext0)]">
-        Hierarchy: Agency → Client → Location → Site (ADR-0002). Self Client seeded on org open.
+        Agency → Client → Location → Site. Your self client is ready when the agency opens.
       </p>
       <Card>
         <CardHeader>

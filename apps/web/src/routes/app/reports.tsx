@@ -25,7 +25,7 @@ function ReportsPage() {
       <div>
         <h1 className="text-2xl font-semibold">Reports</h1>
         <p className="text-sm text-[var(--color-mocha-subtext0)]">
-          Audit report snapshots · export history (ADR-0024 / print later)
+          Saved audit snapshots and export history.
         </p>
       </div>
 

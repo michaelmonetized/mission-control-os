@@ -97,9 +97,9 @@ function Onboarding() {
   return (
     <CockpitShell title="Agency Onboarding">
       <p className="text-[var(--color-mocha-subtext0)] mb-6 max-w-[42rem]">
-        Guided full-OS spine (ADR-0040).{" "}
-        <strong className="text-[var(--color-brand-sky)]">You are your first Client</strong> — Self
-        Client is created automatically when the Agency is ensured in Convex.
+        Get your agency workspace ready.{" "}
+        <strong className="text-[var(--color-brand-sky)]">You are your first client</strong> — a self
+        client is created automatically for your team to dogfood the product.
       </p>
       <ol className="flex flex-wrap gap-2 mb-8">
         {steps.map((s, i) => (
@@ -123,11 +123,11 @@ function Onboarding() {
             Step {step + 1}: {steps[step]}
           </CardTitle>
           <CardDescription>
-            {step === 0 && "Clerk Organization maps to Agency (ADR-0015)."}
-            {step === 1 && "Self Client dogfoods Client CRM, PM, social, audit."}
-            {step === 2 && "Invite Agency staff via Clerk Organization (Admin/Member)."}
-            {step === 3 && "Resend-backed ESP — DNS records for Email Domain (ADR-0036)."}
-            {step === 7 && "Requires Local Agent user-level daemon (ADR-0012/0013)."}
+            {step === 0 && "Name your agency workspace."}
+            {step === 1 && "Your self client is ready for CRM, projects, social, and audit."}
+            {step === 2 && "Invite teammates as Admin or Member from the organization switcher."}
+            {step === 3 && "Add a sending domain, then verify DNS on Email."}
+            {step === 7 && "Install the local agent when you are ready to run crawls."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -139,15 +139,14 @@ function Onboarding() {
           )}
           {step === 1 && (
             <p className="text-sm text-[var(--color-mocha-subtext1)]">
-              Self Client: <strong>{agencyName}</strong> (isSelf=true) — created by{" "}
-              <code className="text-xs">agencies.ensureMine</code>
+              Self client <strong>{agencyName}</strong> is ready for your team to use as a first
+              workspace.
             </p>
           )}
           {step === 2 && (
             <p className="text-sm text-[var(--color-mocha-subtext1)]">
-              Use the Organization switcher → Manage → Members to invite staff. Roles are{" "}
-              <strong>org:admin</strong> and <strong>org:member</strong> (ADR-0045). Client portal
-              users are invited separately and stay outside the org (ADR-0026).
+              Open the organization switcher → Manage → Members to invite staff. Client portal
+              users are invited separately under Portal setup and never join the agency org.
             </p>
           )}
           {step === 3 && (

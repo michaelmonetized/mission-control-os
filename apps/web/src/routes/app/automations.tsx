@@ -99,8 +99,7 @@ function AutomationsPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Automations</h1>
       <p className="text-[var(--color-mocha-subtext0)] max-w-[42rem]">
-        Trigger → steps builder (ADR-0043). Inline first; external failure / wait → Trigger.dev handoff
-        (ADR-0046). First-class outside CRM too (ADR-0044).
+        Build trigger → action flows. Long waits and failures can hand off to durable jobs.
       </p>
       {note ? (
         <pre className="text-xs mc-glass p-3 rounded-md overflow-x-auto text-[var(--color-brand-sky)]">
@@ -195,7 +194,7 @@ function AutomationsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Trigger.dev handoff queue</CardTitle>
-          <CardDescription>Durable recovery jobs (ADR-0046)</CardDescription>
+          <CardDescription>Recovery jobs</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           {(handoffs ?? []).length === 0 ? (

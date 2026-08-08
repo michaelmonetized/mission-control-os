@@ -65,7 +65,7 @@ function SettingsPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Settings</h1>
       <p className="text-sm text-[var(--color-mocha-subtext0)]">
-        Agency = Clerk Organization · roles Admin/Member (ADR-0015/0045)
+        Your agency workspace · Admin and Member roles
       </p>
 
       <div className="grid md:grid-cols-2 gap-4">
@@ -90,7 +90,7 @@ function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Agency (Convex)</CardTitle>
-            <CardDescription>ensureMine row</CardDescription>
+            <CardDescription>Agency record</CardDescription>
           </CardHeader>
           <CardContent className="text-sm space-y-1">
             {agency ? (
@@ -114,7 +114,7 @@ function SettingsPage() {
         <CardHeader>
           <CardTitle className="text-base">Billing</CardTitle>
           <CardDescription>
-            Direct Stripe subscriptions (ADR-0001 / 0031) · Starter $99 · Pro $299 · Enterprise $699
+            Subscriptions · Starter $99 · Pro $299 · Enterprise $699
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
@@ -249,7 +249,7 @@ function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Webhook probe</CardTitle>
-          <CardDescription>Automation action catalog (ADR-0043) · failures → Trigger handoff</CardDescription>
+          <CardDescription>Automation action catalog · failures hand off to recovery jobs</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
           <Input
@@ -269,7 +269,7 @@ function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Keyboard</CardTitle>
-          <CardDescription>⌘K command palette</CardDescription>
+          <CardDescription>Command palette (;)</CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="grid sm:grid-cols-2 gap-1 text-xs font-mono text-[var(--color-mocha-subtext0)]">

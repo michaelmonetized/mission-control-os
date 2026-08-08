@@ -36,7 +36,7 @@ function ClientOnboarding() {
       <main className="flex-1 px-4 py-10 max-w-[32rem] mx-auto w-full space-y-6">
         <h1 className="text-2xl font-semibold">Client onboarding</h1>
         <p className="text-sm text-[var(--color-mocha-subtext0)]">
-          Guided path for external Client Users (ADR-0041). You never join the Agency Clerk org.
+          Welcome. Set up your client workspace — you will not join the agency organization.
         </p>
         <ol className="flex flex-wrap gap-2">
           {steps.map((s, i) => (

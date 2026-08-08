@@ -46,8 +46,7 @@ export function AgencyGate({ children }: { children: React.ReactNode }) {
           <CardHeader>
             <CardTitle>Sign in to Mission Control</CardTitle>
             <CardDescription>
-              Agency staff use Clerk Organizations. Client portal users sign in without joining the
-              Agency org (ADR-0026).
+              Agency staff sign in with their organization. Client portal users use a separate invite and never join the agency org.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
