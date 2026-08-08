@@ -62,19 +62,19 @@ export function SetupChecklist() {
   if (remaining.length === 0) return null;
 
   return (
-    <div className="mc-glass mx-4 mb-2 px-4 py-3 rounded-[var(--radius-md)] border border-[var(--color-mocha-surface1)]">
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-        <p className="text-sm font-medium text-[var(--color-brand-sky)]">Setup checklist</p>
-        <span className="text-xs text-[var(--color-mocha-subtext0)]">
-          {items.length - remaining.length}/{items.length} complete · skippable
+    <div className="mb-3 rounded-[var(--radius-sm)] border border-[var(--color-mocha-surface1)] bg-[var(--color-mocha-mantle)] px-3 py-2">
+      <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs font-medium text-[var(--color-brand-sky)]">Setup</p>
+        <span className="text-[10px] text-[var(--color-mocha-subtext0)]">
+          {items.length - remaining.length}/{items.length}
         </span>
       </div>
-      <ul className="flex flex-wrap gap-2">
+      <ul className="flex flex-wrap gap-1.5">
         {items.map((i) => (
           <li key={i.id}>
             <Link
               to={i.to}
-              className={`text-xs px-2.5 py-1 rounded-full border ${
+              className={`text-[11px] px-2 py-0.5 rounded-full border ${
                 i.done
                   ? "border-[var(--color-mocha-green)] text-[var(--color-mocha-green)]"
                   : "border-[var(--color-mocha-surface1)] text-[var(--color-mocha-subtext0)] hover:text-[var(--color-brand-sky)]"

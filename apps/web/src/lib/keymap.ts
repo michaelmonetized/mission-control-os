@@ -1,14 +1,15 @@
 /**
- * Mission Control keymap table (DSD-0011 seed + open Q full table).
- * Command palette implements ⌘K / j/k / Enter / Esc.
+ * Mission Control keyboard shortcuts (shown on `?`).
+ * Palette open is `;` · j/k / Enter / Esc inside palette.
  */
 export const KEYMAP = [
-  { keys: "⌘K / Ctrl+K", action: "Open command palette" },
-  { keys: "Esc", action: "Close palette / dialog" },
+  { keys: ";", action: "Open command palette" },
+  { keys: "?", action: "Show this keymap" },
+  { keys: "Esc", action: "Close palette / keymap" },
   { keys: "j / ↓", action: "Palette: next item" },
   { keys: "k / ↑", action: "Palette: previous item" },
   { keys: "Enter", action: "Palette: run selected" },
-  { keys: "g c", action: "Go Cockpit (palette filter)" },
+  { keys: "g c", action: "Go Cockpit" },
   { keys: "g l", action: "Go Clients" },
   { keys: "g r", action: "Go CRM" },
   { keys: "g t", action: "Go Tasks" },
@@ -19,5 +20,5 @@ export const KEYMAP = [
   { keys: "g p", action: "Go Portal setup" },
   { keys: "g o", action: "Go Onboarding" },
   { keys: "g x", action: "Go Client Portal" },
-  { keys: "g ,", action: "Go Settings (palette: settings)" },
+  { keys: "g ,", action: "Go Settings" },
 ] as const;

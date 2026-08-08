@@ -6,8 +6,7 @@ import { api } from "../../../convex/_generated/api";
 import { cn } from "cnfast";
 
 /**
- * Command palette — vim j/k + Superhuman-ish binds (DSD-0011).
- * ⌘K / Ctrl+K open · Esc close · Enter select · j/k move.
+ * Command palette — `;` open · Esc close · Enter select · j/k move.
  */
 
 const COMMANDS = [
@@ -97,8 +96,15 @@ export function CommandPaletteHost() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      const meta = e.metaKey || e.ctrlKey;
-      if (meta && e.key.toLowerCase() === "k") {
+      const tag = (e.target as HTMLElement)?.tagName;
+      const typing =
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        (e.target as HTMLElement)?.isContentEditable;
+
+      // `;` opens palette (not while typing in fields)
+      if (e.key === ";" && !e.metaKey && !e.ctrlKey && !e.altKey && !typing) {
         e.preventDefault();
         setOpen((o) => !o);
         setQ("");
@@ -159,7 +165,7 @@ export function CommandPaletteHost() {
       />
       <div className="relative w-full max-w-[32rem] mc-glass rounded-[var(--radius-lg)] shadow-2xl overflow-hidden border border-[var(--color-mocha-surface1)]">
         <div className="px-3 py-2 border-b border-[var(--color-mocha-surface1)] flex items-center gap-2">
-          <span className="text-xs text-[var(--color-brand-sky)]">⌘K</span>
+          <span className="text-xs font-mono text-[var(--color-brand-sky)]">;</span>
           <input
             autoFocus
             value={q}
