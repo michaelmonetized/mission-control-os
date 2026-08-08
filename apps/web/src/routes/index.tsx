@@ -13,7 +13,7 @@ function Landing() {
   return (
     <div className="bg-[#11111b] text-[#cdd6f4] selection:bg-[#89dceb]/40 selection:text-white">
       <header className="fixed top-0 z-50 w-full border-b border-white/[0.06] bg-[#11111b]/55 px-5 py-3 backdrop-blur-2xl lg:px-10">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
+        <div className="mx-auto flex max-w-[1140px] items-center justify-between">
           <Link to="/" className="relative">
             <LogoLockup sky className="origin-left scale-[0.88]" />
           </Link>
@@ -57,17 +57,17 @@ function Landing() {
           />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-7xl">
+        <div className="relative z-10 mx-auto w-full max-w-[1140px]">
           <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#89dceb]">
             Mission Control OS · Agency operating system
           </p>
-          <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
+          <h1 className="max-w-[56rem] text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl">
             Fly the agency.{" "}
             <span className="bg-gradient-to-r from-[#89dceb] via-[#cba6f7] to-[#f2cdcd] bg-clip-text text-transparent">
               Not a pile of tabs.
             </span>
           </h1>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-[#a6adc8] sm:text-lg">
+          <p className="mt-6 max-w-[36rem] text-base leading-relaxed text-[#a6adc8] sm:text-lg">
             Technical audit, dual CRM, social, email, automations, and a real client portal —
             one multi-tenant cockpit. Local Rust crawls. Flat SaaS pricing.
           </p>
@@ -103,11 +103,11 @@ function Landing() {
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-1/2 h-[420px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#89dceb]/[0.06] blur-[100px]" />
         </div>
-        <h2 className="relative z-10 mx-auto max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+        <h2 className="relative z-10 mx-auto max-w-[42rem] text-3xl font-semibold tracking-tight text-white sm:text-5xl">
           Stop renting crawlers.{" "}
           <span className="text-[#89dceb]">Own the loop.</span>
         </h2>
-        <p className="relative z-10 mx-auto mt-5 max-w-lg text-[#a6adc8]">
+        <p className="relative z-10 mx-auto mt-5 max-w-[32rem] text-[#a6adc8]">
           Screaming Frog depth. Sitebulb prioritisation. Client-ready portal. One flat plan —
           Starter, Pro, or Enterprise.
         </p>
@@ -133,7 +133,7 @@ function Landing() {
       </section>
 
       <footer className="border-t border-white/[0.06] px-6 py-8 lg:px-10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-xs text-[#6c7086] sm:flex-row">
+        <div className="mx-auto flex max-w-[1140px] flex-col items-center justify-between gap-4 text-xs text-[#6c7086] sm:flex-row">
           <div className="flex items-center gap-3">
             <LogoLockup sky className="origin-left scale-[0.65]" />
             <span>© 2026 Mission Control</span>

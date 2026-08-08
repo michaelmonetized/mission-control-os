@@ -371,7 +371,7 @@ export function WorldStage() {
   if (reduced) {
     return (
       <section className="relative bg-[#11111b] px-6 py-24">
-        <div className="mx-auto max-w-3xl space-y-16">
+        <div className="mx-auto max-w-[48rem] space-y-16">
           {STATIONS.map((s) => (
             <article key={s.id} className="space-y-3">
               <p className="text-xs uppercase tracking-[0.2em] text-[#89dceb]">{s.eyebrow}</p>
@@ -400,7 +400,7 @@ export function WorldStage() {
 
         {/* Glass copy overlay */}
         <div className="pointer-events-none absolute inset-0 z-10 flex items-end md:items-center">
-          <div className="w-full max-w-xl p-6 md:p-12 md:ml-8 lg:ml-16">
+          <div className="w-full max-w-[36rem] p-6 md:p-12 md:ml-8 lg:ml-16">
             {STATIONS.map((s, i) => {
               const on = i === active;
               return (
