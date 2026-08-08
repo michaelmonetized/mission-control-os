@@ -61,9 +61,9 @@ function AppProviders({ children }: { children: React.ReactNode }) {
     | string
     | undefined;
 
-  if (!publishableKey && import.meta.env.DEV) {
+  if (!publishableKey) {
     console.error(
-      "Missing VITE_CLERK_PUBLISHABLE_KEY — run `clerk env pull` and set Vite prefix",
+      "Missing VITE_CLERK_PUBLISHABLE_KEY — set in Vercel env or run `clerk env pull` (Vite prefix)",
     );
   }
 

@@ -1,6 +1,10 @@
 import { handleApi } from "../src/server/api";
 
-/** Vercel Serverless Function route handler for /api/* (ADR-0042 / ADR-0029) */
+/**
+ * Legacy Vercel serverless entry (SPA-era).
+ * Primary path under TanStack Start + Nitro: `src/routes/api/$.ts` server handlers.
+ * Kept for local/tooling compatibility; BOA deploys serve the Start route.
+ */
 export default async function handler(req: Request) {
   const url = new URL(req.url);
   const response = await handleApi(req, url.pathname);

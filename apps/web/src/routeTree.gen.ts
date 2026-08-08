@@ -16,6 +16,7 @@ import { Route as PortalRouteImport } from './routes/portal'
 import { Route as SelectAgencyRouteImport } from './routes/select-agency'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as ApiSplatRouteImport } from './routes/api/$'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppActivityRouteImport } from './routes/app/activity'
 import { Route as AppAuditRouteImport } from './routes/app/audit'
@@ -68,6 +69,11 @@ const SignInRoute = SignInRouteImport.update({
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
   path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSplatRoute = ApiSplatRouteImport.update({
+  id: '/api/$',
+  path: '/api/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/select-agency': typeof SelectAgencyRoute
   '/sign-in': typeof SignInRouteWithChildren
   '/sign-up': typeof SignUpRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
   '/app/activity': typeof AppActivityRoute
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/select-agency': typeof SelectAgencyRoute
   '/sign-in': typeof SignInRouteWithChildren
   '/sign-up': typeof SignUpRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
   '/app/activity': typeof AppActivityRoute
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
@@ -223,6 +231,7 @@ export interface FileRoutesById {
   '/select-agency': typeof SelectAgencyRoute
   '/sign-in': typeof SignInRouteWithChildren
   '/sign-up': typeof SignUpRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
   '/app/activity': typeof AppActivityRoute
   '/app/audit': typeof AppAuditRoute
   '/app/automations': typeof AppAutomationsRoute
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
     | '/select-agency'
     | '/sign-in'
     | '/sign-up'
+    | '/api/$'
     | '/app/activity'
     | '/app/audit'
     | '/app/automations'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/select-agency'
     | '/sign-in'
     | '/sign-up'
+    | '/api/$'
     | '/app/activity'
     | '/app/audit'
     | '/app/automations'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/select-agency'
     | '/sign-in'
     | '/sign-up'
+    | '/api/$'
     | '/app/activity'
     | '/app/audit'
     | '/app/automations'
@@ -333,6 +345,7 @@ export interface RootRouteChildren {
   SelectAgencyRoute: typeof SelectAgencyRoute
   SignInRoute: typeof SignInRouteWithChildren
   SignUpRoute: typeof SignUpRouteWithChildren
+  ApiSplatRoute: typeof ApiSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -384,6 +397,13 @@ declare module '@tanstack/react-router' {
       path: '/sign-up'
       fullPath: '/sign-up'
       preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -594,6 +614,7 @@ const rootRouteChildren: RootRouteChildren = {
   SelectAgencyRoute: SelectAgencyRoute,
   SignInRoute: SignInRouteWithChildren,
   SignUpRoute: SignUpRouteWithChildren,
+  ApiSplatRoute: ApiSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

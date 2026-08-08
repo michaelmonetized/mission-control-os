@@ -1,13 +1,29 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, ClientOnly } from "@tanstack/react-router";
 import { Show, SignInButton, UserButton } from "@clerk/react";
 import { LogoLockup } from "@/components/mc/logo";
 import { Button } from "@/components/mc/button";
-import { WorldStage } from "@/components/landing/world-stage";
 import { ArrowRight } from "lucide-react";
+import { lazy, Suspense } from "react";
+
+/** Keep R3F/drei/three out of the SSR/server function graph. */
+const WorldStage = lazy(() =>
+  import("@/components/landing/world-stage").then((m) => ({ default: m.WorldStage })),
+);
 
 export const Route = createFileRoute("/")({
   component: Landing,
 });
+
+function FlightPlaceholder() {
+  return (
+    <div
+      className="flex min-h-[50vh] items-center justify-center bg-[#11111b] text-sm text-[#a6adc8]"
+      aria-hidden
+    >
+      Loading flight…
+    </div>
+  );
+}
 
 function Landing() {
   return (
@@ -96,7 +112,11 @@ function Landing() {
       </section>
 
       <div id="flight">
-        <WorldStage />
+        <ClientOnly fallback={<FlightPlaceholder />}>
+          <Suspense fallback={<FlightPlaceholder />}>
+            <WorldStage />
+          </Suspense>
+        </ClientOnly>
       </div>
 
       <section className="relative overflow-hidden px-6 py-28 text-center lg:px-12">

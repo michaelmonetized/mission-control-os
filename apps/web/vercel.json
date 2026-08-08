@@ -1,7 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "tanstack-start",
-  "buildCommand": "cd ../.. && bun install && bun run build",
+  "installCommand": "cd ../.. && bun install",
+  "buildCommand": "cd ../.. && bun run build",
   "git": {
     "deploymentEnabled": {
       "main": false,
